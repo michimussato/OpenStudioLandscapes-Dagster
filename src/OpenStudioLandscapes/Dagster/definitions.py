@@ -3,11 +3,11 @@ from dagster import (
     load_assets_from_modules,
 )
 
-import OpenStudioLandscapes_Dagster.assets
+import OpenStudioLandscapes.Dagster.assets
 
 
 assets = load_assets_from_modules(
-    modules=[OpenStudioLandscapes_Dagster.assets],
+    modules=[OpenStudioLandscapes.Dagster.assets],
 )
 
 
