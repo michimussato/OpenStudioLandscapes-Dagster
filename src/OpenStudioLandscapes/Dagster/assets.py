@@ -26,6 +26,8 @@ from OpenStudioLandscapes.engine.base.ops import op_docker_compose_graph
 from OpenStudioLandscapes.engine.base.ops import op_group_out
 from OpenStudioLandscapes.engine.utils import *
 
+from OpenStudioLandscapes.Dagster.constants import *
+
 GROUP = "Dagster"
 KEY = "Dagster"
 
