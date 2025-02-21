@@ -6,6 +6,9 @@ __all__ = [
     "ENVIRONMENT",
 ]
 
+import pathlib
+from OpenStudioLandscapes.engine.utils import *
+
 
 DOCKER_USE_CACHE = False
 
@@ -21,6 +24,11 @@ ASSET_HEADER = {
 
 # @formatter:off
 ENVIRONMENT = {
+    "CONFIGS_ROOT": pathlib.Path(
+        get_git_root(pathlib.Path(__file__)),
+        "configs",
+        KEY,
+    ).as_posix(),
     "DAGSTER_DEV_PORT_HOST": "3003",
     "DAGSTER_DEV_PORT_CONTAINER": "3006",
     "DAGSTER_ROOT": "/dagster",

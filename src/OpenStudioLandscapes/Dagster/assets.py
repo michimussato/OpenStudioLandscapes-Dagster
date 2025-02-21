@@ -174,8 +174,6 @@ def build_docker_image(
     shutil.copy(
         src=pathlib.Path(
             env["CONFIGS_ROOT"],
-            "dagster",
-            "config",
             "workspace.yaml",
         ).expanduser(),
         dst=payload,
@@ -185,8 +183,6 @@ def build_docker_image(
     shutil.copy(
         src=pathlib.Path(
             env["CONFIGS_ROOT"],
-            "dagster",
-            "config",
             "materializations",
             "dagster.yaml",
         ).expanduser(),
