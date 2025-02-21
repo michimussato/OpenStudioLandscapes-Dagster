@@ -1,5 +1,4 @@
 import copy
-import json
 import pathlib
 import shutil
 import textwrap
@@ -28,14 +27,9 @@ from OpenStudioLandscapes.engine.utils import *
 
 from OpenStudioLandscapes.Dagster.constants import *
 
-GROUP = "Dagster"
-KEY = "Dagster"
-
-asset_header = {"group_name": GROUP, "key_prefix": [KEY], "compute_kind": "python"}
-
 
 @asset(
-    **asset_header,
+    **ASSET_HEADER,
     ins={
         "group_in": AssetIn(
             AssetKey([KEY_BASE, "group_out"])
@@ -49,37 +43,7 @@ def env(
 
     env_in = copy.deepcopy(group_in["env"])
 
-    # @formatter:off
-    _env = {
-        "DAGSTER_DEV_PORT_HOST": "3003",
-        "DAGSTER_DEV_PORT_CONTAINER": "3006",
-        "DAGSTER_ROOT": "/dagster",
-        "DAGSTER_HOME": "/dagster/materializations",
-        "DAGSTER_HOST": "0.0.0.0",
-        "DAGSTER_WORKSPACE": "/dagster/workspace.yaml",
-    }
-    # @formatter:on
-
-    env_in.update(_env)
-
-    env_json = pathlib.Path(
-        env_in["DOT_LANDSCAPES"],
-        env_in.get("LANDSCAPE", "default"),
-        "third_party",
-        *context.asset_key.path,
-        f"{'__'.join(context.asset_key.path)}.json",
-    )
-
-    env_json.parent.mkdir(parents=True, exist_ok=True)
-
-    with open(env_json, "w") as fw:
-        json.dump(
-            obj=_env.copy(),
-            fp=fw,
-            indent=2,
-            ensure_ascii=True,
-            sort_keys=True,
-        )
+    env_in.update(ENVIRONMENT)
 
     yield Output(env_in)
 
@@ -87,13 +51,13 @@ def env(
         asset_key=context.asset_key,
         metadata={
             "__".join(context.asset_key.path): MetadataValue.json(env_in),
-            "json": MetadataValue.path(env_json),
+            "ENVIRONMENT": MetadataValue.json(ENVIRONMENT),
         },
     )
 
 
 @asset(
-    **asset_header,
+    **ASSET_HEADER,
 )
 def pip_packages(
     context: AssetExecutionContext,
@@ -118,7 +82,7 @@ def pip_packages(
 
 
 @asset(
-    **asset_header,
+    **ASSET_HEADER,
     ins={
         "env": AssetIn(
             AssetKey([KEY, "env"]),
@@ -265,7 +229,7 @@ def build_docker_image(
 
 
 @asset(
-    **asset_header,
+    **ASSET_HEADER,
     ins={
         "env": AssetIn(
             AssetKey([KEY, "env"]),
