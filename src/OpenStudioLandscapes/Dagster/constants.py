@@ -8,17 +8,18 @@ __all__ = [
 
 import pathlib
 from OpenStudioLandscapes.engine.utils import *
+from OpenStudioLandscapes.engine.constants import DOCKER_USE_CACHE_GLOBAL
 
 
-DOCKER_USE_CACHE = False
+DOCKER_USE_CACHE = DOCKER_USE_CACHE_GLOBAL or False
 
 
 GROUP = "Dagster"
-KEY = GROUP
+KEY = [GROUP]
 
 ASSET_HEADER = {
     "group_name": GROUP,
-    "key_prefix": [KEY],
+    "key_prefix": KEY,
     "compute_kind": "python",
 }
 
@@ -27,7 +28,7 @@ ENVIRONMENT = {
     "CONFIGS_ROOT": pathlib.Path(
         get_git_root(pathlib.Path(__file__)),
         "configs",
-        KEY,
+        *KEY,
     ).as_posix(),
     "DAGSTER_DEV_PORT_HOST": "3003",
     "DAGSTER_DEV_PORT_CONTAINER": "3006",

@@ -32,7 +32,7 @@ from OpenStudioLandscapes.Dagster.constants import *
     **ASSET_HEADER,
     ins={
         "group_in": AssetIn(
-            AssetKey([KEY_BASE, "group_out"])
+            AssetKey([*KEY_BASE, "group_out"])
         ),
     },
 )
@@ -85,13 +85,13 @@ def pip_packages(
     **ASSET_HEADER,
     ins={
         "env": AssetIn(
-            AssetKey([KEY, "env"]),
+            AssetKey([*KEY, "env"]),
         ),
         "group_in": AssetIn(
-            AssetKey([KEY_BASE, "group_out"])
+            AssetKey([*KEY_BASE, "group_out"])
         ),
         "pip_packages": AssetIn(
-            AssetKey([KEY, "pip_packages"]),
+            AssetKey([*KEY, "pip_packages"]),
         ),
     },
 )
@@ -109,7 +109,7 @@ def build_docker_image(
     docker_file = pathlib.Path(
         env["DOT_LANDSCAPES"],
         env.get("LANDSCAPE", "default"),
-        KEY,
+        f"{GROUP}__{'__'.join(KEY)}",
         "__".join(context.asset_key.path),
         "Dockerfiles",
         "Dockerfile",
@@ -228,10 +228,10 @@ def build_docker_image(
     **ASSET_HEADER,
     ins={
         "env": AssetIn(
-            AssetKey([KEY, "env"]),
+            AssetKey([*KEY, "env"]),
         ),
         "build": AssetIn(
-            AssetKey([KEY, "build_docker_image"]),
+            AssetKey([*KEY, "build_docker_image"]),
         ),
     },
 )
@@ -316,10 +316,10 @@ group_out = AssetsDefinition.from_op(
     key_prefix=KEY,
     keys_by_input_name={
         "compose": AssetKey(
-            [KEY, "compose"]
+            [*KEY, "compose"]
         ),
         "env": AssetKey(
-            [KEY, "env"]
+            [*KEY, "env"]
         ),
     },
 )
@@ -331,7 +331,7 @@ docker_compose_graph = AssetsDefinition.from_op(
     key_prefix=KEY,
     keys_by_input_name={
         "group_out": AssetKey(
-            [KEY, "group_out"]
+            [*KEY, "group_out"]
         ),
     },
 )
