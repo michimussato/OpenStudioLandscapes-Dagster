@@ -38,10 +38,10 @@ ASSET_HEADER = {
 ENVIRONMENT = {
     "DOCKER_USE_CACHE": DOCKER_USE_CACHE,
     "CONFIGS_ROOT": pathlib.Path(
-        get_git_root(pathlib.Path(__file__)),
-        "configs",
-        *KEY,
-    ).as_posix(),
+        get_configs_root(pathlib.Path(__file__)),
+    )
+    .expanduser()
+    .as_posix(),
     "DAGSTER_DEV_PORT_HOST": "3003",
     "DAGSTER_DEV_PORT_CONTAINER": "3006",
     "DAGSTER_ROOT": "/dagster",
