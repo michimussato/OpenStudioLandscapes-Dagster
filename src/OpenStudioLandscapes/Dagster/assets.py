@@ -5,9 +5,7 @@ import shutil
 import textwrap
 import time
 import urllib.parse
-from collections import ChainMap
-from functools import reduce
-from typing import Generator, MutableMapping
+from typing import Generator
 
 import yaml
 from docker_compose_graph.utils import *
@@ -25,8 +23,11 @@ from dagster import (
 )
 from OpenStudioLandscapes.engine.base.assets import KEY_BASE
 from OpenStudioLandscapes.engine.constants import *
-from OpenStudioLandscapes.engine.base.ops import op_docker_compose_graph
-from OpenStudioLandscapes.engine.base.ops import op_group_out
+from OpenStudioLandscapes.engine.base.ops import (
+    op_compose,
+    op_docker_compose_graph,
+    op_group_out,
+)
 
 from OpenStudioLandscapes.engine.enums import *
 from OpenStudioLandscapes.engine.utils import *
@@ -392,45 +393,46 @@ def compose_dagster(
 @asset(
     **ASSET_HEADER,
     ins={
-        "compose_networks": AssetIn(
-            AssetKey([*KEY, "compose_networks"]),
-        ),
         "compose_dagster": AssetIn(
             AssetKey([*KEY, "compose_dagster"]),
         ),
     },
 )
-def compose(
+def compose_maps(
     context: AssetExecutionContext,
-    compose_networks: dict,  # pylint: disable=redefined-outer-name
-    compose_dagster: dict,  # pylint: disable=redefined-outer-name
-) -> Generator[Output[MutableMapping] | AssetMaterialization, None, None]:
-    """ """
+    **kwargs,  # pylint: disable=redefined-outer-name
+) -> Generator[Output[list[dict]] | AssetMaterialization, None, None]:
 
-    if "networks" in compose_networks:
-        network_dict = copy.deepcopy(compose_networks)
-    else:
-        network_dict = {}
+    ret = list(kwargs.values())
 
-    docker_chainmap = ChainMap(
-        network_dict,
-        compose_dagster,
-    )
-
-    docker_dict = reduce(deep_merge, docker_chainmap.maps)
-
-    docker_yaml = yaml.dump(docker_dict)
-
-    yield Output(docker_dict)
+    yield Output(ret)
 
     yield AssetMaterialization(
         asset_key=context.asset_key,
         metadata={
-            "__".join(context.asset_key.path): MetadataValue.json(docker_dict),
-            "docker_yaml": MetadataValue.md(f"```yaml\n{docker_yaml}\n```"),
-            # Todo: "cmd_docker_run": MetadataValue.path(cmd_list_to_str(cmd_docker_run)),
+            "__".join(context.asset_key.path): MetadataValue.json(ret),
         },
     )
+
+
+compose = AssetsDefinition.from_op(
+    op_compose,
+    tags_by_output_name={
+        "compose": {
+            "compose": "third_party",
+        },
+    },
+    group_name=GROUP,
+    key_prefix=KEY,
+    keys_by_input_name={
+        "compose_networks": AssetKey(
+            [*KEY, "compose_networks"]
+        ),
+        "compose_maps": AssetKey(
+            [*KEY, "compose_maps"]
+        ),
+    },
+)
 
 
 group_out = AssetsDefinition.from_op(
