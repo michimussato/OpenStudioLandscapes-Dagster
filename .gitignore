@@ -55,3 +55,8 @@ MANIFEST
 
 .payload/data/
 .payload/bin/
+
+# Obsidian
+.obsidian/hotkeys.json
+.obsidian/workspace.json
+.obsidian/workspaces.json
