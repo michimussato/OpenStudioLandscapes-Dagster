@@ -8,6 +8,7 @@ import urllib.parse
 from typing import Generator
 
 import yaml
+from python_on_whales import Builder
 from docker_compose_graph.utils import *
 
 from dagster import (
@@ -119,8 +120,15 @@ def build_docker_image(
 ) -> Generator[Output[str] | AssetMaterialization, None, None]:
     """ """
 
-    # env: dict = group_in["env"]
     build_base_image: str = group_in["docker_image"]
+
+    docker_builder: str = group_in["docker_builder"]
+    builder: Builder = get_builder_by_name(
+        builder_name=docker_builder,
+    )
+
+    ip = get_ip()
+    port_registry = get_port(run_registry)
 
     docker_file = pathlib.Path(
         env["DOT_LANDSCAPES"],
@@ -132,8 +140,8 @@ def build_docker_image(
     )
 
     tags = [
-        f"{env.get('IMAGE_PREFIX')}/{'__'.join(context.asset_key.path).lower()}:latest",
-        f"{env.get('IMAGE_PREFIX')}/{'__'.join(context.asset_key.path).lower()}:{env.get('LANDSCAPE', str(time.time()))}",
+        f"{ip}:{port_registry}/{env.get('IMAGE_PREFIX')}/{'__'.join(context.asset_key.path).lower()}:latest",
+        f"{ip}:{port_registry}/{env.get('IMAGE_PREFIX')}/{'__'.join(context.asset_key.path).lower()}:{env.get('LANDSCAPE', str(time.time()))}",
     ]
 
     pip_install_str: str = get_pip_install_str(
@@ -213,8 +221,9 @@ def build_docker_image(
         context_path=docker_file.parent,
         tags=tags,
         docker_use_cache=DOCKER_USE_CACHE,
-        cache_dir=pathlib.Path(env.get('DOCKER_CACHE_DIR')),
-        images_dir=pathlib.Path(env.get('DOCKER_IMAGES_DIR')),
+        # cache_dir=pathlib.Path(env.get('DOCKER_CACHE_DIR')),
+        # images_dir=pathlib.Path(env.get('DOCKER_IMAGES_DIR')),
+        parent_image=build_base_image,
     )
 
     cmds_docker = compile_cmds(
