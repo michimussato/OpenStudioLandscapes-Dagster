@@ -117,18 +117,14 @@ def build_docker_image(
     env: dict,  # pylint: disable=redefined-outer-name
     group_in: dict,  # pylint: disable=redefined-outer-name
     pip_packages: list,  # pylint: disable=redefined-outer-name
-) -> Generator[Output[str] | AssetMaterialization, None, None]:
+) -> Generator[Output[dict] | AssetMaterialization, None, None]:
     """ """
 
-    build_base_image: str = group_in["docker_image"]
+    build_base_image_data: dict = group_in["docker_image"]
+    build_base_docker_config: DockerConfig = group_in["docker_config"]
+    build_base_parent_image_name: str = build_base_image_data["image_name"]
 
-    docker_builder: str = group_in["docker_builder"]
-    builder: Builder = get_builder_by_name(
-        builder_name=docker_builder,
-    )
-
-    ip = get_ip()
-    port_registry = get_port(run_registry)
+    docker_builder: Builder = group_in["docker_builder"]
 
     docker_file = pathlib.Path(
         env["DOT_LANDSCAPES"],
@@ -139,9 +135,14 @@ def build_docker_image(
         "Dockerfile",
     )
 
+    image_name = get_image_name(context=context)
+    image_path = parse_docker_image_path(
+        image_name=image_name,
+        docker_config=build_base_docker_config,
+    )
+
     tags = [
-        f"{ip}:{port_registry}/{env.get('IMAGE_PREFIX')}/{'__'.join(context.asset_key.path).lower()}:latest",
-        f"{ip}:{port_registry}/{env.get('IMAGE_PREFIX')}/{'__'.join(context.asset_key.path).lower()}:{env.get('LANDSCAPE', str(time.time()))}",
+        f"{env.get('LANDSCAPE', str(time.time()))}",
     ]
 
     pip_install_str: str = get_pip_install_str(
@@ -178,8 +179,12 @@ def build_docker_image(
             f"http://localhost:3000/asset-groups/{'%2F'.join(context.asset_key.path)}",
             safe=":/%",
         ),
-        image_name="__".join(context.asset_key.path).lower(),
-        parent_image=build_base_image,
+        image_name=image_name,
+        parent_image=parse_docker_image_path(
+            image_name=build_base_parent_image_name,
+            docker_config=build_base_docker_config,
+            tag=tags[-1],
+        ),
         **env,
     )
     # @formatter:on
@@ -216,29 +221,29 @@ def build_docker_image(
     with open(docker_file, "r") as fr:
         docker_file_content = fr.read()
 
+    image_data = {
+        "image_name": image_name,
+        "image_path": image_path,
+        "image_tags": tags,
+        "image_parent": copy.deepcopy(build_base_image_data),
+    }
+
     log: str = docker_build(
         context=context,
+        docker_config=build_base_docker_config,
         context_path=docker_file.parent,
-        tags=tags,
         docker_use_cache=DOCKER_USE_CACHE,
-        # cache_dir=pathlib.Path(env.get('DOCKER_CACHE_DIR')),
-        # images_dir=pathlib.Path(env.get('DOCKER_IMAGES_DIR')),
-        parent_image=build_base_image,
+        builder=docker_builder,
+        image_data=image_data,
     )
 
-    cmds_docker = compile_cmds(
-        docker_file=docker_file,
-        tag=tags[1],
-    )
-
-    yield Output(tags[1])
+    yield Output(image_data)
 
     yield AssetMaterialization(
         asset_key=context.asset_key,
         metadata={
-            "__".join(context.asset_key.path): MetadataValue.path(tags[1]),
+            "__".join(context.asset_key.path): MetadataValue.json(image_data),
             "docker_file": MetadataValue.md(f"```shell\n{docker_file_content}\n```"),
-            **cmds_docker,
             "build_logs": MetadataValue.md(f"```shell\n{log}\n```"),
             "env": MetadataValue.json(env),
         },
@@ -313,7 +318,7 @@ def compose_dagster(
     context: AssetExecutionContext,
     env: dict,  # pylint: disable=redefined-outer-name
     compose_networks: dict,  # pylint: disable=redefined-outer-name
-    build: str,  # pylint: disable=redefined-outer-name
+    build: dict,  # pylint: disable=redefined-outer-name
 ) -> Generator[Output[dict] | AssetMaterialization, None, None]:
     """ """
 
@@ -347,7 +352,7 @@ def compose_dagster(
                 "hostname": "dagster",
                 "domainname": env.get("ROOT_DOMAIN"),
                 "restart": "always",
-                "image": build,
+                "image": f"{build['image_path']}:{build['image_tags'][-1]}",
                 **copy.deepcopy(network_dict),
                 "environment": {
                     "DAGSTER_HOME": env.get("DAGSTER_HOME"),
@@ -456,6 +461,9 @@ group_out = AssetsDefinition.from_op(
         ),
         "env": AssetKey(
             [*KEY, "env"]
+        ),
+        "group_in": AssetKey(
+            [*KEY_BASE, "group_out"]
         ),
     },
 )
