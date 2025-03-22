@@ -142,7 +142,7 @@ def build_docker_image(
     )
 
     tags = [
-        f"{env.get('LANDSCAPE', str(time.time()))}",
+        env.get('LANDSCAPE', str(time.time())),
     ]
 
     pip_install_str: str = get_pip_install_str(
