@@ -331,6 +331,9 @@ def compose_dagster(
 ) -> Generator[Output[dict] | AssetMaterialization, None, None]:
     """ """
 
+    network_dict = {}
+    ports_dict = {}
+
     if "networks" in compose_networks:
         network_dict = {
             "networks": list(compose_networks.get("networks", {}).keys())
@@ -344,15 +347,13 @@ def compose_dagster(
         network_dict = {
             "network_mode": compose_networks.get("network_mode")
         }
-        ports_dict = {}
-    else:
-        network_dict = {}
-        ports_dict = {}
 
-    volumes = [
-        f"{env.get('NFS_ENTRY_POINT')}:{env.get('NFS_ENTRY_POINT')}",
-        f"{env.get('NFS_ENTRY_POINT')}:{env.get('NFS_ENTRY_POINT_LNS')}",
-    ]
+    volumes_dict = {
+        "volumes": [
+            f"{env.get('NFS_ENTRY_POINT')}:{env.get('NFS_ENTRY_POINT')}",
+            f"{env.get('NFS_ENTRY_POINT')}:{env.get('NFS_ENTRY_POINT_LNS')}",
+        ]
+    }
 
     docker_dict = {
         "services": {
@@ -389,7 +390,7 @@ def compose_dagster(
                     "--port",
                     env.get("DAGSTER_DEV_PORT_CONTAINER"),
                 ],
-                "volumes": volumes,
+                **copy.deepcopy(volumes_dict),
                 **copy.deepcopy(ports_dict),
             },
         },
