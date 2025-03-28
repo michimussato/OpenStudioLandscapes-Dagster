@@ -8,8 +8,6 @@ import urllib.parse
 from typing import Generator
 
 import yaml
-from python_on_whales import Builder
-from docker_compose_graph.utils import *
 
 from dagster import (
     AssetExecutionContext,
@@ -31,7 +29,7 @@ from OpenStudioLandscapes.engine.base.ops import (
 
 from OpenStudioLandscapes.engine.enums import *
 from OpenStudioLandscapes.engine.utils import *
-from OpenStudioLandscapes.engine.docker import *
+from OpenStudioLandscapes.engine.docker.whales import *
 
 from OpenStudioLandscapes.Dagster.constants import *
 
@@ -122,9 +120,14 @@ def build_docker_image(
 
     build_base_image_data: dict = group_in["docker_image"]
     build_base_docker_config: DockerConfig = group_in["docker_config"]
-    build_base_parent_image_name: str = build_base_image_data["image_name"]
 
-    docker_builder: Builder = group_in["docker_builder"]
+    if build_base_docker_config.value["docker_push"]:
+        build_base_parent_image_prefix: str = build_base_image_data["image_prefix_full"]
+    else:
+        build_base_parent_image_prefix: str = build_base_image_data["image_prefix_local"]
+
+    build_base_parent_image_name: str = build_base_image_data["image_name"]
+    build_base_parent_image_tags: list = build_base_image_data["image_tags"]
 
     docker_file = pathlib.Path(
         env["DOT_LANDSCAPES"],
@@ -135,10 +138,20 @@ def build_docker_image(
         "Dockerfile",
     )
 
+    docker_file.parent.mkdir(parents=True, exist_ok=True)
+
     image_name = get_image_name(context=context)
-    image_path = parse_docker_image_path(
-        image_name=image_name,
+    # image_path = parse_docker_image_path(
+    #     image_name=image_name,
+    #     docker_config=build_base_docker_config,
+    # )
+    image_prefix_local = parse_docker_image_path(
         docker_config=build_base_docker_config,
+        prepend_registry=False,
+    )
+    image_prefix_full = parse_docker_image_path(
+        docker_config=build_base_docker_config,
+        prepend_registry=True,
     )
 
     tags = [
@@ -180,18 +193,11 @@ def build_docker_image(
             safe=":/%",
         ),
         image_name=image_name,
-        parent_image=parse_docker_image_path(
-            image_name=build_base_parent_image_name,
-            docker_config=build_base_docker_config,
-            tag=tags[-1],
-        ),
+        # Todo: this won't work as expected if len(tags) > 1
+        parent_image=f"{build_base_parent_image_prefix}{build_base_parent_image_name}:{build_base_parent_image_tags[0]}",
         **env,
     )
     # @formatter:on
-
-    shutil.rmtree(docker_file.parent, ignore_errors=True)
-
-    docker_file.parent.mkdir(parents=True, exist_ok=True)
 
     with open(docker_file, "w") as fw:
         fw.write(docker_file_str)
@@ -223,17 +229,20 @@ def build_docker_image(
 
     image_data = {
         "image_name": image_name,
-        "image_path": image_path,
+        "image_prefix_local": image_prefix_local,
+        "image_prefix_full": image_prefix_full,
         "image_tags": tags,
         "image_parent": copy.deepcopy(build_base_image_data),
     }
 
-    log: str = docker_build(
+    context.log.debug(image_data)
+
+    tags_list: list = docker_build(
         context=context,
         docker_config=build_base_docker_config,
+        docker_file=docker_file,
         context_path=docker_file.parent,
         docker_use_cache=DOCKER_USE_CACHE,
-        builder=docker_builder,
         image_data=image_data,
     )
 
@@ -243,8 +252,8 @@ def build_docker_image(
         asset_key=context.asset_key,
         metadata={
             "__".join(context.asset_key.path): MetadataValue.json(image_data),
+            "tags_list": MetadataValue.json(tags_list),
             "docker_file": MetadataValue.md(f"```shell\n{docker_file_content}\n```"),
-            "build_logs": MetadataValue.md(f"```shell\n{log}\n```"),
             "env": MetadataValue.json(env),
         },
     )
@@ -352,7 +361,7 @@ def compose_dagster(
                 "hostname": "dagster",
                 "domainname": env.get("ROOT_DOMAIN"),
                 "restart": "always",
-                "image": f"{build['image_path']}:{build['image_tags'][-1]}",
+                "image": f"{build['image_prefix_full']}{build['image_name']}:{build['image_tags'][0]}",
                 **copy.deepcopy(network_dict),
                 "environment": {
                     "DAGSTER_HOME": env.get("DAGSTER_HOME"),
