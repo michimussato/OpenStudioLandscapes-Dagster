@@ -29,7 +29,7 @@ from OpenStudioLandscapes.engine.base.ops import (
 
 from OpenStudioLandscapes.engine.enums import *
 from OpenStudioLandscapes.engine.utils import *
-from OpenStudioLandscapes.engine.docker.whales import *
+from OpenStudioLandscapes.engine.utils.docker.whales import *
 
 from OpenStudioLandscapes.Dagster.constants import *
 
