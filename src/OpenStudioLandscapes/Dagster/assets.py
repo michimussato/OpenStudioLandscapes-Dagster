@@ -355,11 +355,13 @@ def compose_dagster(
         ]
     }
 
+    container_name = "dagster"
+
     docker_dict = {
         "services": {
-            "dagster": {
-                "container_name": "dagster",
-                "hostname": "dagster",
+            container_name: {
+                "container_name": container_name,
+                "hostname":  ".".join([container_name, env["ROOT_DOMAIN"]]),
                 "domainname": env.get("ROOT_DOMAIN"),
                 "restart": "always",
                 "image": f"{build['image_prefix_full']}{build['image_name']}:{build['image_tags'][0]}",
