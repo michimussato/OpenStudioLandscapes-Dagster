@@ -34,6 +34,10 @@ from OpenStudioLandscapes.engine.utils.docker.whales import *
 from OpenStudioLandscapes.Dagster.constants import *
 
 
+# Todo:
+#  - [ ] Create dagster.yaml dynamically
+
+
 @asset(
     **ASSET_HEADER,
     ins={
@@ -51,6 +55,13 @@ def env(
 ) -> Generator[Output[dict] | AssetMaterialization, None, None]:
 
     env_in = copy.deepcopy(group_in["env"])
+
+    # Todo
+    #  - [ ] externalize
+    # expanding variables in OpenStudioLandscapes.Kitsu.constants.ENVIRONMENT
+    for k, v in ENVIRONMENT.items():
+        if isinstance(v, str):
+            ENVIRONMENT[k] = v.format(**env_in)
 
     env_in.update(ENVIRONMENT)
 
@@ -85,6 +96,11 @@ def pip_packages(
         # "dagster-shared[dev] @ git+https://github.com/michimussato/dagster-shared.git@main",
         # "deadline-dagster[dev] @ git+https://github.com/michimussato/deadline-dagster.git@main",
     ]
+
+    if DAGSTER_USE_POSTGRES:
+        _pip_packages.append(
+            "dagster-postgres"
+        )
 
     yield Output(_pip_packages)
 
@@ -205,6 +221,20 @@ def build_docker_image(
     payload = docker_file.parent / "payload"
     payload.mkdir(parents=True, exist_ok=True)
 
+    # dagster.yaml
+    if DAGSTER_USE_POSTGRES:
+        dagster_yaml = pathlib.Path(
+            env["CONFIGS_ROOT"],
+            "materializations-postgres",
+            "dagster.yaml",
+        ).expanduser()
+    else:
+        dagster_yaml = pathlib.Path(
+            env["CONFIGS_ROOT"],
+            "materializations",
+            "dagster.yaml",
+        ).expanduser()
+
     # workspace.yaml
     shutil.copy(
         src=pathlib.Path(
@@ -216,11 +246,7 @@ def build_docker_image(
 
     # dagster.yaml
     shutil.copy(
-        src=pathlib.Path(
-            env["CONFIGS_ROOT"],
-            "materializations",
-            "dagster.yaml",
-        ).expanduser(),
+        src=dagster_yaml,
         dst=payload,
     )
 
@@ -333,6 +359,7 @@ def compose_dagster(
 
     network_dict = {}
     ports_dict = {}
+    depends_on_dict = {}
 
     if "networks" in compose_networks:
         network_dict = {
@@ -355,13 +382,23 @@ def compose_dagster(
         ]
     }
 
-    container_name = "dagster"
+    if DAGSTER_USE_POSTGRES:
+
+        depends_on_dict = {
+            "depends_on": [
+                env["POSTGRES_SERVICE_NAME"],
+            ],
+        }
+
+    service_name = "dagster"
+    container_name = service_name
+    host_name = ".".join([service_name, env["ROOT_DOMAIN"]])
 
     docker_dict = {
         "services": {
-            container_name: {
+            service_name: {
                 "container_name": container_name,
-                "hostname":  ".".join([container_name, env["ROOT_DOMAIN"]]),
+                "hostname":  host_name,
                 "domainname": env.get("ROOT_DOMAIN"),
                 "restart": "always",
                 "image": f"{build['image_prefix_full']}{build['image_name']}:{build['image_tags'][0]}",
@@ -392,6 +429,7 @@ def compose_dagster(
                     "--port",
                     env.get("DAGSTER_DEV_PORT_CONTAINER"),
                 ],
+                **copy.deepcopy(depends_on_dict),
                 **copy.deepcopy(volumes_dict),
                 **copy.deepcopy(ports_dict),
             },
@@ -415,8 +453,140 @@ def compose_dagster(
 @asset(
     **ASSET_HEADER,
     ins={
+        "env": AssetIn(
+            AssetKey([*KEY, "env"]),
+        ),
+        "compose_networks": AssetIn(
+            AssetKey([*KEY, "compose_networks"]),
+        ),
+        # "build": AssetIn(
+        #     AssetKey([*KEY, "build_docker_image"]),
+        # ),
+    },
+)
+def compose_postgres(
+    context: AssetExecutionContext,
+    env: dict,  # pylint: disable=redefined-outer-name
+    compose_networks: dict,  # pylint: disable=redefined-outer-name
+    # build: dict,  # pylint: disable=redefined-outer-name
+) -> Generator[Output[dict] | AssetMaterialization, None, None]:
+    """ """
+
+    if not DAGSTER_USE_POSTGRES:
+
+        ret = dict()
+
+        yield Output(ret)
+
+        yield AssetMaterialization(
+            asset_key=context.asset_key,
+            metadata={
+                "__".join(context.asset_key.path): MetadataValue.json(ret),
+            },
+        )
+
+    else:
+
+        network_dict = {}
+        ports_dict = {}
+
+        if "networks" in compose_networks:
+            network_dict = {
+                "networks": list(compose_networks.get("networks", {}).keys())
+            }
+            ports_dict = {
+                # "ports": [
+                #     f"{env.get('POSTGRES_PORT_HOST')}:{env.get('POSTGRES_PORT_CONTAINER')}",
+                # ]
+            }
+        elif "network_mode" in compose_networks:
+            network_dict = {
+                "network_mode": compose_networks.get("network_mode")
+            }
+
+
+
+        postgres_db_dir_host = (
+            pathlib.Path(env.get("POSTGRES_DATABASE_INSTALL_DESTINATION"))
+        )
+        postgres_db_dir_host.mkdir(parents=True, exist_ok=True)
+        context.log.info(f"Directory {postgres_db_dir_host.as_posix()} created.")
+
+        volumes_dict = {
+            "volumes": [
+                f"{postgres_db_dir_host.as_posix()}:{env.get('PGDATA')}",
+                # f"{env.get('NFS_ENTRY_POINT')}:{env.get('NFS_ENTRY_POINT_LNS')}",
+            ]
+        }
+
+        service_name = env["POSTGRES_SERVICE_NAME"]
+        container_name = service_name
+        host_name = ".".join([service_name, env["ROOT_DOMAIN"]])
+
+        docker_dict = {
+            "services": {
+                service_name: {
+                    "container_name": container_name,
+                    "hostname":  host_name,
+                    "domainname": env.get("ROOT_DOMAIN"),
+                    "restart": "always",
+                    "image": "docker.io/postgres",
+                    **copy.deepcopy(network_dict),
+                    "environment": {
+                        "POSTGRES_USER": env.get("POSTGRES_USER"),
+                        "POSTGRES_PASSWORD": env.get("POSTGRES_PASSWORD"),
+                        "POSTGRES_DB": env.get("POSTGRES_DB"),
+                        "PGDATA": env.get("PGDATA"),
+                        # ??? "POSTGRES_PORT": env.get("PGDAPOSTGRES_PORT_CONTAINERTA"),
+                    },
+                    # Todo
+                    #  "healthcheck": {
+                    #      "test": [
+                    #          "CMD",
+                    #          "curl",
+                    #          "-f",
+                    #          f"http://localhost:{env.get('DAGSTER_DEV_PORT_CONTAINER')}",
+                    #      ],
+                    #      "interval": "10s",
+                    #      "timeout": "2s",
+                    #      "retries": "3",
+                    #  },
+                    # "command": [
+                    #     "--workspace",
+                    #     env.get("DAGSTER_WORKSPACE"),
+                    #     "--host",
+                    #     env.get("DAGSTER_HOST"),
+                    #     "--port",
+                    #     env.get("DAGSTER_DEV_PORT_CONTAINER"),
+                    # ],
+                    **copy.deepcopy(volumes_dict),
+                    **copy.deepcopy(ports_dict),
+                },
+            },
+        }
+
+        docker_yaml = yaml.dump(docker_dict)
+
+        yield Output(docker_dict)
+
+        yield AssetMaterialization(
+            asset_key=context.asset_key,
+            metadata={
+                "__".join(context.asset_key.path): MetadataValue.json(docker_dict),
+                "docker_yaml": MetadataValue.md(f"```yaml\n{docker_yaml}\n```"),
+                # Todo: "cmd_docker_run": MetadataValue.path(cmd_list_to_str(cmd_docker_run)),
+            },
+        )
+
+
+@asset(
+    **ASSET_HEADER,
+    ins={
         "compose_dagster": AssetIn(
             AssetKey([*KEY, "compose_dagster"]),
+        ),
+        "compose_postgres": AssetIn(
+            AssetKey([*KEY, "compose_postgres"]),
         ),
     },
 )

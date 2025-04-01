@@ -1,5 +1,6 @@
 __all__ = [
     "DOCKER_USE_CACHE",
+    "DAGSTER_USE_POSTGRES",
     "GROUP",
     "KEY",
     "ASSET_HEADER",
@@ -23,6 +24,9 @@ from OpenStudioLandscapes.engine.constants import DOCKER_USE_CACHE_GLOBAL, THIRD
 
 
 DOCKER_USE_CACHE = DOCKER_USE_CACHE_GLOBAL or False
+
+
+DAGSTER_USE_POSTGRES = False
 
 
 GROUP = "Dagster"
@@ -50,6 +54,61 @@ ENVIRONMENT = {
     "DAGSTER_WORKSPACE": "/dagster/workspace.yaml",
 }
 # @formatter:on
+
+# @formatter:off
+_env_postgres = {
+    "POSTGRES_SERVICE_NAME": "openstudiolandscapes-postgres-dagster",
+    "POSTGRES_USER": "postgres",
+    "POSTGRES_PASSWORD": "mysecretpassword",
+    "POSTGRES_DB": "postgres",
+    "PGDATA": "/var/lib/postgresql/data/pgdata",
+    "POSTGRES_PORT_HOST": "5432",
+    "POSTGRES_PORT_CONTAINER": "5432",
+
+    "POSTGRES_DATABASE_INSTALL_DESTINATION": {
+        #################################################################
+        #
+        #################################################################
+        #################################################################
+        # Inside Landscape:
+        "default": pathlib.Path(
+            "{DOT_LANDSCAPES}",
+            "{LANDSCAPE}",
+            f"{GROUP}__{'__'.join(KEY)}",
+            "postgres",
+        )
+        .expanduser()
+        .as_posix(),
+        #################################################################
+        # In Landscapes root dir:
+        "landscapes_root": pathlib.Path(
+            "{DOT_LANDSCAPES}",
+            ".dagster",
+            "postgres",
+        )
+        .expanduser()
+        .as_posix(),
+        # #################################################################
+        # # Prod DB:
+        # "prod_db": get
+        #     pathlib.Path(
+        #     "{NFS_ENTRY_POINT}",
+        #     "services",
+        #     "kitsu",
+        # ).as_posix(),
+        # #################################################################
+        # # Test DB:
+        # "test_db": pathlib.Path(
+        #     "{NFS_ENTRY_POINT}",
+        #     "test_data",
+        #     "10.2",
+        #     "kitsu",
+        # ).as_posix(),
+    }["landscapes_root"],
+}
+# @formatter:on
+if DAGSTER_USE_POSTGRES:
+    ENVIRONMENT.update(_env_postgres)
 
 # Todo
 #  - [ ] This is a bit hacky
