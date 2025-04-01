@@ -93,14 +93,16 @@ def pip_packages(
     # Todo
     #  Check: content seems identical to asset `pip_packages_base_image`
     _pip_packages: list = [
-        # "dagster-shared[dev] @ git+https://github.com/michimussato/dagster-shared.git@main",
-        # "deadline-dagster[dev] @ git+https://github.com/michimussato/deadline-dagster.git@main",
+        "dagster==1.9.11",
+        "dagster-webserver==1.9.11",
+        "dagster-shared[dev] @ git+https://github.com/michimussato/dagster-shared.git@main",
+        "dagster-job-processor[dev] @ git+https://github.com/michimussato/dagster-job-processor.git@main",
     ]
 
     if DAGSTER_USE_POSTGRES:
-        _pip_packages.append(
-            "dagster-postgres==0.25.11"
-        )
+        _pip_packages.extend([
+            "dagster-postgres==0.25.11",
+        ])
 
     yield Output(_pip_packages)
 
@@ -187,16 +189,13 @@ def build_docker_image(
         LABEL authors="{AUTHOR}"
 
         {pip_install_str}
-
-        WORKDIR {DAGSTER_ROOT}
-        COPY ./payload/workspace.yaml .
-
-        WORKDIR {DAGSTER_HOME}
-        COPY ./payload/dagster.yaml .
+        
+        RUN mkdir -p {DAGSTER_ROOT}
+        RUN mkdir -p {DAGSTER_HOME}
 
         WORKDIR {DAGSTER_ROOT}
 
-        ENTRYPOINT ["dagster", "dev"]
+        ENTRYPOINT []
         CMD []
     """
     ).format(
@@ -217,38 +216,6 @@ def build_docker_image(
 
     with open(docker_file, "w") as fw:
         fw.write(docker_file_str)
-
-    payload = docker_file.parent / "payload"
-    payload.mkdir(parents=True, exist_ok=True)
-
-    # dagster.yaml
-    if DAGSTER_USE_POSTGRES:
-        dagster_yaml = pathlib.Path(
-            env["CONFIGS_ROOT"],
-            "materializations-postgres",
-            "dagster.yaml",
-        ).expanduser()
-    else:
-        dagster_yaml = pathlib.Path(
-            env["CONFIGS_ROOT"],
-            "materializations",
-            "dagster.yaml",
-        ).expanduser()
-
-    # workspace.yaml
-    shutil.copy(
-        src=pathlib.Path(
-            env["CONFIGS_ROOT"],
-            "workspace.yaml",
-        ).expanduser(),
-        dst=payload,
-    )
-
-    # dagster.yaml
-    shutil.copy(
-        src=dagster_yaml,
-        dst=payload,
-    )
 
     with open(docker_file, "r") as fr:
         docker_file_content = fr.read()
@@ -280,6 +247,240 @@ def build_docker_image(
             "__".join(context.asset_key.path): MetadataValue.json(image_data),
             "tags_list": MetadataValue.json(tags_list),
             "docker_file": MetadataValue.md(f"```shell\n{docker_file_content}\n```"),
+            "env": MetadataValue.json(env),
+        },
+    )
+
+
+@asset(
+    **ASSET_HEADER,
+    ins={
+        "env": AssetIn(
+            AssetKey([*KEY, "env"]),
+        ),
+    },
+    description="Visit https://docs.dagster.io/guides/deploy/dagster-yaml for reference. "
+                "For more info regarding Postgres backend for Dagster, visit "
+                "https://docs.dagster.io/api/python-api/libraries/dagster-postgres and "
+                "https://docs.dagster.io/guides/deploy/dagster-instance-configuration."
+)
+def dagster_yaml(
+    context: AssetExecutionContext,
+    env: dict,  # pylint: disable=redefined-outer-name
+) -> Generator[Output[pathlib.Path] | AssetMaterialization, None, None]:
+    # @formatter:off
+
+    concurrency_dict = {}
+    storage_dict = {}
+
+    if DAGSTER_USE_POSTGRES:
+        # dagster.yaml with Postgres backend
+        """
+        Reference
+        
+        # https://docs.dagster.io/guides/deploy/dagster-yaml
+        ## https://docs.dagster.io/guides/limiting-concurrency-in-data-pipelines
+        run_queue:
+          max_concurrent_runs: 1
+          block_op_concurrency_limited_runs:
+            enabled: true
+        #concurrency:
+        #  default_op_concurrency_limit: 1
+        telemetry:
+          enabled: false
+        #run_monitoring:
+        #  enabled: true
+        #  free_slots_after_run_end_seconds: 300
+        auto_materialize:
+          enabled: true
+          use_sensors: true
+        storage:
+          postgres:
+            postgres_db:
+              username: postgres
+              password: mysecretpassword
+        #      hostname: openstudiolandscapes-postgres-dagster.farm.evil
+              hostname: openstudiolandscapes-postgres-dagster
+              db_name: postgres
+              port: 5432
+        """
+
+        storage_dict = {
+            "storage": {
+                "postgres": {
+                    "postgres_db": {
+                        "username": str(env.get("POSTGRES_USER")),
+                        "password": str(env.get("POSTGRES_PASSWORD")),
+                        "hostname": ".".join(
+                            [
+                                str(env.get("POSTGRES_SERVICE_NAME")),
+                                env["ROOT_DOMAIN"],
+                            ],
+                        ),
+                        "db_name": str(env.get("POSTGRES_DB")),
+                        "port": int(env.get("POSTGRES_PORT_CONTAINER")),
+                    }
+                }
+            }
+        }
+    else:
+        # dagster.yaml with default MySQL backend
+        """
+        Reference
+        
+        # https://docs.dagster.io/guides/deploy/dagster-yaml
+        ## https://docs.dagster.io/guides/limiting-concurrency-in-data-pipelines
+        run_queue:
+          max_concurrent_runs: 1
+          block_op_concurrency_limited_runs:
+            enabled: true
+        concurrency:
+          default_op_concurrency_limit: 1
+        telemetry:
+          enabled: false
+        #run_monitoring:
+        #  enabled: true
+        #  free_slots_after_run_end_seconds: 300
+        auto_materialize:
+          enabled: true
+          use_sensors: true
+        """
+
+        concurrency_dict = {
+            "concurrency": {
+                "default_op_concurrency_limit": 1
+            }
+        }
+
+    dagster_yaml_dict = {
+        "run_queue": {
+            "max_concurrent_runs": 1,
+            "block_op_concurrency_limited_runs": {
+                "enabled": True,
+            }
+        },
+        "telemetry": {
+            "enabled": True,
+        },
+        "auto_materialize": {
+            "enabled": True,
+            "use_sensors": True,
+        },
+        **concurrency_dict,
+        **storage_dict,
+    }
+
+    dagster_yaml_load = yaml.dump(dagster_yaml_dict)
+
+    dagster_yaml_file = pathlib.Path(
+        env["DOT_LANDSCAPES"],
+        env.get("LANDSCAPE", "default"),
+        f"{GROUP}__{'__'.join(KEY)}",
+        "__".join(context.asset_key.path),
+        "materializations",
+        "dagster.yaml",
+    ).expanduser()
+
+    dagster_yaml_file.parent.mkdir(parents=True, exist_ok=True)
+
+    with open(dagster_yaml_file, "w") as fw:
+        fw.write(dagster_yaml_load)
+
+    yield Output(dagster_yaml_file)
+
+    yield AssetMaterialization(
+        asset_key=context.asset_key,
+        metadata={
+            "__".join(context.asset_key.path): MetadataValue.path(
+                dagster_yaml_file
+            ),
+            "use_postgres": MetadataValue.bool(DAGSTER_USE_POSTGRES),
+            "dagster_yaml_dict": MetadataValue.json(dagster_yaml_dict),
+            "dagster_yaml": MetadataValue.md(f"```\n{dagster_yaml_load}\n```"),
+            "env": MetadataValue.json(env),
+        },
+    )
+
+
+@asset(
+    **ASSET_HEADER,
+    ins={
+        "env": AssetIn(
+            AssetKey([*KEY, "env"]),
+        ),
+    },
+    description="Visit https://docs.dagster.io/guides/deploy/code-locations/workspace-yaml for reference."
+)
+def workspace_yaml(
+    context: AssetExecutionContext,
+    env: dict,  # pylint: disable=redefined-outer-name
+) -> Generator[Output[pathlib.Path] | AssetMaterialization, None, None]:
+    # @formatter:off
+
+    """
+    Reference
+
+    load_from:
+    #  - python_package:
+    #      package_name: My-Skeleton-Package
+    #      location_name: "My Skeleton Package Location"
+    # Todo:
+    #  - [ ] dynamic workspace.yaml to be able to add dagster-shared dynamically (https://github.com/michimussato/dagster-shared)
+    #  - [ ] Shouldn't this be OpenStudioLandscapes.open_studio_landscapes also?
+      - python_module:
+          # https://github.com/michimussato/deadline-dagster
+          working_directory: src
+          module_name: OpenStudioLandscapes.dagster_job_processor.definitions
+          location_name: "dagster_job_processor Package Location"
+          # executable_path: ../.venv/bin/python
+    #  - python_module:
+    #      # Todo:
+    #      #  - [ ] will only work after making studio-landscapes public
+    #      # https://github.com/michimussato/deadline-dagster
+    #      working_directory: src
+    #      module_name: OpenStudioLandscapes.open_studio_landscapes.definitions
+    #      location_name: "OpenStudioLandscapes.open_studio_landscapes Package Location"
+    #      # executable_path: ../.venv/bin/python
+    """
+
+    workspace_yaml_dict = {
+        "load_from": [
+            {
+                "python_module": {
+                    "working_directory": "src",
+                    "module_name": "OpenStudioLandscapes.dagster_job_processor.definitions",
+                    "location_name": "dagster_job_processor Package Location",
+                }
+            }
+        ],
+    }
+
+    workspace_yaml_load = yaml.dump(workspace_yaml_dict)
+
+    workspace_yaml_file = pathlib.Path(
+        env["DOT_LANDSCAPES"],
+        env.get("LANDSCAPE", "default"),
+        f"{GROUP}__{'__'.join(KEY)}",
+        "__".join(context.asset_key.path),
+        "workspace.yaml",
+    ).expanduser()
+
+    workspace_yaml_file.parent.mkdir(parents=True, exist_ok=True)
+
+    with open(workspace_yaml_file, "w") as fw:
+        fw.write(workspace_yaml_load)
+
+    yield Output(workspace_yaml_file)
+
+    yield AssetMaterialization(
+        asset_key=context.asset_key,
+        metadata={
+            "__".join(context.asset_key.path): MetadataValue.path(
+                workspace_yaml_file
+            ),
+            "use_postgres": MetadataValue.bool(DAGSTER_USE_POSTGRES),
+            "workspace_yaml_dict": MetadataValue.json(workspace_yaml_dict),
+            "workspace_yaml": MetadataValue.md(f"```\n{workspace_yaml_load}\n```"),
             "env": MetadataValue.json(env),
         },
     )
@@ -347,6 +548,12 @@ def compose_networks(
         "build": AssetIn(
             AssetKey([*KEY, "build_docker_image"]),
         ),
+        "dagster_yaml": AssetIn(
+            AssetKey([*KEY, "dagster_yaml"]),
+        ),
+        "workspace_yaml": AssetIn(
+            AssetKey([*KEY, "workspace_yaml"]),
+        ),
     },
 )
 def compose_dagster(
@@ -354,6 +561,8 @@ def compose_dagster(
     env: dict,  # pylint: disable=redefined-outer-name
     compose_networks: dict,  # pylint: disable=redefined-outer-name
     build: dict,  # pylint: disable=redefined-outer-name
+    dagster_yaml: pathlib.Path,  # pylint: disable=redefined-outer-name
+    workspace_yaml: pathlib.Path,  # pylint: disable=redefined-outer-name
 ) -> Generator[Output[dict] | AssetMaterialization, None, None]:
     """ """
 
@@ -375,10 +584,22 @@ def compose_dagster(
             "network_mode": compose_networks.get("network_mode")
         }
 
+    # ./materializations
+    # with ./materlializations/dagster.yaml inside
+    materializations_dagster_yaml_container = pathlib.Path(
+        env.get('DAGSTER_HOME'),
+    )
+    workspace_yaml_container = pathlib.Path(
+        env.get('DAGSTER_ROOT'),
+        "workspace.yaml"
+    )
+
     volumes_dict = {
         "volumes": [
             f"{env.get('NFS_ENTRY_POINT')}:{env.get('NFS_ENTRY_POINT')}",
             f"{env.get('NFS_ENTRY_POINT')}:{env.get('NFS_ENTRY_POINT_LNS')}",
+            f"{dagster_yaml.parent.as_posix()}:{materializations_dagster_yaml_container.as_posix()}:rw",
+            f"{workspace_yaml.as_posix()}:{workspace_yaml_container.as_posix()}:ro",
         ]
     }
 
@@ -422,6 +643,8 @@ def compose_dagster(
                     "retries": "3",
                 },
                 "command": [
+                    "dagster",
+                    "dev",
                     "--workspace",
                     env.get("DAGSTER_WORKSPACE"),
                     "--host",
@@ -459,16 +682,14 @@ def compose_dagster(
         "compose_networks": AssetIn(
             AssetKey([*KEY, "compose_networks"]),
         ),
-        # "build": AssetIn(
-        #     AssetKey([*KEY, "build_docker_image"]),
-        # ),
     },
+    description="See https://docs.dagster.io/guides/deploy/deployment-options/docker and "
+                "https://docs.dagster.io/api/python-api/libraries/dagster-postgres."
 )
 def compose_postgres(
     context: AssetExecutionContext,
     env: dict,  # pylint: disable=redefined-outer-name
     compose_networks: dict,  # pylint: disable=redefined-outer-name
-    # build: dict,  # pylint: disable=redefined-outer-name
 ) -> Generator[Output[dict] | AssetMaterialization, None, None]:
     """ """
 
@@ -504,8 +725,6 @@ def compose_postgres(
                 "network_mode": compose_networks.get("network_mode")
             }
 
-
-
         postgres_db_dir_host = (
             pathlib.Path(env.get("POSTGRES_DATABASE_INSTALL_DESTINATION"))
         )
@@ -539,18 +758,15 @@ def compose_postgres(
                         "PGDATA": env.get("PGDATA"),
                         # ??? "POSTGRES_PORT": env.get("PGDAPOSTGRES_PORT_CONTAINERTA"),
                     },
-                    # Todo
-                    #  "healthcheck": {
-                    #      "test": [
-                    #          "CMD",
-                    #          "curl",
-                    #          "-f",
-                    #          f"http://localhost:{env.get('DAGSTER_DEV_PORT_CONTAINER')}",
-                    #      ],
-                    #      "interval": "10s",
-                    #      "timeout": "2s",
-                    #      "retries": "3",
-                    #  },
+                    "healthcheck": {
+                        "test": [
+                            "CMD-SHELL",
+                            f"pg_isready --username {env.get('POSTGRES_USER')} --dbname {env.get('POSTGRES_DB')} --port {env.get('POSTGRES_PORT_CONTAINER')}",
+                        ],
+                        "interval": "10s",
+                        "timeout": "8s",
+                        "retries": "5",
+                    },
                     # "command": [
                     #     "--workspace",
                     #     env.get("DAGSTER_WORKSPACE"),

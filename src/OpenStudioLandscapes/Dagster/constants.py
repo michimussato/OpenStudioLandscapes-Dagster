@@ -26,7 +26,7 @@ from OpenStudioLandscapes.engine.constants import DOCKER_USE_CACHE_GLOBAL, THIRD
 DOCKER_USE_CACHE = DOCKER_USE_CACHE_GLOBAL or False
 
 
-DAGSTER_USE_POSTGRES = False
+DAGSTER_USE_POSTGRES = True
 
 
 GROUP = "Dagster"
