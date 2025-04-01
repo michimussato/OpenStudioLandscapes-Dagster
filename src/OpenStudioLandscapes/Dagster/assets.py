@@ -99,7 +99,7 @@ def pip_packages(
 
     if DAGSTER_USE_POSTGRES:
         _pip_packages.append(
-            "dagster-postgres"
+            "dagster-postgres==0.25.11"
         )
 
     yield Output(_pip_packages)
