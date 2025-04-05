@@ -21,6 +21,7 @@ from dagster import (
 
 from OpenStudioLandscapes.engine.utils import *
 from OpenStudioLandscapes.engine.constants import DOCKER_USE_CACHE_GLOBAL, THIRD_PARTY
+from OpenStudioLandscapes.engine.exceptions import ComposeScopeException
 
 
 DOCKER_USE_CACHE = DOCKER_USE_CACHE_GLOBAL or False
@@ -123,7 +124,9 @@ for i in THIRD_PARTY:
         break
 
 if COMPOSE_SCOPE is None:
-    raise Exception("No compose_scope found for module '%s'" % _module)
+    raise ComposeScopeException(
+        "No compose_scope found for module '%s'. Is the module enabled?" % _module
+    )
 
 
 @asset(
