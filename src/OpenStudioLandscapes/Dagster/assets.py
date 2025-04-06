@@ -8,31 +8,28 @@ import urllib.parse
 from typing import Generator
 
 import yaml
-
 from dagster import (
     AssetExecutionContext,
     AssetIn,
     AssetKey,
     AssetMaterialization,
+    AssetsDefinition,
     MetadataValue,
     Output,
     asset,
-    AssetsDefinition,
 )
 from OpenStudioLandscapes.engine.base.assets import KEY_BASE
-from OpenStudioLandscapes.engine.constants import *
 from OpenStudioLandscapes.engine.base.ops import (
     op_compose,
     op_docker_compose_graph,
     op_group_out,
 )
-
+from OpenStudioLandscapes.engine.constants import *
 from OpenStudioLandscapes.engine.enums import *
 from OpenStudioLandscapes.engine.utils import *
 from OpenStudioLandscapes.engine.utils.docker.whales import *
 
 from OpenStudioLandscapes.Dagster.constants import *
-
 
 # Todo:
 #  - [ ] Create dagster.yaml dynamically
@@ -41,13 +38,9 @@ from OpenStudioLandscapes.Dagster.constants import *
 @asset(
     **ASSET_HEADER,
     ins={
-        "group_in": AssetIn(
-            AssetKey([*KEY_BASE, "group_out"])
-        ),
+        "group_in": AssetIn(AssetKey([*KEY_BASE, "group_out"])),
     },
-    deps=[
-        AssetKey([*ASSET_HEADER['key_prefix'], "constants"])
-    ],
+    deps=[AssetKey([*ASSET_HEADER["key_prefix"], "constants"])],
 )
 def env(
     context: AssetExecutionContext,
@@ -100,9 +93,11 @@ def pip_packages(
     ]
 
     if DAGSTER_USE_POSTGRES:
-        _pip_packages.extend([
-            "dagster-postgres==0.25.11",
-        ])
+        _pip_packages.extend(
+            [
+                "dagster-postgres==0.25.11",
+            ]
+        )
 
     yield Output(_pip_packages)
 
@@ -120,9 +115,7 @@ def pip_packages(
         "env": AssetIn(
             AssetKey([*KEY, "env"]),
         ),
-        "group_in": AssetIn(
-            AssetKey([*KEY_BASE, "group_out"])
-        ),
+        "group_in": AssetIn(AssetKey([*KEY_BASE, "group_out"])),
         "pip_packages": AssetIn(
             AssetKey([*KEY, "pip_packages"]),
         ),
@@ -142,7 +135,9 @@ def build_docker_image(
     if build_base_docker_config.value["docker_push"]:
         build_base_parent_image_prefix: str = build_base_image_data["image_prefix_full"]
     else:
-        build_base_parent_image_prefix: str = build_base_image_data["image_prefix_local"]
+        build_base_parent_image_prefix: str = build_base_image_data[
+            "image_prefix_local"
+        ]
 
     build_base_parent_image_name: str = build_base_image_data["image_name"]
     build_base_parent_image_tags: list = build_base_image_data["image_tags"]
@@ -173,7 +168,7 @@ def build_docker_image(
     )
 
     tags = [
-        env.get('LANDSCAPE', str(time.time())),
+        env.get("LANDSCAPE", str(time.time())),
     ]
 
     pip_install_str: str = get_pip_install_str(
@@ -189,7 +184,7 @@ def build_docker_image(
         LABEL authors="{AUTHOR}"
 
         {pip_install_str}
-        
+
         RUN mkdir -p {DAGSTER_ROOT}
         RUN mkdir -p {DAGSTER_HOME}
 
@@ -260,9 +255,9 @@ def build_docker_image(
         ),
     },
     description="Visit https://docs.dagster.io/guides/deploy/dagster-yaml for reference. "
-                "For more info regarding Postgres backend for Dagster, visit "
-                "https://docs.dagster.io/api/python-api/libraries/dagster-postgres and "
-                "https://docs.dagster.io/guides/deploy/dagster-instance-configuration."
+    "For more info regarding Postgres backend for Dagster, visit "
+    "https://docs.dagster.io/api/python-api/libraries/dagster-postgres and "
+    "https://docs.dagster.io/guides/deploy/dagster-instance-configuration.",
 )
 def dagster_yaml(
     context: AssetExecutionContext,
@@ -277,7 +272,7 @@ def dagster_yaml(
         # dagster.yaml with Postgres backend
         """
         Reference
-        
+
         # https://docs.dagster.io/guides/deploy/dagster-yaml
         ## https://docs.dagster.io/guides/limiting-concurrency-in-data-pipelines
         run_queue:
@@ -327,7 +322,7 @@ def dagster_yaml(
         # dagster.yaml with default MySQL backend
         """
         Reference
-        
+
         # https://docs.dagster.io/guides/deploy/dagster-yaml
         ## https://docs.dagster.io/guides/limiting-concurrency-in-data-pipelines
         run_queue:
@@ -346,18 +341,14 @@ def dagster_yaml(
           use_sensors: true
         """
 
-        concurrency_dict = {
-            "concurrency": {
-                "default_op_concurrency_limit": 1
-            }
-        }
+        concurrency_dict = {"concurrency": {"default_op_concurrency_limit": 1}}
 
     dagster_yaml_dict = {
         "run_queue": {
             "max_concurrent_runs": 1,
             "block_op_concurrency_limited_runs": {
                 "enabled": True,
-            }
+            },
         },
         "telemetry": {
             "enabled": True,
@@ -391,9 +382,7 @@ def dagster_yaml(
     yield AssetMaterialization(
         asset_key=context.asset_key,
         metadata={
-            "__".join(context.asset_key.path): MetadataValue.path(
-                dagster_yaml_file
-            ),
+            "__".join(context.asset_key.path): MetadataValue.path(dagster_yaml_file),
             "use_postgres": MetadataValue.bool(DAGSTER_USE_POSTGRES),
             "dagster_yaml_dict": MetadataValue.json(dagster_yaml_dict),
             "dagster_yaml": MetadataValue.md(f"```\n{dagster_yaml_load}\n```"),
@@ -409,7 +398,7 @@ def dagster_yaml(
             AssetKey([*KEY, "env"]),
         ),
     },
-    description="Visit https://docs.dagster.io/guides/deploy/code-locations/workspace-yaml for reference."
+    description="Visit https://docs.dagster.io/guides/deploy/code-locations/workspace-yaml for reference.",
 )
 def workspace_yaml(
     context: AssetExecutionContext,
@@ -475,9 +464,7 @@ def workspace_yaml(
     yield AssetMaterialization(
         asset_key=context.asset_key,
         metadata={
-            "__".join(context.asset_key.path): MetadataValue.path(
-                workspace_yaml_file
-            ),
+            "__".join(context.asset_key.path): MetadataValue.path(workspace_yaml_file),
             "use_postgres": MetadataValue.bool(DAGSTER_USE_POSTGRES),
             "workspace_yaml_dict": MetadataValue.json(workspace_yaml_dict),
             "workspace_yaml": MetadataValue.md(f"```\n{workspace_yaml_load}\n```"),
@@ -492,7 +479,8 @@ def workspace_yaml(
 def compose_networks(
     context: AssetExecutionContext,
 ) -> Generator[
-    Output[dict[str, dict[str, dict[str, str]]]] | AssetMaterialization, None, None]:
+    Output[dict[str, dict[str, dict[str, str]]]] | AssetMaterialization, None, None
+]:
 
     compose_network_mode = ComposeNetworkMode.DEFAULT
 
@@ -571,28 +559,21 @@ def compose_dagster(
     depends_on_dict = {}
 
     if "networks" in compose_networks:
-        network_dict = {
-            "networks": list(compose_networks.get("networks", {}).keys())
-        }
+        network_dict = {"networks": list(compose_networks.get("networks", {}).keys())}
         ports_dict = {
             "ports": [
                 f"{env.get('DAGSTER_DEV_PORT_HOST')}:{env.get('DAGSTER_DEV_PORT_CONTAINER')}",
             ]
         }
     elif "network_mode" in compose_networks:
-        network_dict = {
-            "network_mode": compose_networks.get("network_mode")
-        }
+        network_dict = {"network_mode": compose_networks.get("network_mode")}
 
     # ./materializations
     # with ./materlializations/dagster.yaml inside
     materializations_dagster_yaml_container = pathlib.Path(
-        env.get('DAGSTER_HOME'),
+        env.get("DAGSTER_HOME"),
     )
-    workspace_yaml_container = pathlib.Path(
-        env.get('DAGSTER_ROOT'),
-        "workspace.yaml"
-    )
+    workspace_yaml_container = pathlib.Path(env.get("DAGSTER_ROOT"), "workspace.yaml")
 
     volumes_dict = {
         "volumes": [
@@ -619,7 +600,7 @@ def compose_dagster(
         "services": {
             service_name: {
                 "container_name": container_name,
-                "hostname":  host_name,
+                "hostname": host_name,
                 "domainname": env.get("ROOT_DOMAIN"),
                 "restart": "always",
                 "image": f"{build['image_prefix_full']}{build['image_name']}:{build['image_tags'][0]}",
@@ -684,7 +665,7 @@ def compose_dagster(
         ),
     },
     description="See https://docs.dagster.io/guides/deploy/deployment-options/docker and "
-                "https://docs.dagster.io/api/python-api/libraries/dagster-postgres."
+    "https://docs.dagster.io/api/python-api/libraries/dagster-postgres.",
 )
 def compose_postgres(
     context: AssetExecutionContext,
@@ -721,12 +702,10 @@ def compose_postgres(
                 # ]
             }
         elif "network_mode" in compose_networks:
-            network_dict = {
-                "network_mode": compose_networks.get("network_mode")
-            }
+            network_dict = {"network_mode": compose_networks.get("network_mode")}
 
-        postgres_db_dir_host = (
-            pathlib.Path(env.get("POSTGRES_DATABASE_INSTALL_DESTINATION"))
+        postgres_db_dir_host = pathlib.Path(
+            env.get("POSTGRES_DATABASE_INSTALL_DESTINATION")
         )
         postgres_db_dir_host.mkdir(parents=True, exist_ok=True)
         context.log.info(f"Directory {postgres_db_dir_host.as_posix()} created.")
@@ -746,7 +725,7 @@ def compose_postgres(
             "services": {
                 service_name: {
                     "container_name": container_name,
-                    "hostname":  host_name,
+                    "hostname": host_name,
                     "domainname": env.get("ROOT_DOMAIN"),
                     "restart": "always",
                     "image": "docker.io/postgres",
@@ -833,12 +812,8 @@ compose = AssetsDefinition.from_op(
     group_name=GROUP,
     key_prefix=KEY,
     keys_by_input_name={
-        "compose_networks": AssetKey(
-            [*KEY, "compose_networks"]
-        ),
-        "compose_maps": AssetKey(
-            [*KEY, "compose_maps"]
-        ),
+        "compose_networks": AssetKey([*KEY, "compose_networks"]),
+        "compose_maps": AssetKey([*KEY, "compose_maps"]),
     },
 )
 
@@ -854,15 +829,9 @@ group_out = AssetsDefinition.from_op(
     },
     key_prefix=KEY,
     keys_by_input_name={
-        "compose": AssetKey(
-            [*KEY, "compose"]
-        ),
-        "env": AssetKey(
-            [*KEY, "env"]
-        ),
-        "group_in": AssetKey(
-            [*KEY_BASE, "group_out"]
-        ),
+        "compose": AssetKey([*KEY, "compose"]),
+        "env": AssetKey([*KEY, "env"]),
+        "group_in": AssetKey([*KEY_BASE, "group_out"]),
     },
 )
 
@@ -872,11 +841,7 @@ docker_compose_graph = AssetsDefinition.from_op(
     group_name=GROUP,
     key_prefix=KEY,
     keys_by_input_name={
-        "group_out": AssetKey(
-            [*KEY, "group_out"]
-        ),
-        "compose_project_name": AssetKey(
-            [*KEY, "compose_project_name"]
-        ),
+        "group_out": AssetKey([*KEY, "group_out"]),
+        "compose_project_name": AssetKey([*KEY, "compose_project_name"]),
     },
 )
