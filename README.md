@@ -135,7 +135,7 @@ Currently, the following Python interpreters are enabled for testing:
 
 ## Variables
 
-The following variables are being declared in [`OpenStudioLandscapes.Dagster.constants`](https://github.com/michimussato/OpenStudioLandscapes-Dagster/tree/main/src/OpenStudioLandscapes/Dagster/constants.py) published throuout the `OpenStudioLandscapes-Dagster` package.
+The following variables are being declared in [`OpenStudioLandscapes.Dagster.constants`](https://github.com/michimussato/OpenStudioLandscapes-Dagster/tree/main/src/OpenStudioLandscapes/Dagster/constants.py) published throughout the `OpenStudioLandscapes-Dagster` package.
 
 | Variable               | Type           |
 | :--------------------- | :------------- |
