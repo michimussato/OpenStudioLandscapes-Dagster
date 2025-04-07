@@ -58,9 +58,7 @@ def dagster_mysql(session):
     session.run(
         shutil.which("dagster"),
         "dev",
-        env={
-            "DAGSTER_HOME": f"{pathlib.Path.cwd()}/.dagster"
-        },
+        env={"DAGSTER_HOME": f"{pathlib.Path.cwd()}/.dagster"},
         external=True,
     )
 
@@ -123,9 +121,7 @@ def dagster_postgres(session):
     session.run(
         shutil.which("dagster"),
         "dev",
-        env={
-            "DAGSTER_HOME": f"{pathlib.Path.cwd()}/.dagster-postgres"
-        },
+        env={"DAGSTER_HOME": f"{pathlib.Path.cwd()}/.dagster-postgres"},
         external=True,
     )
 
