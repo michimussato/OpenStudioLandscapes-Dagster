@@ -57,7 +57,9 @@ def harbor_up(session):
     #     --file /home/michael/git/repos/OpenStudioLandscapes/.landscapes/.harbor/bin/docker-compose.yml \
     #     --project-name openstudiolandscapes-harbor up --remove-orphans
 
-    compose = pathlib.Path.cwd() / ".landscapes" / ".harbor" / "bin" / "docker-compose.yml"
+    compose = (
+        pathlib.Path.cwd() / ".landscapes" / ".harbor" / "bin" / "docker-compose.yml"
+    )
 
     session.run(
         shutil.which("sudo"),
@@ -84,7 +86,9 @@ def harbor_down(session):
     #     --file /home/michael/git/repos/OpenStudioLandscapes/.landscapes/.harbor/bin/docker-compose.yml \
     #     --project-name openstudiolandscapes-harbor down
 
-    compose = pathlib.Path.cwd() / ".landscapes" / ".harbor" / "bin" / "docker-compose.yml"
+    compose = (
+        pathlib.Path.cwd() / ".landscapes" / ".harbor" / "bin" / "docker-compose.yml"
+    )
 
     session.run(
         shutil.which("sudo"),
