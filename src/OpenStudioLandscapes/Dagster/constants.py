@@ -122,7 +122,8 @@ for i in THIRD_PARTY:
 
 if COMPOSE_SCOPE is None:
     raise ComposeScopeException(
-        "No compose_scope found for module '%s'. Is the module enabled?" % _module
+        "No compose_scope found for module '%s'. Is the module enabled "
+        "in `OpenStudioLandscapes.engine.constants.THIRD_PARTY`?" % _module
     )
 
 
