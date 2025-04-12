@@ -12,19 +12,21 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 def download(
-        url: str,
-        dest_folder: pathlib.Path,
+    url: str,
+    dest_folder: pathlib.Path,
 ) -> pathlib.Path:
     if not dest_folder.exists():
-        dest_folder.mkdir(parents=True, exist_ok=True)  # create folder if it does not exist
+        dest_folder.mkdir(
+            parents=True, exist_ok=True
+        )  # create folder if it does not exist
 
-    filename = url.split('/')[-1].replace(" ", "_")  # be careful with file names
+    filename = url.split("/")[-1].replace(" ", "_")  # be careful with file names
     file_path = dest_folder / filename
 
     r = requests.get(url, stream=True)
     if r.ok:
         logging.info("Saving to %s" % file_path.absolute().as_posix())
-        with open(file_path, 'wb') as f:
+        with open(file_path, "wb") as f:
             for chunk in r.iter_content(chunk_size=1024 * 8):
                 if chunk:
                     f.write(chunk)
@@ -32,7 +34,9 @@ def download(
                     os.fsync(f.fileno())
         return file_path
     else:  # HTTP status code 4XX/5XX
-        raise Exception("Download failed: status code {}\n{}".format(r.status_code, r.text))
+        raise Exception(
+            "Download failed: status code {}\n{}".format(r.status_code, r.text)
+        )
 
 
 import tarfile
@@ -230,14 +234,15 @@ ENVIRONMENT_HARBOR = {
         "online": "https://github.com/goharbor/harbor/releases/download/{HARBOR_RELEASE}/harbor-online-installer-{HARBOR_RELEASE}.tgz",
         "offline": "https://github.com/goharbor/harbor/releases/download/{HARBOR_RELEASE}/harbor-offline-installer-{HARBOR_RELEASE}.tgz",
     }["online"],
-    "HARBOR_ROOT_DIR": pathlib.Path.cwd()  / ".landscapes" / ".harbor",
+    "HARBOR_ROOT_DIR": pathlib.Path.cwd() / ".landscapes" / ".harbor",
     "HARBOR_BIN_DIR": "bin",
     "HARBOR_DOWNLOAD_DIR": "download",
     "HARBOR_DATA_DIR": "data",
 }
 
+
 def setup_harbor(
-        harbor_download_dir: pathlib.Path,
+    harbor_download_dir: pathlib.Path,
 ) -> pathlib.Path:
 
     file_path: pathlib.Path = download(
@@ -253,7 +258,7 @@ def setup_harbor(
 
 
 def write_harbor_yml(
-        yaml_out: pathlib.Path,
+    yaml_out: pathlib.Path,
 ) -> pathlib.Path:
 
     harbor_root_dir: pathlib.Path = ENVIRONMENT_HARBOR["HARBOR_ROOT_DIR"]
@@ -263,66 +268,66 @@ def write_harbor_yml(
     harbor_data_dir.mkdir(parents=True, exist_ok=True)
 
     harbor_dict = {
-        'hostname': ENVIRONMENT_HARBOR["HARBOR_HOSTNAME"],
-        'http': {'port': ENVIRONMENT_HARBOR["HARBOR_PORT"]},
-        'harbor_admin_password': ENVIRONMENT_HARBOR["HARBOR_PASSWORD"],
-        'database': {
-            'password': 'root123',
-            'max_idle_conns': 100,
-            'max_open_conns': 900,
-            'conn_max_idle_time': 0
+        "hostname": ENVIRONMENT_HARBOR["HARBOR_HOSTNAME"],
+        "http": {"port": ENVIRONMENT_HARBOR["HARBOR_PORT"]},
+        "harbor_admin_password": ENVIRONMENT_HARBOR["HARBOR_PASSWORD"],
+        "database": {
+            "password": "root123",
+            "max_idle_conns": 100,
+            "max_open_conns": 900,
+            "conn_max_idle_time": 0,
         },
-        'data_volume': harbor_data_dir.as_posix(),
-        'trivy': {
-            'ignore_unfixed': False,
-            'skip_update': False,
-            'skip_java_db_update': False,
-            'offline_scan': False,
-            'security_check': 'vuln',
-            'insecure': False,
-            'timeout': '5m0s'
+        "data_volume": harbor_data_dir.as_posix(),
+        "trivy": {
+            "ignore_unfixed": False,
+            "skip_update": False,
+            "skip_java_db_update": False,
+            "offline_scan": False,
+            "security_check": "vuln",
+            "insecure": False,
+            "timeout": "5m0s",
         },
-        'jobservice': {
-            'max_job_workers': 10,
-            'job_loggers': ['STD_OUTPUT', 'FILE'],
-            'logger_sweeper_duration': 1
+        "jobservice": {
+            "max_job_workers": 10,
+            "job_loggers": ["STD_OUTPUT", "FILE"],
+            "logger_sweeper_duration": 1,
         },
-        'notification': {
-            'webhook_job_max_retry': 3,
-            'webhook_job_http_client_timeout': 3
+        "notification": {
+            "webhook_job_max_retry": 3,
+            "webhook_job_http_client_timeout": 3,
         },
-        'log': {
-            'level': 'info',
-            'local': {
-                'rotate_count': 50,
-                'rotate_size': '200M',
-                'location': '/var/log/harbor'
-            }
+        "log": {
+            "level": "info",
+            "local": {
+                "rotate_count": 50,
+                "rotate_size": "200M",
+                "location": "/var/log/harbor",
+            },
         },
-        '_version': '2.12.0',
-        'proxy': {
-            'http_proxy': None,
-            'https_proxy': None,
-            'no_proxy': None,
-            'components': ['core', 'jobservice', 'trivy']
+        "_version": "2.12.0",
+        "proxy": {
+            "http_proxy": None,
+            "https_proxy": None,
+            "no_proxy": None,
+            "components": ["core", "jobservice", "trivy"],
         },
-        'upload_purging': {
-            'enabled': True,
-            'age': '168h',
-            'interval': '24h',
-            'dryrun': False
+        "upload_purging": {
+            "enabled": True,
+            "age": "168h",
+            "interval": "24h",
+            "dryrun": False,
         },
-        'cache': {
-            'enabled': False,
-            'expire_hours': 24
-        }
+        "cache": {"enabled": False, "expire_hours": 24},
     }
 
-    logging.debug("Harbor Configuration = %s" % json.dumps(
-        obj=harbor_dict,
-        sort_keys=True,
-        indent=2,
-    ))
+    logging.debug(
+        "Harbor Configuration = %s"
+        % json.dumps(
+            obj=harbor_dict,
+            sort_keys=True,
+            indent=2,
+        )
+    )
 
     harbor_yml: str = yaml.dump(
         harbor_dict,
@@ -344,7 +349,9 @@ def write_harbor_yml(
 #        all the variables
 
 compose_harbor = (
-    ENVIRONMENT_HARBOR["HARBOR_ROOT_DIR"] / ENVIRONMENT_HARBOR["HARBOR_BIN_DIR"] / "docker-compose.yml"
+    ENVIRONMENT_HARBOR["HARBOR_ROOT_DIR"]
+    / ENVIRONMENT_HARBOR["HARBOR_BIN_DIR"]
+    / "docker-compose.yml"
 )
 
 cmd_harbor = [
@@ -378,7 +385,9 @@ def harbor_prepare(session):
     harbor_root_dir: pathlib.Path = ENVIRONMENT_HARBOR["HARBOR_ROOT_DIR"]
     harbor_root_dir.mkdir(parents=True, exist_ok=True)
 
-    harbor_bin_dir: pathlib.Path = harbor_root_dir / ENVIRONMENT_HARBOR["HARBOR_BIN_DIR"]
+    harbor_bin_dir: pathlib.Path = (
+        harbor_root_dir / ENVIRONMENT_HARBOR["HARBOR_BIN_DIR"]
+    )
     harbor_bin_dir.mkdir(parents=True, exist_ok=True)
 
     prepare: pathlib.Path = harbor_bin_dir / "prepare"
@@ -386,7 +395,8 @@ def harbor_prepare(session):
     if prepare.exists():
         logging.info(
             "`prepare` already present in. Use that or start fresh by "
-            "issuing `nox --session harbor_clear` first.")
+            "issuing `nox --session harbor_clear` first."
+        )
         return
 
     harbor_download_dir = harbor_root_dir / ENVIRONMENT_HARBOR["HARBOR_DOWNLOAD_DIR"]
@@ -398,7 +408,9 @@ def harbor_prepare(session):
 
     # equivalent to tar --strip-components=1
     # Credits: https://stackoverflow.com/a/78461535
-    strip1 = lambda member, path: member.replace(name=pathlib.Path(*pathlib.Path(member.path).parts[1:]))
+    strip1 = lambda member, path: member.replace(
+        name=pathlib.Path(*pathlib.Path(member.path).parts[1:])
+    )
 
     logging.debug("Extracting tar file...")
     with tarfile.open(tar_file, "r:gz") as tar:
@@ -413,18 +425,12 @@ def harbor_prepare(session):
     )
 
     if not harbor_yml.exists():
-        raise FileNotFoundError(
-            "`harbor.yml` file not found. "
-            "Not able to continue."
-        )
+        raise FileNotFoundError("`harbor.yml` file not found. " "Not able to continue.")
 
     prepare: pathlib.Path = harbor_bin_dir / "prepare"
 
     if not prepare.exists():
-        raise FileNotFoundError(
-            "`prepare` file not found. "
-            "Not able to continue."
-        )
+        raise FileNotFoundError("`prepare` file not found. " "Not able to continue.")
 
     logging.debug("Preparing Harbor...")
     session.run(
@@ -434,6 +440,7 @@ def harbor_prepare(session):
         env=ENV,
         external=True,
     )
+
 
 # # harbor_clear
 @nox.session(python=None, tags=["harbor_clear"])
@@ -454,8 +461,7 @@ def harbor_clear(session):
     logging.debug("Clearing Harbor...")
 
     if harbor_root_dir.exists():
-        logging.warning("Clearing out Harbor...\n"
-                        "Continue? Type `yes` to confirm.")
+        logging.warning("Clearing out Harbor...\n" "Continue? Type `yes` to confirm.")
         answer = input()
         if answer.lower() == "yes":
             session.run(
