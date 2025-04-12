@@ -69,13 +69,19 @@ def pi_hole_up(session):
     #     --project-name openstudiolandscapes-pi-hole up --remove-orphans
 
     compose = (
-        pathlib.Path.cwd() / ".landscapes" / ".pi-hole" / "docker_compose" / "docker-compose.yml"
+        pathlib.Path.cwd()
+        / ".landscapes"
+        / ".pi-hole"
+        / "docker_compose"
+        / "docker-compose.yml"
     )
 
     if not compose.exists():
-        raise FileNotFoundError(f"Compose file not found: {compose}. "
-                                f"Execute `Compose_pi_hole / compose` in "
-                                f"Dagster to create it.")
+        raise FileNotFoundError(
+            f"Compose file not found: {compose}. "
+            f"Execute `Compose_pi_hole / compose` in "
+            f"Dagster to create it."
+        )
 
     session.run(
         shutil.which("docker"),
@@ -111,13 +117,19 @@ def pi_hole_up_detach(session):
     #     --project-name openstudiolandscapes-pi-hole up --remove-orphans --detach
 
     compose = (
-        pathlib.Path.cwd() / ".landscapes" / ".pi-hole" / "docker_compose" / "docker-compose.yml"
+        pathlib.Path.cwd()
+        / ".landscapes"
+        / ".pi-hole"
+        / "docker_compose"
+        / "docker-compose.yml"
     )
 
     if not compose.exists():
-        raise FileNotFoundError(f"Compose file not found: {compose}. "
-                                f"Execute `Compose_pi_hole / compose` in "
-                                f"Dagster to create it.")
+        raise FileNotFoundError(
+            f"Compose file not found: {compose}. "
+            f"Execute `Compose_pi_hole / compose` in "
+            f"Dagster to create it."
+        )
 
     session.run(
         shutil.which("docker"),
@@ -132,7 +144,6 @@ def pi_hole_up_detach(session):
         env=ENV,
         external=True,
     )
-
 
 
 # # pi_hole_down
@@ -155,13 +166,19 @@ def pi_hole_down(session):
     #     --project-name openstudiolandscapes-pi-holw down
 
     compose = (
-        pathlib.Path.cwd() / ".landscapes" / ".pi-hole" / "docker_compose" / "docker-compose.yml"
+        pathlib.Path.cwd()
+        / ".landscapes"
+        / ".pi-hole"
+        / "docker_compose"
+        / "docker-compose.yml"
     )
 
     if not compose.exists():
-        raise FileNotFoundError(f"Compose file not found: {compose}. "
-                                f"Execute `Compose_pi_hole / compose` in "
-                                f"Dagster to create it.")
+        raise FileNotFoundError(
+            f"Compose file not found: {compose}. "
+            f"Execute `Compose_pi_hole / compose` in "
+            f"Dagster to create it."
+        )
 
     session.run(
         shutil.which("docker"),
@@ -177,7 +194,6 @@ def pi_hole_down(session):
 
 
 #######################################################################################################################
-
 
 
 #######################################################################################################################
