@@ -179,11 +179,7 @@ def pi_hole_down(session):
 # Harbor
 
 compose_harbor = (
-    pathlib.Path.cwd()
-    / ".landscapes"
-    / ".harbor"
-    / "bin"
-    / "docker-compose.yml"
+    pathlib.Path.cwd() / ".landscapes" / ".harbor" / "bin" / "docker-compose.yml"
 )
 
 cmd_harbor = [
