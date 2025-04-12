@@ -114,13 +114,10 @@ ENVIRONMENT_PI_HOLE = {
 }
 
 # Todo
-#  - [ ] Maybe we can create the docker-compose.yml in here directly taking into consideration
+#  - [x] Maybe we can create the docker-compose.yml in here directly taking into consideration
 #        all the variables
 
-compose_pi_hole = (
-    ENVIRONMENT_PI_HOLE["PI_HOLE_ROOT_DIR"]
-    / "docker-compose.yml"
-)
+compose_pi_hole = ENVIRONMENT_PI_HOLE["PI_HOLE_ROOT_DIR"] / "docker-compose.yml"
 
 cmd_pi_hole = [
     shutil.which("docker"),
@@ -133,16 +130,20 @@ cmd_pi_hole = [
 
 
 def write_pi_hole_yml(
-        # yaml_out: pathlib.Path,
+    # yaml_out: pathlib.Path,
 ) -> pathlib.Path:
 
     pi_hole_root_dir: pathlib.Path = ENVIRONMENT_PI_HOLE["PI_HOLE_ROOT_DIR"]
     pi_hole_root_dir.mkdir(parents=True, exist_ok=True)
 
-    harbor_etc_pi_hole_dir = pi_hole_root_dir / ENVIRONMENT_PI_HOLE["PI_HOLE_ETC_PI_HOLE"]
+    harbor_etc_pi_hole_dir = (
+        pi_hole_root_dir / ENVIRONMENT_PI_HOLE["PI_HOLE_ETC_PI_HOLE"]
+    )
     harbor_etc_pi_hole_dir.mkdir(parents=True, exist_ok=True)
 
-    harbor_etc_dnsmasq_dir = pi_hole_root_dir / ENVIRONMENT_PI_HOLE["PI_HOLE_ETC_DNSMASQ"]
+    harbor_etc_dnsmasq_dir = (
+        pi_hole_root_dir / ENVIRONMENT_PI_HOLE["PI_HOLE_ETC_DNSMASQ"]
+    )
     harbor_etc_dnsmasq_dir.mkdir(parents=True, exist_ok=True)
 
     service_name = "pihole-unbound"
@@ -159,7 +160,7 @@ def write_pi_hole_yml(
         "services": {
             service_name: {
                 "container_name": container_name,
-                "hostname":  host_name,
+                "hostname": host_name,
                 "domainname": ENVIRONMENT_PI_HOLE["ROOT_DOMAIN"],
                 "restart": "unless-stopped",
                 "image": "docker.io/mpgirro/pihole-unbound:latest",
@@ -170,9 +171,7 @@ def write_pi_hole_yml(
                     # Uncomment the below if you have custom dnsmasq config files that you want to persist. Not needed for most starting fresh with Pi-hole v6. If you're upgrading from v5 you and have used this directory before, you should keep it enabled for the first v6 container start to allow for a complete migration. It can be removed afterwards. Needs environment variable FTLCONF_misc_etc_dnsmasq_d: 'true'
                     # f"./etc-dnsmasq.d:/etc/dnsmasq.d"
                 ],
-                "networks": [
-                    network_name
-                ],
+                "networks": [network_name],
                 "ports": [
                     # DNS Ports
                     "53:53/tcp",
@@ -188,19 +187,25 @@ def write_pi_hole_yml(
                 ],
                 "environment": {
                     # Set the appropriate timezone for your location (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones), e.g:
-                    "TZ": ENVIRONMENT_PI_HOLE['PIHOLE_TIMEZONE'],
+                    "TZ": ENVIRONMENT_PI_HOLE["PIHOLE_TIMEZONE"],
                     # Set a password to access the web interface. Not setting one will result in a random password being assigned
-                    "FTLCONF_webserver_api_password": ENVIRONMENT_PI_HOLE['PIHOLE_WEB_PASSWORD'],
+                    "FTLCONF_webserver_api_password": ENVIRONMENT_PI_HOLE[
+                        "PIHOLE_WEB_PASSWORD"
+                    ],
                     # If using Docker's default `bridge` network setting the dns listening mode should be set to 'all'
                     # Unbound
                     # "FTLCONF_LOCAL_IPV4": "0.0.0.0",
-                    "FTLCONF_webserver_interface_theme": ENVIRONMENT_PI_HOLE['PIHOLE_WEB_THEME'],
+                    "FTLCONF_webserver_interface_theme": ENVIRONMENT_PI_HOLE[
+                        "PIHOLE_WEB_THEME"
+                    ],
                     # "FTLCONF_dns_revServers": "${REV_SERVER:-false},${REV_SERVER_CIDR},${REV_SERVER_TARGET},${REV_SERVER_DOMAIN}",
                     "FTLCONF_dns_upstreams": "127.0.0.1#5335",
-                    "FTLCONF_dns_dnssec": ENVIRONMENT_PI_HOLE['PIHOLE_DNS_DNSSEC'],
-                    "FTLCONF_dns_listeningMode": ENVIRONMENT_PI_HOLE['PIHOLE_DNS_LISTENING_MODE'],
+                    "FTLCONF_dns_dnssec": ENVIRONMENT_PI_HOLE["PIHOLE_DNS_DNSSEC"],
+                    "FTLCONF_dns_listeningMode": ENVIRONMENT_PI_HOLE[
+                        "PIHOLE_DNS_LISTENING_MODE"
+                    ],
                     # "FTLCONF_webserver_port": "82",
-                    "REV_SERVER": ENVIRONMENT_PI_HOLE['PIHOLE_REV_SERVER'],
+                    "REV_SERVER": ENVIRONMENT_PI_HOLE["PIHOLE_REV_SERVER"],
                     # If REV_SERVER is "false", these are not necessary:
                     # "REV_SERVER_CIDR": "",
                     # "REV_SERVER_TARGET": "",
@@ -270,6 +275,7 @@ def pi_hole_up(session):
         env=ENV,
         external=True,
     )
+
 
 # # pi_hole_prepare
 @nox.session(python=None, tags=["pi_hole_prepare"])
