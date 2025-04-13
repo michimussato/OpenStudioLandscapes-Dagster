@@ -1252,7 +1252,9 @@ ENVIRONMENT_DAGSTER = {
 }
 
 yml_dagster_postgres = ENVIRONMENT_DAGSTER["DAGSTER_POSTGRES_ROOT_DIR"] / "dagster.yaml"
-compose_dagster_postgres = ENVIRONMENT_DAGSTER["DAGSTER_POSTGRES_ROOT_DIR"] / "docker-compose.yml"
+compose_dagster_postgres = (
+    ENVIRONMENT_DAGSTER["DAGSTER_POSTGRES_ROOT_DIR"] / "docker-compose.yml"
+)
 
 cmd_dagster_postgres = [
     shutil.which("docker"),
@@ -1271,7 +1273,9 @@ def write_dagster_postgres_yml(
     # Example:
     # https://github.com/docker-library/docs/blob/master/postgres/README.md#-via-docker-compose-or-docker-stack-deploy
 
-    dagster_postgres_root_dir: pathlib.Path = ENVIRONMENT_DAGSTER["DAGSTER_POSTGRES_ROOT_DIR"]
+    dagster_postgres_root_dir: pathlib.Path = ENVIRONMENT_DAGSTER[
+        "DAGSTER_POSTGRES_ROOT_DIR"
+    ]
     dagster_postgres_root_dir.mkdir(parents=True, exist_ok=True)
 
     service_name = "postgres-dagster"
@@ -1320,18 +1324,22 @@ def write_dagster_postgres_yml(
     with open(yml_dagster_postgres.as_posix(), "w") as fw:
         fw.write(dagster_postgres_yml)
 
-    logging.debug("Contents Dagster-Postgres `dagster.yaml`: \n%s" % dagster_postgres_yml)
+    logging.debug(
+        "Contents Dagster-Postgres `dagster.yaml`: \n%s" % dagster_postgres_yml
+    )
 
     return yml_dagster_postgres
 
 
 def write_dagster_postgres_compose() -> pathlib.Path:
 
-    dagster_postgres_root_dir: pathlib.Path = ENVIRONMENT_DAGSTER["DAGSTER_POSTGRES_ROOT_DIR"]
+    dagster_postgres_root_dir: pathlib.Path = ENVIRONMENT_DAGSTER[
+        "DAGSTER_POSTGRES_ROOT_DIR"
+    ]
     dagster_postgres_root_dir.mkdir(parents=True, exist_ok=True)
 
     dagster_postgres_db_dir: pathlib.Path = (
-            dagster_postgres_root_dir / ENVIRONMENT_DAGSTER['DAGSTER_POSTGRES_DB_DIR_DIR']
+        dagster_postgres_root_dir / ENVIRONMENT_DAGSTER["DAGSTER_POSTGRES_DB_DIR_DIR"]
     )
     dagster_postgres_db_dir.mkdir(parents=True, exist_ok=True)
 
@@ -1361,8 +1369,12 @@ def write_dagster_postgres_compose() -> pathlib.Path:
                     f"{ENVIRONMENT_DAGSTER['DAGSTER_POSTGRES_DB_PORT_HOST']}:{ENVIRONMENT_DAGSTER['DAGSTER_POSTGRES_DB_PORT_CONTAINER']}",
                 ],
                 "environment": {
-                    "POSTGRES_USER": ENVIRONMENT_DAGSTER["DAGSTER_POSTGRES_DB_USERNAME"],
-                    "POSTGRES_PASSWORD": ENVIRONMENT_DAGSTER["DAGSTER_POSTGRES_DB_PASSWORD"],
+                    "POSTGRES_USER": ENVIRONMENT_DAGSTER[
+                        "DAGSTER_POSTGRES_DB_USERNAME"
+                    ],
+                    "POSTGRES_PASSWORD": ENVIRONMENT_DAGSTER[
+                        "DAGSTER_POSTGRES_DB_PASSWORD"
+                    ],
                     "POSTGRES_DB": ENVIRONMENT_DAGSTER["DAGSTER_POSTGRES_DB_NAME"],
                     "PGDATA": "/var/lib/postgresql/data/pgdata",
                 },
@@ -1382,7 +1394,9 @@ def write_dagster_postgres_compose() -> pathlib.Path:
     with open(compose_dagster_postgres.as_posix(), "w") as fw:
         fw.write(dagster_postgres_yml)
 
-    logging.debug("Contents Dagster-Postgres `docker-compose.yml`: \n%s" % dagster_postgres_yml)
+    logging.debug(
+        "Contents Dagster-Postgres `docker-compose.yml`: \n%s" % dagster_postgres_yml
+    )
 
     return compose_dagster_postgres
 
@@ -1437,14 +1451,17 @@ def dagster_postgres_clear(session):
     # nox --session dagster_postgres_clear
     # nox --tags dagster_postgres_clear
 
-    dagster_postgres_root_dir: pathlib.Path = ENVIRONMENT_DAGSTER["DAGSTER_POSTGRES_ROOT_DIR"]
+    dagster_postgres_root_dir: pathlib.Path = ENVIRONMENT_DAGSTER[
+        "DAGSTER_POSTGRES_ROOT_DIR"
+    ]
 
     logging.debug("Clearing Dagster-Postgres...")
     logging.debug("Removing Dir %s" % dagster_postgres_root_dir.as_posix())
 
     if dagster_postgres_root_dir.exists():
-        logging.warning("Clearing out Dagster-Postgres...\n " 
-                        "Continue? Type `yes` to confirm.")
+        logging.warning(
+            "Clearing out Dagster-Postgres...\n " "Continue? Type `yes` to confirm."
+        )
         answer = input()
         if answer.lower() == "yes":
             session.run(
