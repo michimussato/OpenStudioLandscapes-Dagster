@@ -179,7 +179,7 @@ def pull_features(session):
             MAIN_BRANCH,
             "--rebase=true",
             "--tags",
-            external=True
+            external=True,
         )
 
 
@@ -211,7 +211,7 @@ def stash_features(session):
             "-C",
             pathlib.Path.cwd() / ".features" / name,
             "stash",
-            external=True
+            external=True,
         )
 
 
@@ -244,7 +244,7 @@ def stash_apply_features(session):
             pathlib.Path.cwd() / ".features" / name,
             "stash",
             "apply",
-            external=True
+            external=True,
         )
 
 
@@ -267,7 +267,6 @@ def pull_engine(session):
     #     --file /home/michael/git/repos/OpenStudioLandscapes/.landscapes/.pi-hole/docker_compose/docker-compose.yml \
     #     --project-name openstudiolandscapes-pi-hole up --remove-orphans
 
-
     logging.info("Pulling %s" % REPO_ENGINE)
 
     session.run(
@@ -278,7 +277,7 @@ def pull_engine(session):
         MAIN_BRANCH,
         "--rebase=true",
         "--tags",
-        external=True
+        external=True,
     )
 
 
@@ -303,11 +302,7 @@ def stash_engine(session):
 
     logging.info("Stashing %s" % REPO_ENGINE)
 
-    session.run(
-        shutil.which("git"),
-        "stash",
-        external=True
-    )
+    session.run(shutil.which("git"), "stash", external=True)
 
 
 # # stash_apply_engine
@@ -331,12 +326,7 @@ def stash_apply_engine(session):
 
     logging.info("Stashing %s" % REPO_ENGINE)
 
-    session.run(
-        shutil.which("git"),
-        "stash",
-        "apply",
-        external=True
-    )
+    session.run(shutil.which("git"), "stash", "apply", external=True)
 
 
 #######################################################################################################################
@@ -385,7 +375,8 @@ def create_venv_engine(session):
         "pip",
         "install",
         "--upgrade",
-        "pip", "setuptools",
+        "pip",
+        "setuptools",
         external=True,
     )
 
@@ -440,7 +431,8 @@ def create_venv_features(session):
                         "pip",
                         "install",
                         "--upgrade",
-                        "pip", "setuptools",
+                        "pip",
+                        "setuptools",
                         external=True,
                     )
 
@@ -484,7 +476,8 @@ def install_features_into_engine(session):
         "pip",
         "install",
         "--upgrade",
-        "pip", "setuptools",
+        "pip",
+        "setuptools",
         external=True,
     )
 
@@ -506,7 +499,6 @@ def install_features_into_engine(session):
 
 
 #######################################################################################################################
-
 
 
 #######################################################################################################################
@@ -572,7 +564,9 @@ def fix_hardlinks_in_features(session):
 
                     with session.chdir(dir_ / file_path):
 
-                        logging.info("Working director is %s" % pathlib.Path.cwd().as_posix())
+                        logging.info(
+                            "Working director is %s" % pathlib.Path.cwd().as_posix()
+                        )
 
                         logging.info("Fixing hardlink for file %s" % file_)
 
@@ -593,7 +587,6 @@ def fix_hardlinks_in_features(session):
 
 
 #######################################################################################################################
-
 
 
 #######################################################################################################################
