@@ -593,7 +593,7 @@ def compose_dagster(
         }
 
     service_name = "dagster"
-    container_name = service_name
+    container_name = "--".join([service_name, env.get("LANDSCAPE", "default")])
     host_name = ".".join([service_name, env["ROOT_DOMAIN"]])
 
     docker_dict = {
@@ -718,7 +718,7 @@ def compose_postgres(
         }
 
         service_name = env["POSTGRES_SERVICE_NAME"]
-        container_name = service_name
+        container_name = "--".join([service_name, env.get("LANDSCAPE", "default")])
         host_name = ".".join([service_name, env["ROOT_DOMAIN"]])
 
         docker_dict = {
