@@ -17,7 +17,11 @@ from dagster import (
     MetadataValue,
     Output,
     asset,
+    get_dagster_logger
 )
+
+LOGGER = get_dagster_logger(__name__)
+
 from OpenStudioLandscapes.engine.constants import DOCKER_USE_CACHE_GLOBAL, THIRD_PARTY
 from OpenStudioLandscapes.engine.exceptions import ComposeScopeException
 from OpenStudioLandscapes.engine.utils import *
