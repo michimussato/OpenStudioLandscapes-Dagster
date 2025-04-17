@@ -22,6 +22,8 @@ from OpenStudioLandscapes.engine.base.ops import (
     op_compose,
     op_docker_compose_graph,
     op_group_out,
+    op_group_in,
+    op_env,
 )
 from OpenStudioLandscapes.engine.constants import *
 from OpenStudioLandscapes.engine.enums import *
@@ -33,55 +35,6 @@ from OpenStudioLandscapes.Dagster.constants import *
 
 # Todo:
 #  - [ ] Create dagster.yaml dynamically
-
-
-@asset(
-    **ASSET_HEADER,
-    ins={
-        "group_in": AssetIn(AssetKey([*KEY_BASE, "group_out"])),
-        "constants": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "FEATURE_CONFIGS"])
-        ),
-        "FEATURE_CONFIG": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "FEATURE_CONFIG"])
-        ),
-        "COMPOSE_SCOPE": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "COMPOSE_SCOPE"])
-        ),
-    },
-)
-def env(
-    context: AssetExecutionContext,
-    group_in: dict,  # pylint: disable=redefined-outer-name
-    constants: dict,  # pylint: disable=redefined-outer-name
-    FEATURE_CONFIG: OpenStudioLandscapesConfig,  # pylint: disable=redefined-outer-name
-    COMPOSE_SCOPE: ComposeScope,  # pylint: disable=redefined-outer-name
-) -> Generator[Output[dict] | AssetMaterialization, None, None]:
-
-    env_in = copy.deepcopy(group_in["env"])
-
-    env_in.update(
-        expand_dict_vars(
-            dict_to_expand=constants[FEATURE_CONFIG],
-            kv=env_in,
-        )
-    )
-
-    env_in.update(
-        {
-            "COMPOSE_SCOPE": COMPOSE_SCOPE,
-        },
-    )
-
-    yield Output(env_in)
-
-    yield AssetMaterialization(
-        asset_key=context.asset_key,
-        metadata={
-            "__".join(context.asset_key.path): MetadataValue.json(env_in),
-            "ENVIRONMENT": MetadataValue.json(constants[FEATURE_CONFIG]),
-        },
-    )
 
 
 @asset(
@@ -809,6 +762,38 @@ def compose_maps(
             "__".join(context.asset_key.path): MetadataValue.json(ret),
         },
     )
+
+
+group_in = AssetsDefinition.from_op(
+    op_group_in,
+    can_subset=False,
+    group_name=ASSET_HEADER["group_name"],
+    # This can be deceiving: Prefixes everything on top of all
+    # other Prefixes
+    # key_prefix=ASSET_HEADER["key_prefix"],
+    keys_by_input_name={
+        "group_out": AssetKey([*KEY_BASE, "group_out"]),
+    },
+    keys_by_output_name={
+        "group_in": AssetKey([*ASSET_HEADER["key_prefix"], "group_in"]),
+    }
+)
+
+
+env = AssetsDefinition.from_op(
+    op_env,
+    can_subset=False,
+    group_name=GROUP,
+    keys_by_input_name={
+        "group_in": AssetKey([*ASSET_HEADER["key_prefix"], "group_in"]),
+        "constants": AssetKey([*ASSET_HEADER["key_prefix"], "FEATURE_CONFIGS"]),
+        "FEATURE_CONFIG": AssetKey([*ASSET_HEADER["key_prefix"], "FEATURE_CONFIG"]),
+        "COMPOSE_SCOPE": AssetKey([*ASSET_HEADER["key_prefix"], "COMPOSE_SCOPE"]),
+    },
+    keys_by_output_name={
+        "env_out": AssetKey([*ASSET_HEADER["key_prefix"], "env"]),
+    }
+)
 
 
 compose = AssetsDefinition.from_op(
