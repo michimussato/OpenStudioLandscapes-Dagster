@@ -907,4 +907,3 @@ feature_out = AssetsDefinition.from_op(
     },
     keys_by_input_name=feature_out_ins_asset,
 )
-
