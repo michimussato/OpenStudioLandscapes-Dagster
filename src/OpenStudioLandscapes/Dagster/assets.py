@@ -16,6 +16,8 @@ from dagster import (
     MetadataValue,
     Output,
     asset,
+    In,
+    Out,
 )
 
 from OpenStudioLandscapes.engine.base.ops import (
@@ -24,6 +26,7 @@ from OpenStudioLandscapes.engine.base.ops import (
     op_group_out,
     op_group_in,
     op_env,
+    factory_feature_out,
 )
 from OpenStudioLandscapes.engine.constants import *
 from OpenStudioLandscapes.engine.enums import *
@@ -75,11 +78,11 @@ def pip_packages(
     **ASSET_HEADER,
     ins={
         "env": AssetIn(
-            AssetKey([*KEY, "env"]),
+            AssetKey([*ASSET_HEADER["key_prefix"], "env"]),
         ),
-        "group_in": AssetIn(AssetKey([*KEY_BASE, "group_out"])),
+        "group_in": AssetIn(AssetKey([*ASSET_HEADER_BASE["key_prefix"], "group_out"])),
         "pip_packages": AssetIn(
-            AssetKey([*KEY, "pip_packages"]),
+            AssetKey([*ASSET_HEADER["key_prefix"], "pip_packages"]),
         ),
     },
 )
@@ -107,7 +110,7 @@ def build_docker_image(
     docker_file = pathlib.Path(
         env["DOT_LANDSCAPES"],
         env.get("LANDSCAPE", "default"),
-        f"{GROUP}__{'__'.join(KEY)}",
+        f"{ASSET_HEADER['group_name']}__{'__'.join(ASSET_HEADER['key_prefix'])}",
         "__".join(context.asset_key.path),
         "Dockerfiles",
         "Dockerfile",
@@ -213,7 +216,7 @@ def build_docker_image(
     **ASSET_HEADER,
     ins={
         "env": AssetIn(
-            AssetKey([*KEY, "env"]),
+            AssetKey([*ASSET_HEADER["key_prefix"], "env"]),
         ),
     },
     description="Visit https://docs.dagster.io/guides/deploy/dagster-yaml for reference. "
@@ -328,7 +331,7 @@ def dagster_yaml(
     dagster_yaml_file = pathlib.Path(
         env["DOT_LANDSCAPES"],
         env.get("LANDSCAPE", "default"),
-        f"{GROUP}__{'__'.join(KEY)}",
+        f"{ASSET_HEADER['group_name']}__{'__'.join(ASSET_HEADER['key_prefix'])}",
         "__".join(context.asset_key.path),
         "materializations",
         "dagster.yaml",
@@ -357,7 +360,7 @@ def dagster_yaml(
     **ASSET_HEADER,
     ins={
         "env": AssetIn(
-            AssetKey([*KEY, "env"]),
+            AssetKey([*ASSET_HEADER["key_prefix"], "env"]),
         ),
     },
     description="Visit https://docs.dagster.io/guides/deploy/code-locations/workspace-yaml for reference.",
@@ -411,7 +414,7 @@ def workspace_yaml(
     workspace_yaml_file = pathlib.Path(
         env["DOT_LANDSCAPES"],
         env.get("LANDSCAPE", "default"),
-        f"{GROUP}__{'__'.join(KEY)}",
+        f"{ASSET_HEADER['group_name']}__{'__'.join(ASSET_HEADER['key_prefix'])}",
         "__".join(context.asset_key.path),
         "workspace.yaml",
     ).expanduser()
@@ -490,19 +493,19 @@ def compose_networks(
     **ASSET_HEADER,
     ins={
         "env": AssetIn(
-            AssetKey([*KEY, "env"]),
+            AssetKey([*ASSET_HEADER["key_prefix"], "env"]),
         ),
         "compose_networks": AssetIn(
-            AssetKey([*KEY, "compose_networks"]),
+            AssetKey([*ASSET_HEADER["key_prefix"], "compose_networks"]),
         ),
         "build": AssetIn(
-            AssetKey([*KEY, "build_docker_image"]),
+            AssetKey([*ASSET_HEADER["key_prefix"], "build_docker_image"]),
         ),
         "dagster_yaml": AssetIn(
-            AssetKey([*KEY, "dagster_yaml"]),
+            AssetKey([*ASSET_HEADER["key_prefix"], "dagster_yaml"]),
         ),
         "workspace_yaml": AssetIn(
-            AssetKey([*KEY, "workspace_yaml"]),
+            AssetKey([*ASSET_HEADER["key_prefix"], "workspace_yaml"]),
         ),
     },
 )
@@ -620,10 +623,10 @@ def compose_dagster(
     **ASSET_HEADER,
     ins={
         "env": AssetIn(
-            AssetKey([*KEY, "env"]),
+            AssetKey([*ASSET_HEADER["key_prefix"], "env"]),
         ),
         "compose_networks": AssetIn(
-            AssetKey([*KEY, "compose_networks"]),
+            AssetKey([*ASSET_HEADER["key_prefix"], "compose_networks"]),
         ),
     },
     description="See https://docs.dagster.io/guides/deploy/deployment-options/docker and "
@@ -740,10 +743,10 @@ def compose_postgres(
     **ASSET_HEADER,
     ins={
         "compose_dagster": AssetIn(
-            AssetKey([*KEY, "compose_dagster"]),
+            AssetKey([*ASSET_HEADER["key_prefix"], "compose_dagster"]),
         ),
         "compose_postgres": AssetIn(
-            AssetKey([*KEY, "compose_postgres"]),
+            AssetKey([*ASSET_HEADER["key_prefix"], "compose_postgres"]),
         ),
     },
 )
@@ -764,15 +767,40 @@ def compose_maps(
     )
 
 
+@asset(
+    **ASSET_HEADER,
+    ins={
+        "features_in": AssetIn(AssetKey([*ASSET_HEADER["key_prefix"], "group_in"])),
+    },
+)
+def docker_config(
+    context: AssetExecutionContext,
+    features_in: dict,
+) -> Generator[Output[DockerConfig] | AssetMaterialization, None, None]:
+
+    context.log.info(features_in)
+
+    _docker_config: DockerConfig = features_in.pop("docker_config")
+    context.log.info(_docker_config)
+
+    yield Output(_docker_config)
+
+    yield AssetMaterialization(
+        asset_key=context.asset_key,
+        metadata={
+            _docker_config.name: MetadataValue.json(_docker_config.value),
+        },
+    )
+
+
 group_in = AssetsDefinition.from_op(
     op_group_in,
     can_subset=False,
     group_name=ASSET_HEADER["group_name"],
-    # This can be deceiving: Prefixes everything on top of all
+    # key_prefix=ASSET_HEADER["key_prefix"]: This can be deceiving: Prefixes everything on top of all
     # other Prefixes
-    # key_prefix=ASSET_HEADER["key_prefix"],
     keys_by_input_name={
-        "group_out": AssetKey([*KEY_BASE, "group_out"]),
+        "group_out": AssetKey([*ASSET_HEADER_BASE["key_prefix"], "group_out"]),
     },
     keys_by_output_name={
         "group_in": AssetKey([*ASSET_HEADER["key_prefix"], "group_in"]),
@@ -783,31 +811,35 @@ group_in = AssetsDefinition.from_op(
 env = AssetsDefinition.from_op(
     op_env,
     can_subset=False,
-    group_name=GROUP,
+    group_name=ASSET_HEADER["group_name"],
     keys_by_input_name={
         "group_in": AssetKey([*ASSET_HEADER["key_prefix"], "group_in"]),
         "constants": AssetKey([*ASSET_HEADER["key_prefix"], "FEATURE_CONFIGS"]),
         "FEATURE_CONFIG": AssetKey([*ASSET_HEADER["key_prefix"], "FEATURE_CONFIG"]),
         "COMPOSE_SCOPE": AssetKey([*ASSET_HEADER["key_prefix"], "COMPOSE_SCOPE"]),
+        "DOCKER_COMPOSE": AssetKey([*ASSET_HEADER["key_prefix"], "DOCKER_COMPOSE"]),
     },
     keys_by_output_name={
         "env_out": AssetKey([*ASSET_HEADER["key_prefix"], "env"]),
-    }
+    },
 )
 
 
 compose = AssetsDefinition.from_op(
     op_compose,
+    # Todo:
+    #  - [ ] Change to AssetKey
     tags_by_output_name={
         "compose": {
             "compose": "third_party",
         },
     },
-    group_name=GROUP,
-    key_prefix=KEY,
+    group_name=ASSET_HEADER["group_name"],
+    key_prefix=ASSET_HEADER["key_prefix"],
     keys_by_input_name={
-        "compose_networks": AssetKey([*KEY, "compose_networks"]),
-        "compose_maps": AssetKey([*KEY, "compose_maps"]),
+        "compose_networks": AssetKey([*ASSET_HEADER["key_prefix"], "compose_networks"]),
+        "compose_maps": AssetKey([*ASSET_HEADER["key_prefix"], "compose_maps"]),
+        "env": AssetKey([*ASSET_HEADER["key_prefix"], "env"]),
     },
 )
 
@@ -815,27 +847,64 @@ compose = AssetsDefinition.from_op(
 group_out = AssetsDefinition.from_op(
     op_group_out,
     can_subset=True,
-    group_name=GROUP,
+    group_name=ASSET_HEADER["group_name"],
+    # Todo:
+    #  - [ ] Change to AssetKey
     tags_by_output_name={
         "group_out": {
             "group_out": "third_party",
         },
     },
-    key_prefix=KEY,
+    key_prefix=ASSET_HEADER["key_prefix"],
     keys_by_input_name={
-        "compose": AssetKey([*KEY, "compose"]),
-        "env": AssetKey([*KEY, "env"]),
-        "group_in": AssetKey([*KEY_BASE, "group_out"]),
+        "compose": AssetKey([*ASSET_HEADER["key_prefix"], "compose"]),
+        "env": AssetKey([*ASSET_HEADER["key_prefix"], "env"]),
+        "docker_config": AssetKey([*ASSET_HEADER["key_prefix"], "docker_config"]),
     },
 )
 
 
 docker_compose_graph = AssetsDefinition.from_op(
     op_docker_compose_graph,
-    group_name=GROUP,
-    key_prefix=KEY,
+    group_name=ASSET_HEADER["group_name"],
+    key_prefix=ASSET_HEADER["key_prefix"],
     keys_by_input_name={
-        "group_out": AssetKey([*KEY, "group_out"]),
-        "compose_project_name": AssetKey([*KEY, "compose_project_name"]),
+        "group_out": AssetKey([*ASSET_HEADER["key_prefix"], "group_out"]),
+        "compose_project_name": AssetKey([*ASSET_HEADER["key_prefix"], "compose_project_name"]),
     },
 )
+
+
+feature_out_ins = {
+    "env": dict,
+    "compose": dict,
+    "group_in": dict,
+}
+
+
+feature_out_ins_op = {}
+feature_out_ins_asset = {}
+for k, v in feature_out_ins.items():
+    feature_out_ins_op[k] = In(v)
+    feature_out_ins_asset[k] = AssetKey([*ASSET_HEADER["key_prefix"], k])
+
+
+feature_out_op = factory_feature_out(
+    name=f"op_feature_out_{ASSET_HEADER['group_name']}",
+    ins=feature_out_ins_op,
+    out={
+        "feature_out": Out(dict),
+    },
+)
+
+
+feature_out = AssetsDefinition.from_op(
+    feature_out_op,
+    can_subset=False,
+    group_name=ASSET_HEADER["group_name"],
+    keys_by_output_name={
+        "feature_out": AssetKey([*ASSET_HEADER["key_prefix"], "feature_out"]),
+    },
+    keys_by_input_name=feature_out_ins_asset,
+)
+

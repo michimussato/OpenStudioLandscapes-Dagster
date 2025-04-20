@@ -1,14 +1,13 @@
 __all__ = [
     "DOCKER_USE_CACHE",
     "DAGSTER_USE_POSTGRES",
-    "GROUP",
-    "KEY",
     "ASSET_HEADER",
     "FEATURE_CONFIGS",
 ]
 
 import pathlib
-from typing import Generator, MutableMapping
+from pathlib import Path
+from typing import Generator, Any
 
 from dagster import (
     multi_asset,
@@ -129,8 +128,6 @@ constants = AssetsDefinition.from_op(
     keys_by_output_name={
         "COMPOSE_SCOPE": AssetKey([*ASSET_HEADER["key_prefix"], "COMPOSE_SCOPE"]),
         "FEATURE_CONFIG": AssetKey([*ASSET_HEADER["key_prefix"], "FEATURE_CONFIG"]),
-        # "FEATURE_CONFIGS": AssetKey([*ASSET_HEADER["key_prefix"], "FEATURE_CONFIGS"]),
-        # "DOCKER_USE_CACHE": AssetKey([*ASSET_HEADER["key_prefix"], "DOCKER_USE_CACHE"]),
     }
 )
 
@@ -148,11 +145,18 @@ constants = AssetsDefinition.from_op(
             dagster_type=dict,
             description="",
         ),
+        "DOCKER_COMPOSE": AssetOut(
+            **ASSET_HEADER,
+            dagster_type=pathlib.Path,
+            description="",
+        ),
     },
 )
 def constants_multi_asset(
     context: AssetExecutionContext,
-) -> Generator[Output[MutableMapping] | AssetMaterialization, None, None]:
+) -> Generator[
+    Output[dict[OpenStudioLandscapesConfig, dict[str | Any, bool | str | Any]]] | AssetMaterialization | Output[Any] |
+    Output[Path] | Any, None, None]:
     """ """
 
     yield Output(
@@ -180,5 +184,28 @@ def constants_multi_asset(
             "__".join(
                 context.asset_key_for_output("NAME").path
             ): MetadataValue.path(__name__),
+        },
+    )
+
+    docker_compose = pathlib.Path(
+        "{DOT_LANDSCAPES}",
+        "{LANDSCAPE}",
+        f"{ASSET_HEADER['group_name']}__{'_'.join(ASSET_HEADER['key_prefix'])}",
+        "__".join(context.asset_key_for_output("DOCKER_COMPOSE").path),
+        "docker_compose",
+        "docker-compose.yml",
+    )
+
+    yield Output(
+        output_name="DOCKER_COMPOSE",
+        value=docker_compose,
+    )
+
+    yield AssetMaterialization(
+        asset_key=context.asset_key_for_output("DOCKER_COMPOSE"),
+        metadata={
+            "__".join(
+                context.asset_key_for_output("DOCKER_COMPOSE").path
+            ): MetadataValue.path(docker_compose),
         },
     )
