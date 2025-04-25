@@ -50,7 +50,8 @@ docker_config = get_docker_config(
 
 group_in = get_group_in(
     ASSET_HEADER=ASSET_HEADER,
-    ASSET_HEADER_BASE=ASSET_HEADER_BASE,
+    ASSET_HEADER_PARENT=ASSET_HEADER_BASE,
+    input_name=str(GroupIn.BASE_IN),
 )
 
 
@@ -124,7 +125,7 @@ def pip_packages(
         "env": AssetIn(
             AssetKey([*ASSET_HEADER["key_prefix"], "env"]),
         ),
-        "group_in": AssetIn(AssetKey([*ASSET_HEADER_BASE["key_prefix"], "group_out"])),
+        "group_in": AssetIn(AssetKey([*ASSET_HEADER_BASE["key_prefix"], str(GroupIn.BASE_IN)])),
         "pip_packages": AssetIn(
             AssetKey([*ASSET_HEADER["key_prefix"], "pip_packages"]),
         ),
