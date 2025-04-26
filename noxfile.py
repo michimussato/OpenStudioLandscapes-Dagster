@@ -1368,7 +1368,6 @@ def write_dagster_postgres_yml(
                     # Todo:
                     #  - [ ] Which one is it?
                     # "port": ENVIRONMENT_DAGSTER["DAGSTER_POSTGRES_DB_PORT_CONTAINER"],
-
                     "port": ENVIRONMENT_DAGSTER["DAGSTER_POSTGRES_DB_PORT_HOST"],
                 },
             },
