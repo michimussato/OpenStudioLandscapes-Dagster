@@ -20,7 +20,7 @@ from dagster import (
 from OpenStudioLandscapes.engine.constants import *
 from OpenStudioLandscapes.engine.enums import *
 from OpenStudioLandscapes.engine.utils import *
-from OpenStudioLandscapes.engine.utils.docker.whales import *
+from OpenStudioLandscapes.engine.utils.docker import *
 
 from OpenStudioLandscapes.Dagster.constants import *
 
@@ -32,6 +32,7 @@ from OpenStudioLandscapes.engine.common_assets.group_out import get_group_out
 from OpenStudioLandscapes.engine.common_assets.docker_compose_graph import get_docker_compose_graph
 from OpenStudioLandscapes.engine.common_assets.feature_out import get_feature_out
 from OpenStudioLandscapes.engine.common_assets.compose import get_compose
+from OpenStudioLandscapes.engine.common_assets.docker_config_json import get_docker_config_json
 
 
 # Todo:
@@ -85,6 +86,11 @@ feature_out = get_feature_out(
 )
 
 
+docker_config_json = get_docker_config_json(
+    ASSET_HEADER=ASSET_HEADER,
+)
+
+
 @asset(
     **ASSET_HEADER,
 )
@@ -125,6 +131,9 @@ def pip_packages(
         "env": AssetIn(
             AssetKey([*ASSET_HEADER["key_prefix"], "env"]),
         ),
+        "docker_config_json": AssetIn(
+            AssetKey([*ASSET_HEADER["key_prefix"], "docker_config_json"]),
+        ),
         "group_in": AssetIn(AssetKey([*ASSET_HEADER_BASE["key_prefix"], str(GroupIn.BASE_IN)])),
         "pip_packages": AssetIn(
             AssetKey([*ASSET_HEADER["key_prefix"], "pip_packages"]),
@@ -134,6 +143,7 @@ def pip_packages(
 def build_docker_image(
     context: AssetExecutionContext,
     env: dict,  # pylint: disable=redefined-outer-name
+    docker_config_json: pathlib.Path,  # pylint: disable=redefined-outer-name
     group_in: dict,  # pylint: disable=redefined-outer-name
     pip_packages: list,  # pylint: disable=redefined-outer-name
 ) -> Generator[Output[dict] | AssetMaterialization, None, None]:
@@ -233,16 +243,40 @@ def build_docker_image(
         "image_parent": copy.deepcopy(build_base_image_data),
     }
 
-    context.log.debug(image_data)
+    context.log.info(f"{image_data = }")
 
-    tags_list: list = docker_build(
+    cmds = []
+
+    tags_local = [f"{image_prefix_local}{image_name}:{tag}" for tag in tags]
+    tags_full = [f"{image_prefix_full}{image_name}:{tag}" for tag in tags]
+
+    cmd_build = docker_build_cmd(
         context=context,
-        docker_config=build_base_docker_config,
+        docker_config_json=docker_config_json,
         docker_file=docker_file,
-        context_path=docker_file.parent,
-        docker_use_cache=DOCKER_USE_CACHE,
-        image_data=image_data,
+        tags_local=tags_local,
+        tags_full=tags_full,
     )
+
+    cmds.append(cmd_build)
+
+    cmds_push = docker_push_cmd(
+        context=context,
+        docker_config_json=docker_config_json,
+        tags_full=tags_full,
+    )
+
+    cmds.extend(cmds_push)
+
+    context.log.info(f"{cmds = }")
+
+    logs = []
+
+    for logs_ in docker_process_cmds(
+        context=context,
+        cmds=cmds,
+    ):
+        logs.append(logs_)
 
     yield Output(image_data)
 
@@ -250,9 +284,9 @@ def build_docker_image(
         asset_key=context.asset_key,
         metadata={
             "__".join(context.asset_key.path): MetadataValue.json(image_data),
-            "tags_list": MetadataValue.json(tags_list),
             "docker_file": MetadataValue.md(f"```shell\n{docker_file_content}\n```"),
             "env": MetadataValue.json(env),
+            "logs": MetadataValue.json(logs),
         },
     )
 
