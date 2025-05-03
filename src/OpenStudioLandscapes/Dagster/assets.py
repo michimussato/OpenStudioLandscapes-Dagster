@@ -20,6 +20,7 @@ from dagster import (
 from OpenStudioLandscapes.engine.constants import *
 from OpenStudioLandscapes.engine.enums import *
 from OpenStudioLandscapes.engine.utils import *
+from OpenStudioLandscapes.engine.utils.docker import *
 
 from OpenStudioLandscapes.Dagster.constants import *
 
