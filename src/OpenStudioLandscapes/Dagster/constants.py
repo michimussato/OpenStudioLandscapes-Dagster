@@ -21,7 +21,6 @@ from dagster import (
 
 LOGGER = get_dagster_logger(__name__)
 
-from OpenStudioLandscapes.engine.utils import *
 from OpenStudioLandscapes.engine.constants import DOCKER_USE_CACHE_GLOBAL
 from OpenStudioLandscapes.engine.enums import OpenStudioLandscapesConfig
 
@@ -35,7 +34,7 @@ DAGSTER_USE_POSTGRES = True
 
 GROUP = "Dagster"
 KEY = [GROUP]
-FEATURE = f"OpenStudioLandscapes-{GROUP}"
+FEATURE = f"OpenStudioLandscapes-{GROUP}".replace("_", "-")
 
 ASSET_HEADER = {
     "group_name": GROUP,
@@ -47,7 +46,10 @@ FEATURE_CONFIGS = {
     OpenStudioLandscapesConfig.DEFAULT: {
         "DOCKER_USE_CACHE": DOCKER_USE_CACHE,
         "CONFIGS_ROOT": pathlib.Path(
-            get_configs_root(pathlib.Path(__file__)),
+            "{DOT_FEATURES}",
+            FEATURE,
+            ".payload",
+            "config",
         )
         .expanduser()
         .as_posix(),
