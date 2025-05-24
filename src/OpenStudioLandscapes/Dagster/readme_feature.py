@@ -27,7 +27,7 @@ def readme_feature(doc: snakemd.Document) -> snakemd.Document:
                 """
             ),
             image={
-                "Dagster": "https://dagster.io/images/download.svg",
+                "Dagster": "https://dagster.io/images/brand/logos/dagster-primary-horizontal.png",
             }["Dagster"],
             link="https://dagster.io/platform",
         ).__str__()
