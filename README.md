@@ -7,13 +7,14 @@
    2. [Requirements](#requirements)
    3. [Install](#install)
       1. [This Feature](#this-feature)
-   4. [Add to OpenStudioLandscapes](#add-to-openstudiolandscapes)
-   5. [Testing](#testing)
+   4. [Dagster Documentation](#dagster-documentation)
+   5. [Add to OpenStudioLandscapes](#add-to-openstudiolandscapes)
+   6. [Testing](#testing)
       1. [pre-commit](#pre-commit)
       2. [nox](#nox)
-   6. [Variables](#variables)
+   7. [Variables](#variables)
       1. [Feature Configs](#feature-configs)
-   7. [Community](#community)
+   8. [Community](#community)
 
 ***
 
@@ -66,6 +67,23 @@ pip install -e ".[dev]"
 
 For more info see [VCS Support of pip](https://pip.pypa.io/en/stable/topics/vcs-support/).
 
+## Dagster Documentation
+
+- [https://release-1-9-13.archive.dagster-docs.io/]()
+
+[![ Logo Dagster ](https://dagster.io/images/brand/logos/dagster-primary-horizontal.png)](https://dagster.io/platform)
+
+Dagster is written and maintained by Dagster Labs.
+
+[![ Logo Dagster ](https://dagster.io/images/brand/logos/dagster_labs-primary-horizontal.png)](https://dagster.io)
+
+Dagster is available in two flavors:
+
+1. [Dagster Community](https://dagster.io/community)
+2. [Dagster+](https://dagster.io/plus)
+
+`OpenStudioLandscapes-Dagster` is based on the Community release. The Dagster version used in `OpenStudioLandscapes-Dagster` is locked to version `1.9.11`.
+
 ## Add to OpenStudioLandscapes
 
 Add the following code to `OpenStudioLandscapes.engine.constants` (`FEATURES`):
@@ -73,12 +91,12 @@ Add the following code to `OpenStudioLandscapes.engine.constants` (`FEATURES`):
 ```python
 
 FEATURES.update(
-   {
-      "enabled": True,
-      "module": "Dagster.definitions",
-      "compose_scope": ComposeScope.DEFAULT,
-      "feature_config": OpenStudioLandscapesConfig.DEFAULT,
-   }
+    "OpenStudioLandscapes-Dagster": {
+        "enabled": True,
+        "module": "OpenStudioLandscapes.Dagster.definitions",
+        "compose_scope": ComposeScope.DEFAULT,
+        "feature_config": OpenStudioLandscapesConfig.DEFAULT,
+    }
 )
 
 ```
@@ -178,7 +196,7 @@ The following variables are being declared in [`Dagster`](https://github.com/mic
 
 | Variable                                | Type   | Value                                                                                                 |
 | :-------------------------------------- | :----- | :---------------------------------------------------------------------------------------------------- |
-| `DOCKER_USE_CACHE`                      | `bool` | `True`                                                                                                |
+| `DOCKER_USE_CACHE`                      | `bool` | `False`                                                                                               |
 | `CONFIGS_ROOT`                          | `str`  | `/home/michael/git/repos/OpenStudioLandscapes/.features/OpenStudioLandscapes-Dagster/.payload/config` |
 | `DAGSTER_DEV_PORT_HOST`                 | `str`  | `3003`                                                                                                |
 | `DAGSTER_DEV_PORT_CONTAINER`            | `str`  | `3006`                                                                                                |
