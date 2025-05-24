@@ -181,7 +181,7 @@ Currently, the following Python interpreters are enabled for testing:
 
 ## Variables
 
-The following variables are being declared in [`Dagster`](https://github.com/michimussato/OpenStudioLandscapes-Dagster/tree/main/src/OpenStudioLandscapes/Dagster/constants.py) published throughout the `OpenStudioLandscapes-Dagster` package.
+The following variables are being declared in `OpenStudioLandscapes.Dagster.constants` and are accessible throughout the [`OpenStudioLandscapes-Dagster`](https://github.com/michimussato/OpenStudioLandscapes-Dagster/tree/main/src/OpenStudioLandscapes/Dagster/constants.py) package.
 
 | Variable               | Type   |
 | :--------------------- | :----- |
@@ -194,24 +194,24 @@ The following variables are being declared in [`Dagster`](https://github.com/mic
 
 #### Feature Config: default
 
-| Variable                                | Type   | Value                                                                                                 |
-| :-------------------------------------- | :----- | :---------------------------------------------------------------------------------------------------- |
-| `DOCKER_USE_CACHE`                      | `bool` | `False`                                                                                               |
-| `CONFIGS_ROOT`                          | `str`  | `/home/michael/git/repos/OpenStudioLandscapes/.features/OpenStudioLandscapes-Dagster/.payload/config` |
-| `DAGSTER_DEV_PORT_HOST`                 | `str`  | `3003`                                                                                                |
-| `DAGSTER_DEV_PORT_CONTAINER`            | `str`  | `3006`                                                                                                |
-| `DAGSTER_ROOT`                          | `str`  | `/dagster`                                                                                            |
-| `DAGSTER_HOME`                          | `str`  | `/dagster/materializations`                                                                           |
-| `DAGSTER_HOST`                          | `str`  | `0.0.0.0`                                                                                             |
-| `DAGSTER_WORKSPACE`                     | `str`  | `/dagster/workspace.yaml`                                                                             |
-| `POSTGRES_SERVICE_NAME`                 | `str`  | `openstudiolandscapes-postgres-dagster`                                                               |
-| `POSTGRES_USER`                         | `str`  | `postgres`                                                                                            |
-| `POSTGRES_PASSWORD`                     | `str`  | `mysecretpassword`                                                                                    |
-| `POSTGRES_DB`                           | `str`  | `postgres`                                                                                            |
-| `PGDATA`                                | `str`  | `/var/lib/postgresql/data/pgdata`                                                                     |
-| `POSTGRES_PORT_HOST`                    | `str`  | `5432`                                                                                                |
-| `POSTGRES_PORT_CONTAINER`               | `str`  | `5432`                                                                                                |
-| `POSTGRES_DATABASE_INSTALL_DESTINATION` | `str`  | `{DOT_LANDSCAPES}/.dagster/postgres`                                                                  |
+| Variable                                | Type   | Value                                                         |
+| :-------------------------------------- | :----- | :------------------------------------------------------------ |
+| `DOCKER_USE_CACHE`                      | `bool` | `False`                                                       |
+| `CONFIGS_ROOT`                          | `str`  | `{DOT_FEATURES}/OpenStudioLandscapes-Dagster/.payload/config` |
+| `DAGSTER_DEV_PORT_HOST`                 | `str`  | `3003`                                                        |
+| `DAGSTER_DEV_PORT_CONTAINER`            | `str`  | `3006`                                                        |
+| `DAGSTER_ROOT`                          | `str`  | `/dagster`                                                    |
+| `DAGSTER_HOME`                          | `str`  | `/dagster/materializations`                                   |
+| `DAGSTER_HOST`                          | `str`  | `0.0.0.0`                                                     |
+| `DAGSTER_WORKSPACE`                     | `str`  | `/dagster/workspace.yaml`                                     |
+| `POSTGRES_SERVICE_NAME`                 | `str`  | `openstudiolandscapes-postgres-dagster`                       |
+| `POSTGRES_USER`                         | `str`  | `postgres`                                                    |
+| `POSTGRES_PASSWORD`                     | `str`  | `mysecretpassword`                                            |
+| `POSTGRES_DB`                           | `str`  | `postgres`                                                    |
+| `PGDATA`                                | `str`  | `/var/lib/postgresql/data/pgdata`                             |
+| `POSTGRES_PORT_HOST`                    | `str`  | `5432`                                                        |
+| `POSTGRES_PORT_CONTAINER`               | `str`  | `5432`                                                        |
+| `POSTGRES_DATABASE_INSTALL_DESTINATION` | `str`  | `{DOT_LANDSCAPES}/.dagster/postgres`                          |
 
 ## Community
 
