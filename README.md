@@ -7,14 +7,18 @@
    2. [Requirements](#requirements)
    3. [Install](#install)
       1. [This Feature](#this-feature)
-   4. [Dagster Documentation](#dagster-documentation)
-   5. [Add to OpenStudioLandscapes](#add-to-openstudiolandscapes)
-   6. [Testing](#testing)
+   4. [Add to OpenStudioLandscapes](#add-to-openstudiolandscapes)
+   5. [Testing](#testing)
       1. [pre-commit](#pre-commit)
       2. [nox](#nox)
-   7. [Variables](#variables)
+   6. [Variables](#variables)
       1. [Feature Configs](#feature-configs)
-   8. [Community](#community)
+2. [Community](#community)
+3. [Dagster Documentation](#dagster-documentation)
+
+***
+
+This `README.md` was dynamically created with [OpenStudioLandscapesUtil-ReadmeGenerator](https://github.com/michimussato/OpenStudioLandscapesUtil-ReadmeGenerator).
 
 ***
 
@@ -66,23 +70,6 @@ pip install -e ".[dev]"
 ```
 
 For more info see [VCS Support of pip](https://pip.pypa.io/en/stable/topics/vcs-support/).
-
-## Dagster Documentation
-
-- [https://release-1-9-13.archive.dagster-docs.io/]()
-
-[![ Logo Dagster ](https://dagster.io/images/brand/logos/dagster-primary-horizontal.png)](https://dagster.io/platform)
-
-Dagster is written and maintained by Dagster Labs.
-
-[![ Logo Dagster ](https://dagster.io/images/brand/logos/dagster_labs-primary-horizontal.png)](https://dagster.io)
-
-Dagster is available in two flavors:
-
-1. [Dagster Community](https://dagster.io/community)
-2. [Dagster+](https://dagster.io/plus)
-
-`OpenStudioLandscapes-Dagster` is based on the Community release. The Dagster version used in `OpenStudioLandscapes-Dagster` is locked to version `1.9.11`.
 
 ## Add to OpenStudioLandscapes
 
@@ -213,7 +200,7 @@ The following variables are being declared in `OpenStudioLandscapes.Dagster.cons
 | `POSTGRES_PORT_CONTAINER`               | `str`  | `5432`                                                        |
 | `POSTGRES_DATABASE_INSTALL_DESTINATION` | `str`  | `{DOT_LANDSCAPES}/.dagster/postgres`                          |
 
-## Community
+# Community
 
 | GitHub                                                                                                                       | Discord                                                                                                                |
 | ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
@@ -236,4 +223,19 @@ To follow up on the previous LinkedIn publications, visit:
 
 ***
 
-This `README.md` was dynamically created with [OpenStudioLandscapesUtil-ReadmeGenerator](https://github.com/michimussato/OpenStudioLandscapesUtil-ReadmeGenerator).
+# Dagster Documentation
+
+- [https://release-1-9-13.archive.dagster-docs.io/]()
+
+[![ Logo Dagster ](https://dagster.io/images/brand/logos/dagster-primary-horizontal.png)](https://dagster.io/platform)
+
+Dagster is written and maintained by Dagster Labs.
+
+[![ Logo Dagster ](https://dagster.io/images/brand/logos/dagster_labs-primary-horizontal.png)](https://dagster.io)
+
+Dagster is available in two flavors:
+
+1. [Dagster Community](https://dagster.io/community)
+2. [Dagster+](https://dagster.io/plus)
+
+`OpenStudioLandscapes-Dagster` is based on the Community release. The Dagster version used in `OpenStudioLandscapes-Dagster` is locked to version `1.9.11`.
