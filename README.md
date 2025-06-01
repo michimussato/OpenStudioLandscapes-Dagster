@@ -115,7 +115,7 @@ nox --no-error-on-missing-interpreters --report .nox/nox-report.json
 
 ```shell
 
-nox --session readme
+nox -v --add-timestamp --session readme
 
 ```
 
@@ -123,7 +123,7 @@ nox --session readme
 
 ```shell
 
-nox --session docs
+nox -v --add-timestamp --session docs
 
 ```
 
@@ -131,7 +131,7 @@ nox --session docs
 
 ```shell
 
-nox --session lint
+nox -v --add-timestamp --session lint
 
 ```
 
@@ -145,7 +145,7 @@ Acronym for Software Bill of Materials
 
 ```shell
 
-nox --session sbom
+nox -v --add-timestamp --session sbom
 
 ```
 
@@ -225,7 +225,7 @@ To follow up on the previous LinkedIn publications, visit:
 
 # Dagster Documentation
 
-- [https://release-1-9-13.archive.dagster-docs.io/]()
+- [https://release-1-9-13.archive.dagster-docs.io](https://release-1-9-13.archive.dagster-docs.io)
 
 [![ Logo Dagster ](https://dagster.io/images/brand/logos/dagster-primary-horizontal.png)](https://dagster.io/platform)
 
