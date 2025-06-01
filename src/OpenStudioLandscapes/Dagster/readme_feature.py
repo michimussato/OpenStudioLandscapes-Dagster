@@ -13,7 +13,7 @@ def readme_feature(doc: snakemd.Document) -> snakemd.Document:
 
     doc.add_unordered_list(
         [
-            "[https://release-1-9-13.archive.dagster-docs.io/]()",
+            "[https://release-1-9-13.archive.dagster-docs.io](https://release-1-9-13.archive.dagster-docs.io)",
         ]
     )
 
