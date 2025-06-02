@@ -24,6 +24,8 @@ build:
   jobs:
     build:
       html:
+        - pwd
+        - touch index.html
         - nox -v -ts -s docs
         - ls -al
         - ls -al ./docs
