@@ -2449,6 +2449,7 @@ def docs(session):
     # paths
     src = pathlib.Path(__file__).parent / "_images"
     trg = pathlib.Path(__file__).parent / "build" / "docs" / "_images"
+    # trg = pathlib.Path(__file__).parent / "build" / "docs" / "html" / "_images"
 
     # if - mistakenly (which has happened) - _images is a file,
     # remove it before proceeding.
@@ -2457,11 +2458,21 @@ def docs(session):
 
     sudo = False
 
+    readthedocs_outdir = os.environ.get("READTHEDOCS_OUTPUT", None)
+    if readthedocs_outdir is None:
+        outdir = pathlib.Path(__file__).parent / "build" / "docs"
+    else:
+        outdir = pathlib.Path(readthedocs_outdir) / "html"
+    #     outdir = pathlib.Path(readthedocs_outdir) / "html"
+    # else:
+    #     outdir = pathlib.Path(__file__).parent / "build" / "docs" / "html"
+
     session.install("-e", ".[docs]", silent=True)
 
     deptree_out = (
         pathlib.Path(__file__).parent
         / "docs"
+        # / "html"
         / "dot"
         / f"graphviz_pipdeptree.{session.name}.dot"
     )
@@ -2479,7 +2490,17 @@ def docs(session):
 
     # sphinx-build [OPTIONS] SOURCEDIR OUTPUTDIR [FILENAMES...]
     # HTML
-    session.run("sphinx-build", "--builder", "html", "docs/", "build/docs")
+    session.run(
+        shutil.which("sphinx-build"),
+        "--builder",
+        "html",
+        # "docs/",
+        str(pathlib.Path(__file__).parent / "docs"),
+        # "build/docs",
+        str(outdir),
+        # str(pathlib.Path(__file__).parent / "build" / "docs"),
+        # str(pathlib.Path(__file__).parent / "build" / "docs" / "html"),
+    )
     # LATEX/PDF
     # session.run("sphinx-build", "--builder", "latex", "docs/", "build/pdf")
     # session.run("make", "-C", "latexmk", "docs/", "build/pdf")
