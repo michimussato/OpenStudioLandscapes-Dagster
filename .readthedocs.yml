@@ -33,6 +33,7 @@ build:
 #        - touch index.html
         - nox -v -ts -s docs
         - ls -al $READTHEDOCS_OUTPUT/html
+        - ls -al $READTHEDOCS_OUTPUT/html/_images
 #        - ls -al ./docs
 #        - ls -al ./build
 #        - ls -al ./build/docs
