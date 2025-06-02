@@ -25,7 +25,8 @@ build:
     build:
       html:
         - nox -v -ts -s docs
-        - mv docs/* .
+        - ls -al
+        # - mv docs/* .
 
 python:
   install:
