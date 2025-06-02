@@ -23,5 +23,7 @@ build:
 
 python:
   install:
-    - sphinx-mdinclude
-    - {path: ., method: pip}
+    - method: pip
+      path: .
+      extra_requirements:
+        - sphinx-mdinclude
