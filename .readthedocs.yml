@@ -26,6 +26,7 @@ build:
       html:
         - nox -v -ts -s docs
         - ls -al
+        - ls -al ./docs
         # - mv docs/* .
 
 python:
