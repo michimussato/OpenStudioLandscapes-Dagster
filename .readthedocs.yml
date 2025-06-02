@@ -21,18 +21,20 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.11"
-#  jobs:
-#    build:
-#      html:
+  jobs:
+    build:
+      html:
+        # Default Build Command:
+        # python -m sphinx -T -b html -d _build/doctrees -D language=en . $READTHEDOCS_OUTPUT/html
 #        - pwd
 #        - echo $READTHEDOCS_OUTPUT
 #        - touch index.html
-#        - nox -v -ts -s docs
+        - nox -v -ts -s docs
 #        - ls -al
 #        - ls -al ./docs
 #        - ls -al ./build
 #        - ls -al ./build/docs
-#        - ls -al $READTHEDOCS_OUTPUT
+        - ls -al $READTHEDOCS_OUTPUT
 #        # - mv docs/* .
 
 python:
