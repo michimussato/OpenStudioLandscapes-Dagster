@@ -2458,11 +2458,6 @@ def docs(session):
         outdir = pathlib.Path(readthedocs_outdir) / "html"
 
     trg = outdir / "_images"
-    #     outdir = pathlib.Path(readthedocs_outdir) / "html"
-    # else:
-    #     outdir = pathlib.Path(__file__).parent / "build" / "docs" / "html"
-
-    # trg = pathlib.Path(__file__).parent / "build" / "docs" / "html" / "_images"
 
     # if - mistakenly (which has happened) - _images is a file,
     # remove it before proceeding.
@@ -2474,7 +2469,6 @@ def docs(session):
     deptree_out = (
         pathlib.Path(__file__).parent
         / "docs"
-        # / "html"
         / "dot"
         / f"graphviz_pipdeptree.{session.name}.dot"
     )
@@ -2496,12 +2490,8 @@ def docs(session):
         shutil.which("sphinx-build"),
         "--builder",
         "html",
-        # "docs/",
         str(pathlib.Path(__file__).parent / "docs"),
-        # "build/docs",
         str(outdir),
-        # str(pathlib.Path(__file__).parent / "build" / "docs"),
-        # str(pathlib.Path(__file__).parent / "build" / "docs" / "html"),
     )
     # LATEX/PDF
     # session.run("sphinx-build", "--builder", "latex", "docs/", "build/pdf")
