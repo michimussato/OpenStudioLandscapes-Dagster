@@ -2448,13 +2448,6 @@ def docs(session):
     # defining source and destination
     # paths
     src = pathlib.Path(__file__).parent / "_images"
-    trg = pathlib.Path(__file__).parent / "build" / "docs" / "_images"
-    # trg = pathlib.Path(__file__).parent / "build" / "docs" / "html" / "_images"
-
-    # if - mistakenly (which has happened) - _images is a file,
-    # remove it before proceeding.
-    if trg.is_file():
-        os.remove(trg.as_posix())
 
     sudo = False
 
@@ -2463,9 +2456,18 @@ def docs(session):
         outdir = pathlib.Path(__file__).parent / "build" / "docs"
     else:
         outdir = pathlib.Path(readthedocs_outdir) / "html"
+
+    trg = outdir / "_images"
     #     outdir = pathlib.Path(readthedocs_outdir) / "html"
     # else:
     #     outdir = pathlib.Path(__file__).parent / "build" / "docs" / "html"
+
+    # trg = pathlib.Path(__file__).parent / "build" / "docs" / "html" / "_images"
+
+    # if - mistakenly (which has happened) - _images is a file,
+    # remove it before proceeding.
+    if trg.is_file():
+        os.remove(trg.as_posix())
 
     session.install("-e", ".[docs]", silent=True)
 
