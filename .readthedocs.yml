@@ -21,19 +21,19 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.11"
-  jobs:
-    build:
-      html:
-        - pwd
-        - echo $READTHEDOCS_OUTPUT
-        - touch index.html
-        - nox -v -ts -s docs
-        - ls -al
-        - ls -al ./docs
-        - ls -al ./build
-        - ls -al ./build/docs
-        - ls -al $READTHEDOCS_OUTPUT
-        # - mv docs/* .
+#  jobs:
+#    build:
+#      html:
+#        - pwd
+#        - echo $READTHEDOCS_OUTPUT
+#        - touch index.html
+#        - nox -v -ts -s docs
+#        - ls -al
+#        - ls -al ./docs
+#        - ls -al ./build
+#        - ls -al ./build/docs
+#        - ls -al $READTHEDOCS_OUTPUT
+#        # - mv docs/* .
 
 python:
   install:
