@@ -25,6 +25,7 @@ build:
     build:
       html:
         - pwd
+        - echo $READTHEDOCS_OUTPUT
         - touch index.html
         - nox -v -ts -s docs
         - ls -al
