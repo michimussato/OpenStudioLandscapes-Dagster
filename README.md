@@ -14,7 +14,10 @@
    6. [Variables](#variables)
       1. [Feature Configs](#feature-configs)
 2. [Community](#community)
-3. [Dagster Documentation](#dagster-documentation)
+3. [Official Resources](#official-resources)
+   1. [Official Documentation (Version 1.9)](#official-documentation-version-19)
+   2. [Getting Started with Dagster](#getting-started-with-dagster)
+   3. [Resources](#resources)
 
 ***
 
@@ -223,19 +226,35 @@ To follow up on the previous LinkedIn publications, visit:
 
 ***
 
-# Dagster Documentation
+# Official Resources
 
-- [https://release-1-9-13.archive.dagster-docs.io](https://release-1-9-13.archive.dagster-docs.io)
-
-[![ Logo Dagster ](https://dagster.io/images/brand/logos/dagster-primary-horizontal.png)](https://dagster.io/platform)
+[![ Logo Dagster ](https://dagster-website.vercel.app/images/brand/logos/dagster-primary-horizontal.png)](https://dagster.io/platform)
 
 Dagster is written and maintained by Dagster Labs.
 
-[![ Logo Dagster ](https://dagster.io/images/brand/logos/dagster_labs-primary-horizontal.png)](https://dagster.io)
+[![ Logo Dagster Labs ](https://docs.dagster.io/img/dagster_labs-primary-horizontal.svg)](https://dagster.io)
 
 Dagster is available in two flavors:
 
 1. [Dagster Community](https://dagster.io/community)
 2. [Dagster+](https://dagster.io/plus)
 
-`OpenStudioLandscapes-Dagster` is based on the Community release. The Dagster version used in `OpenStudioLandscapes-Dagster` is locked to version `1.9.11`.
+`OpenStudioLandscapes-Dagster` is based on the Community release. Dagster is evolving at a very fast pace and it can be hard to keep up. Therefore, for now, the Dagster version used in `OpenStudioLandscapes-Dagster` is locked to [version `1.9.11`](https://pypi.org/project/dagster/1.9.11/). When consulting the official [Dagster Documentation](https://docs.dagster.io), make sure you consult the matching [version](#official-documentation-version-19).
+
+## Official Documentation (Version 1.9)
+
+- [https://release-1-9-13.archive.dagster-docs.io](https://release-1-9-13.archive.dagster-docs.io)
+
+## Getting Started with Dagster
+
+Dagsters primary learning resource is called [Dagster University](https://courses.dagster.io). It is a fantastic learning path and you should check it out if you plan to use Dagster as you automation platform (a personal recommendation by the `OpenStudioLandscapes-Dagster` maintainer). The course [Dagster Essentials](https://courses.dagster.io/courses/dagster-essentials) will give you a basic but deep enough understanding of how Dagster works.
+
+- [Dagster University](https://courses.dagster.io)
+
+## Resources
+
+- [All Resources](https://dagster.io/resources)
+- [GitHub](https://github.com/dagster-io/dagster)
+- [Issue Tracker](https://github.com/dagster-io/dagster/issues)
+- [PyPi](https://pypi.org/project/dagster)
+- [Slack](https://app.slack.com/client/TCDGQDUKF)

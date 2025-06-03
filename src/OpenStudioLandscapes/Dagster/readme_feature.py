@@ -7,14 +7,8 @@ def readme_feature(doc: snakemd.Document) -> snakemd.Document:
     ## Some Specific information
 
     doc.add_heading(
-        text="Dagster Documentation",
+        text="Official Resources",
         level=1,
-    )
-
-    doc.add_unordered_list(
-        [
-            "[https://release-1-9-13.archive.dagster-docs.io](https://release-1-9-13.archive.dagster-docs.io)",
-        ]
     )
 
     # Logo
@@ -27,7 +21,7 @@ def readme_feature(doc: snakemd.Document) -> snakemd.Document:
                 """
             ),
             image={
-                "Dagster": "https://dagster.io/images/brand/logos/dagster-primary-horizontal.png",
+                "Dagster": "https://dagster-website.vercel.app/images/brand/logos/dagster-primary-horizontal.png",
             }["Dagster"],
             link="https://dagster.io/platform",
         ).__str__()
@@ -47,11 +41,11 @@ def readme_feature(doc: snakemd.Document) -> snakemd.Document:
         snakemd.Inline(
             text=textwrap.dedent(
                 """
-                Logo Dagster
+                Logo Dagster Labs
                 """
             ),
             image={
-                "Dagster": "https://dagster.io/images/brand/logos/dagster_labs-primary-horizontal.png",
+                "Dagster": "https://docs.dagster.io/img/dagster_labs-primary-horizontal.svg",
             }["Dagster"],
             link="https://dagster.io",
         ).__str__()
@@ -76,10 +70,65 @@ def readme_feature(doc: snakemd.Document) -> snakemd.Document:
         text=textwrap.dedent(
             """
             `OpenStudioLandscapes-Dagster` is based on the Community release.
-            The Dagster version used in `OpenStudioLandscapes-Dagster` is locked to 
-            version `1.9.11`.
+            Dagster is evolving at a very fast pace and it can be hard to keep up. 
+            Therefore, for now, the Dagster version used in `OpenStudioLandscapes-Dagster` 
+            is locked to [version `1.9.11`](https://pypi.org/project/dagster/1.9.11/). 
+            When consulting the official [Dagster Documentation](https://docs.dagster.io), 
+            make sure you consult the matching [version](#official-documentation-version-19).
             """
         )
+    )
+
+    doc.add_heading(
+        text="Official Documentation (Version 1.9)",
+        level=2,
+    )
+
+    doc.add_unordered_list(
+        [
+            "[https://release-1-9-13.archive.dagster-docs.io](https://release-1-9-13.archive.dagster-docs.io)",
+        ]
+    )
+
+    doc.add_heading(
+        text="Getting Started with Dagster",
+        level=2,
+    )
+
+    doc.add_paragraph(
+        text=textwrap.dedent(
+            """
+            Dagsters primary learning resource is called 
+            [Dagster University](https://courses.dagster.io).
+            It is a fantastic learning path and you should check it out
+            if you plan to use Dagster as you automation platform (a 
+            personal recommendation by the `OpenStudioLandscapes-Dagster`
+            maintainer). The course 
+            [Dagster Essentials](https://courses.dagster.io/courses/dagster-essentials) 
+            will give you a basic but deep enough understanding of how Dagster works. 
+            """
+        )
+    )
+
+    doc.add_unordered_list(
+        [
+            "[Dagster University](https://courses.dagster.io)",
+        ]
+    )
+
+    doc.add_heading(
+        text="Resources",
+        level=2,
+    )
+
+    doc.add_unordered_list(
+        [
+            "[All Resources](https://dagster.io/resources)",
+            "[GitHub](https://github.com/dagster-io/dagster)",
+            "[Issue Tracker](https://github.com/dagster-io/dagster/issues)",
+            "[PyPi](https://pypi.org/project/dagster)",
+            "[Slack](https://app.slack.com/client/TCDGQDUKF)",
+        ]
     )
 
     return doc
