@@ -72,7 +72,7 @@ def readme_feature(doc: snakemd.Document) -> snakemd.Document:
             `OpenStudioLandscapes-Dagster` is based on the Community release.
             Dagster is evolving at a very fast pace and it can be hard to keep up. 
             Therefore, for now, the Dagster version used in `OpenStudioLandscapes-Dagster` 
-            is locked to [version `1.9.11`](https://pypi.org/project/dagster/1.9.11/). 
+            is locked to [version 1.9.11](https://pypi.org/project/dagster/1.9.11/). 
             When consulting the official [Dagster Documentation](https://docs.dagster.io), 
             make sure you consult the matching [version](#official-documentation-version-19).
             """
@@ -108,12 +108,6 @@ def readme_feature(doc: snakemd.Document) -> snakemd.Document:
             will give you a basic but deep enough understanding of how Dagster works. 
             """
         )
-    )
-
-    doc.add_unordered_list(
-        [
-            "[Dagster University](https://courses.dagster.io)",
-        ]
     )
 
     doc.add_heading(
