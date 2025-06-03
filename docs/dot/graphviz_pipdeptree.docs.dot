@@ -27,7 +27,7 @@ digraph {
 	"openstudiolandscapes-dagster" -> "docker-compose-graph" [label=any]
 	"openstudiolandscapes-dagster" -> dagster [label="==1.9.11"]
 	"openstudiolandscapes-dagster" -> pyyaml [label=any]
-	"openstudiolandscapes-dagster" [label="OpenStudioLandscapes-Dagster\n0.0.post1.dev197+g7508d80.d20250602"]
+	"openstudiolandscapes-dagster" [label="OpenStudioLandscapes-Dagster\n0.0.post1.dev219+g3749eb4"]
 	"pydantic-core" -> "typing-extensions" [label=">=4.6.0,!=4.7.0"]
 	"pydantic-core" [label="pydantic_core\n2.33.2"]
 	"python-dotenv" [label="python-dotenv\n1.1.0"]
