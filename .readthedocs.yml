@@ -32,7 +32,5 @@ build:
 
 python:
   install:
-    - method: pip
-      path: .
-      extra_requirements:
-        - readthedocs
+    - requirements: docs/requirements.txt
+    - {path: ., method: pip}
