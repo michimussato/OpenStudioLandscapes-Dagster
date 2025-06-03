@@ -224,19 +224,19 @@ To follow up on the previous LinkedIn publications, visit:
 
 # ReadTheDocs
 
-| ReadTheDocs                                                                                                                                                                          |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [https://openstudiolandscapes.readthedocs.io/en/latest/index.html](https://openstudiolandscapes.readthedocs.io/en/latest/index.html)                                                 |
-| [https://openstudiolandscapes-ayon.readthedocs.io/en/latest/index.html](https://openstudiolandscapes-ayon.readthedocs.io/en/latest/index.html)                                       |
-| [https://openstudiolandscapes-dagster.readthedocs.io/en/latest/index.html](https://openstudiolandscapes-dagster.readthedocs.io/en/latest/index.html)                                 |
-| [https://openstudiolandscapes-deadline-10-2.readthedocs.io/en/latest/index.html](https://openstudiolandscapes-deadline-10-2.readthedocs.io/en/latest/index.html)                     |
-| [https://openstudiolandscapes-deadline-10-2-worker.readthedocs.io/en/latest/index.html](https://openstudiolandscapes-deadline-10-2-worker.readthedocs.io/en/latest/index.html)       |
-| [https://openstudiolandscapes-filebrowser.readthedocs.io/en/latest/index.html](https://openstudiolandscapes-filebrowser.readthedocs.io/en/latest/index.html)                         |
-| [https://openstudiolandscapes-nukerlm-8.readthedocs.io/en/latest/index.html](https://openstudiolandscapes-nukerlm-8.readthedocs.io/en/latest/index.html)                             |
-| [https://openstudiolandscapes-sesi-gcc-9-3-houdini-20.readthedocs.io/en/latest/index.html](https://openstudiolandscapes-sesi-gcc-9-3-houdini-20.readthedocs.io/en/latest/index.html) |
-| [https://openstudiolandscapes-syncthing.readthedocs.io/en/latest/index.html](https://openstudiolandscapes-syncthing.readthedocs.io/en/latest/index.html)                             |
-| [https://openstudiolandscapes-kitsu.readthedocs.io/en/latest/index.html](https://openstudiolandscapes-kitsu.readthedocs.io/en/latest/index.html)                                     |
-| [https://openstudiolandscapes-watchtower.readthedocs.io/en/latest/index.html](https://openstudiolandscapes-watchtower.readthedocs.io/en/latest/index.html)                           |
+| ReadTheDocs                                  | latest                                                                                                                                                                               |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| OpenStudioLandscapes                         | [https://openstudiolandscapes.readthedocs.io/en/latest/index.html](https://openstudiolandscapes.readthedocs.io/en/latest/index.html)                                                 |
+| OpenStudioLandscapes-Ayon                    | [https://openstudiolandscapes-ayon.readthedocs.io/en/latest/index.html](https://openstudiolandscapes-ayon.readthedocs.io/en/latest/index.html)                                       |
+| OpenStudioLandscapes-Dagster                 | [https://openstudiolandscapes-dagster.readthedocs.io/en/latest/index.html](https://openstudiolandscapes-dagster.readthedocs.io/en/latest/index.html)                                 |
+| OpenStudioLandscapes-Deadline-10-2           | [https://openstudiolandscapes-deadline-10-2.readthedocs.io/en/latest/index.html](https://openstudiolandscapes-deadline-10-2.readthedocs.io/en/latest/index.html)                     |
+| OpenStudioLandscapes-Deadline-10-2-Worker    | [https://openstudiolandscapes-deadline-10-2-worker.readthedocs.io/en/latest/index.html](https://openstudiolandscapes-deadline-10-2-worker.readthedocs.io/en/latest/index.html)       |
+| OpenStudioLandscapes-filebrowser             | [https://openstudiolandscapes-filebrowser.readthedocs.io/en/latest/index.html](https://openstudiolandscapes-filebrowser.readthedocs.io/en/latest/index.html)                         |
+| OpenStudioLandscapes-NukeRLM-8               | [https://openstudiolandscapes-nukerlm-8.readthedocs.io/en/latest/index.html](https://openstudiolandscapes-nukerlm-8.readthedocs.io/en/latest/index.html)                             |
+| OpenStudioLandscapes-SESI-gcc-9-3-Houdini-20 | [https://openstudiolandscapes-sesi-gcc-9-3-houdini-20.readthedocs.io/en/latest/index.html](https://openstudiolandscapes-sesi-gcc-9-3-houdini-20.readthedocs.io/en/latest/index.html) |
+| OpenStudioLandscapes-Syncthing               | [https://openstudiolandscapes-syncthing.readthedocs.io/en/latest/index.html](https://openstudiolandscapes-syncthing.readthedocs.io/en/latest/index.html)                             |
+| OpenStudioLandscapes-Kitsu                   | [https://openstudiolandscapes-kitsu.readthedocs.io/en/latest/index.html](https://openstudiolandscapes-kitsu.readthedocs.io/en/latest/index.html)                                     |
+| OpenStudioLandscapes-Watchtower              | [https://openstudiolandscapes-watchtower.readthedocs.io/en/latest/index.html](https://openstudiolandscapes-watchtower.readthedocs.io/en/latest/index.html)                           |
 
 ***
 
