@@ -395,7 +395,7 @@ def dagster_yaml(
             },
         },
         "telemetry": {
-            "enabled": True,
+            "enabled": False,
         },
         "auto_materialize": {
             "enabled": True,
