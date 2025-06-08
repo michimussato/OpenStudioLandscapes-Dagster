@@ -104,8 +104,9 @@ def pip_packages(
     _pip_packages: list = [
         "dagster==1.9.11",
         "dagster-webserver==1.9.11",
-        "dagster-shared[dev] @ git+https://github.com/michimussato/dagster-shared.git@main",
-        "dagster-job-processor[dev] @ git+https://github.com/michimussato/dagster-job-processor.git@main",
+        # "dagster-shared[dev] @ git+https://github.com/michimussato/dagster-shared.git@main",
+        # "dagster-job-processor[dev] @ git+https://github.com/michimussato/dagster-job-processor.git@main",
+        "OpenStudioLandscapes-Dagster-Showcase[dev] @ git+https://github.com/michimussato/OpenStudioLandscapes-Dagster-Showcase.git@main",
     ]
 
     if DAGSTER_USE_POSTGRES:
