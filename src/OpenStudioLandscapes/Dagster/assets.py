@@ -483,8 +483,15 @@ def workspace_yaml(
                 "python_module": {
                     "working_directory": "src",
                     "module_name": "OpenStudioLandscapes.dagster_job_processor.definitions",
-                    "location_name": "dagster_job_processor Package Location",
-                }
+                    "location_name": "dagster_job_processor Package Code Location",
+                },
+            },
+            {
+                "python_module": {
+                    "working_directory": "src",
+                    "module_name": "openstudiolandscapes_dagster_showcase.definitions",
+                    "location_name": "openstudiolandscapes_dagster_showcase Package Code Location",
+                },
             }
         ],
     }
