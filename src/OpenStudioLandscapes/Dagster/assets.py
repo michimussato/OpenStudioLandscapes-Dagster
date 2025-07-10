@@ -629,8 +629,6 @@ def compose_dagster(
 
     volumes_dict = {
         "volumes": [
-            f"{env.get('NFS_ENTRY_POINT')}:{env.get('NFS_ENTRY_POINT')}",
-            f"{env.get('NFS_ENTRY_POINT')}:{env.get('NFS_ENTRY_POINT_LNS')}",
             f"{dagster_yaml.parent.as_posix()}:{materializations_dagster_yaml_container.as_posix()}:rw",
             f"{workspace_yaml.as_posix()}:{workspace_yaml_container.as_posix()}:ro",
         ]
@@ -662,7 +660,6 @@ def compose_dagster(
                     # Todo
                     #  - [ ] fix hard code here (from deadline-dagster .env)
                     "DAGSTER_DEPLOYMENT": "farm",
-                    "DAGSTER_JOBS_IN": "/data/share/nfs/in",
                 },
                 "healthcheck": {
                     "test": [
@@ -765,7 +762,6 @@ def compose_postgres(
         volumes_dict = {
             "volumes": [
                 f"{postgres_db_dir_host.as_posix()}:{env.get('PGDATA')}",
-                # f"{env.get('NFS_ENTRY_POINT')}:{env.get('NFS_ENTRY_POINT_LNS')}",
             ]
         }
 
