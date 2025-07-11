@@ -482,13 +482,6 @@ def workspace_yaml(
             {
                 "python_module": {
                     "working_directory": "src",
-                    "module_name": "OpenStudioLandscapes.dagster_job_processor.definitions",
-                    "location_name": "dagster_job_processor Package Code Location",
-                },
-            },
-            {
-                "python_module": {
-                    "working_directory": "src",
                     "module_name": "openstudiolandscapes_dagster_showcase.definitions",
                     "location_name": "openstudiolandscapes_dagster_showcase Package Code Location",
                 },
@@ -627,10 +620,44 @@ def compose_dagster(
     )
     workspace_yaml_container = pathlib.Path(env.get("DAGSTER_ROOT"), "workspace.yaml")
 
+    # Is:
+    # - /home/michael/git/repos/OpenStudioLandscapes/.landscapes/2025-07-12-15-44-28-d7511d9a293d496daed627176a026b43/Dagster__Dagster/Dagster__dagster_yaml/materializations:/dagster/materializations:rw
+    # - /home/michael/git/repos/OpenStudioLandscapes/.landscapes/2025-07-12-15-44-28-d7511d9a293d496daed627176a026b43/Dagster__Dagster/Dagster__workspace_yaml/workspace.yaml:/dagster/workspace.yaml:ro
+    #
+    # Want:
+    # - ../../../../2025-07-10-22-36-50-47cd6c0a7dd141429707ab6d91190a27/Dagster__Dagster/Dagster__dagster_yaml/materializations:/dagster/materializations:rw
+    # - ../../../../2025-07-10-22-36-50-47cd6c0a7dd141429707ab6d91190a27/Dagster__Dagster/Dagster__workspace_yaml/workspace.yaml:/dagster/workspace.yaml:ro
+    #
+    # Get:
+    # - ../../../../2025-07-12-15-44-28-d7511d9a293d496daed627176a026b43/Dagster__Dagster/Dagster__dagster_yaml/materializations:/dagster/materializations:rw
+    # - ../../../../2025-07-12-15-44-28-d7511d9a293d496daed627176a026b43/Dagster__Dagster/Dagster__workspace_yaml/workspace.yaml:/dagster/workspace.yaml:ro
+
+    # For portability, convert absolute volume paths to relative paths
+    volumes_paths_to_convert = [
+        f"{dagster_yaml.parent.as_posix()}:{materializations_dagster_yaml_container.as_posix()}:rw",
+        f"{workspace_yaml.as_posix()}:{workspace_yaml_container.as_posix()}:ro",
+    ]
+
+    _volume_relative = []
+
+    for v in volumes_paths_to_convert:
+
+        host, container = v.split(":", maxsplit=1)
+
+        ayon_db_dir_host_rel_path = get_relative_path_via_common_root(
+            context=context,
+            path_src=pathlib.Path(env["DOCKER_COMPOSE"]),
+            path_dst=pathlib.Path(host),
+            path_common_root=pathlib.Path(env["DOT_LANDSCAPES"]),
+        )
+
+        _volume_relative.append(
+            f"{ayon_db_dir_host_rel_path.as_posix()}:{container}",
+        )
+
     volumes_dict = {
         "volumes": [
-            f"{dagster_yaml.parent.as_posix()}:{materializations_dagster_yaml_container.as_posix()}:rw",
-            f"{workspace_yaml.as_posix()}:{workspace_yaml_container.as_posix()}:ro",
+            *_volume_relative,
         ]
     }
 
@@ -759,9 +786,40 @@ def compose_postgres(
         postgres_db_dir_host.mkdir(parents=True, exist_ok=True)
         context.log.info(f"Directory {postgres_db_dir_host.as_posix()} created.")
 
+        # Is:
+        # - "/home/michael/git/repos/OpenStudioLandscapes/.landscapes/.dagster/postgres:/var/lib/postgresql/data/pgdata"
+        #
+        # Want:
+        # - ../../../../.dagster/postgres:/var/lib/postgresql/data/pgdata
+        #
+        # Get:
+        # - ../../../../.dagster/postgres:/var/lib/postgresql/data/pgdata
+
+        # For portability, convert absolute volume paths to relative paths
+        volumes_paths_to_convert = [
+            f"{postgres_db_dir_host.as_posix()}:{env.get('PGDATA')}",
+        ]
+
+        _volume_relative = []
+
+        for v in volumes_paths_to_convert:
+
+            host, container = v.split(":", maxsplit=1)
+
+            ayon_db_dir_host_rel_path = get_relative_path_via_common_root(
+                context=context,
+                path_src=pathlib.Path(env["DOCKER_COMPOSE"]),
+                path_dst=pathlib.Path(host),
+                path_common_root=pathlib.Path(env["DOT_LANDSCAPES"]),
+            )
+
+            _volume_relative.append(
+                f"{ayon_db_dir_host_rel_path.as_posix()}:{container}",
+            )
+
         volumes_dict = {
             "volumes": [
-                f"{postgres_db_dir_host.as_posix()}:{env.get('PGDATA')}",
+                *_volume_relative,
             ]
         }
 
