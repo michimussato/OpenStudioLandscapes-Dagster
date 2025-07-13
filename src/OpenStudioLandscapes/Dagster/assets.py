@@ -620,27 +620,18 @@ def compose_dagster(
     )
     workspace_yaml_container = pathlib.Path(env.get("DAGSTER_ROOT"), "workspace.yaml")
 
-    # Is:
-    # - /home/michael/git/repos/OpenStudioLandscapes/.landscapes/2025-07-12-15-44-28-d7511d9a293d496daed627176a026b43/Dagster__Dagster/Dagster__dagster_yaml/materializations:/dagster/materializations:rw
-    # - /home/michael/git/repos/OpenStudioLandscapes/.landscapes/2025-07-12-15-44-28-d7511d9a293d496daed627176a026b43/Dagster__Dagster/Dagster__workspace_yaml/workspace.yaml:/dagster/workspace.yaml:ro
-    #
-    # Want:
-    # - ../../../../2025-07-10-22-36-50-47cd6c0a7dd141429707ab6d91190a27/Dagster__Dagster/Dagster__dagster_yaml/materializations:/dagster/materializations:rw
-    # - ../../../../2025-07-10-22-36-50-47cd6c0a7dd141429707ab6d91190a27/Dagster__Dagster/Dagster__workspace_yaml/workspace.yaml:/dagster/workspace.yaml:ro
-    #
-    # Get:
-    # - ../../../../2025-07-12-15-44-28-d7511d9a293d496daed627176a026b43/Dagster__Dagster/Dagster__dagster_yaml/materializations:/dagster/materializations:rw
-    # - ../../../../2025-07-12-15-44-28-d7511d9a293d496daed627176a026b43/Dagster__Dagster/Dagster__workspace_yaml/workspace.yaml:/dagster/workspace.yaml:ro
+    volumes_dict = {
+        "volumes": [
+            f"{dagster_yaml.parent.as_posix()}:{materializations_dagster_yaml_container.as_posix()}:rw",
+            f"{workspace_yaml.as_posix()}:{workspace_yaml_container.as_posix()}:ro",
+        ]
+    }
 
     # For portability, convert absolute volume paths to relative paths
-    volumes_paths_to_convert = [
-        f"{dagster_yaml.parent.as_posix()}:{materializations_dagster_yaml_container.as_posix()}:rw",
-        f"{workspace_yaml.as_posix()}:{workspace_yaml_container.as_posix()}:ro",
-    ]
 
     _volume_relative = []
 
-    for v in volumes_paths_to_convert:
+    for v in volumes_dict["volumes"]:
 
         host, container = v.split(":", maxsplit=1)
 
