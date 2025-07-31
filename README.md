@@ -207,7 +207,7 @@ The following variables are being declared in `OpenStudioLandscapes.Dagster.cons
 | `PGDATA`                                | `str`  | `/var/lib/postgresql/data/pgdata`                             |
 | `POSTGRES_PORT_HOST`                    | `str`  | `5432`                                                        |
 | `POSTGRES_PORT_CONTAINER`               | `str`  | `5432`                                                        |
-| `POSTGRES_DATABASE_INSTALL_DESTINATION` | `str`  | `{DOT_LANDSCAPES}/.dagster/postgres`                          |
+| `POSTGRES_DATABASE_INSTALL_DESTINATION` | `str`  | `{DOT_LANDSCAPES}/{LANDSCAPE}/Dagster__Dagster/postgres`      |
 
 # Community
 
