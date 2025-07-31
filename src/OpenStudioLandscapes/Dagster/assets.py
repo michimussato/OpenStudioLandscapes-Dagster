@@ -198,7 +198,7 @@ def build_docker_image(
 
     # @formatter:off
     docker_file_str = textwrap.dedent(
-        """
+        """\
         # {auto_generated}
         # {dagster_url}
         FROM {parent_image} AS {image_name}
@@ -213,7 +213,7 @@ def build_docker_image(
 
         ENTRYPOINT []
         CMD []
-    """
+        """
     ).format(
         pip_install_str=pip_install_str.format(
             **env,
@@ -671,7 +671,7 @@ def compose_dagster(
                 "hostname": host_name,
                 "domainname": env.get("ROOT_DOMAIN"),
                 "restart": "always",
-                "image": "${REGISTRY_NAMESPACE_OVERRIDE:-docker.io/openstudiolandscapes}/%s:%s" % (build['image_name'], build['image_tags'][0]),
+                "image": "${DOT_OVERRIDES_REGISTRY_NAMESPACE:-docker.io/openstudiolandscapes}/%s:%s" % (build['image_name'], build['image_tags'][0]),
                 **copy.deepcopy(network_dict),
                 "environment": {
                     "DAGSTER_HOME": env.get("DAGSTER_HOME"),
