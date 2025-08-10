@@ -175,10 +175,6 @@ def build_docker_image(
     docker_file.parent.mkdir(parents=True, exist_ok=True)
 
     image_name = get_image_name(context=context)
-    # image_path = parse_docker_image_path(
-    #     image_name=image_name,
-    #     docker_config=build_base_docker_config,
-    # )
     image_prefix_local = parse_docker_image_path(
         docker_config=build_base_docker_config,
         prepend_registry=False,
