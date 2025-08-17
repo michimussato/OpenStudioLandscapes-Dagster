@@ -4,7 +4,7 @@ import pathlib
 import textwrap
 import time
 import urllib.parse
-from typing import Generator
+from typing import Generator, Any
 
 import yaml
 from dagster import (
@@ -175,10 +175,6 @@ def build_docker_image(
     docker_file.parent.mkdir(parents=True, exist_ok=True)
 
     image_name = get_image_name(context=context)
-    # image_path = parse_docker_image_path(
-    #     image_name=image_name,
-    #     docker_config=build_base_docker_config,
-    # )
     image_prefix_local = parse_docker_image_path(
         docker_config=build_base_docker_config,
         prepend_registry=False,
@@ -198,7 +194,7 @@ def build_docker_image(
 
     # @formatter:off
     docker_file_str = textwrap.dedent(
-        """
+        """\
         # {auto_generated}
         # {dagster_url}
         FROM {parent_image} AS {image_name}
@@ -213,7 +209,7 @@ def build_docker_image(
 
         ENTRYPOINT []
         CMD []
-    """
+        """
     ).format(
         pip_install_str=pip_install_str.format(
             **env,
@@ -482,13 +478,6 @@ def workspace_yaml(
             {
                 "python_module": {
                     "working_directory": "src",
-                    "module_name": "OpenStudioLandscapes.dagster_job_processor.definitions",
-                    "location_name": "dagster_job_processor Package Code Location",
-                },
-            },
-            {
-                "python_module": {
-                    "working_directory": "src",
                     "module_name": "openstudiolandscapes_dagster_showcase.definitions",
                     "location_name": "openstudiolandscapes_dagster_showcase Package Code Location",
                 },
@@ -634,6 +623,31 @@ def compose_dagster(
         ]
     }
 
+    # For portability, convert absolute volume paths to relative paths
+
+    _volume_relative = []
+
+    for v in volumes_dict["volumes"]:
+
+        host, container = v.split(":", maxsplit=1)
+
+        volume_dir_host_rel_path = get_relative_path_via_common_root(
+            context=context,
+            path_src=pathlib.Path(env["DOCKER_COMPOSE"]),
+            path_dst=pathlib.Path(host),
+            path_common_root=pathlib.Path(env["DOT_LANDSCAPES"]),
+        )
+
+        _volume_relative.append(
+            f"{volume_dir_host_rel_path.as_posix()}:{container}",
+        )
+
+    volumes_dict = {
+        "volumes": [
+            *_volume_relative,
+        ]
+    }
+
     if DAGSTER_USE_POSTGRES:
 
         depends_on_dict = {
@@ -653,7 +667,7 @@ def compose_dagster(
                 "hostname": host_name,
                 "domainname": env.get("ROOT_DOMAIN"),
                 "restart": "always",
-                "image": f"{build['image_prefix_full']}{build['image_name']}:{build['image_tags'][0]}",
+                "image": "${DOT_OVERRIDES_REGISTRY_NAMESPACE:-docker.io/openstudiolandscapes}/%s:%s" % (build['image_name'], build['image_tags'][0]),
                 **copy.deepcopy(network_dict),
                 "environment": {
                     "DAGSTER_HOME": env.get("DAGSTER_HOME"),
@@ -759,9 +773,40 @@ def compose_postgres(
         postgres_db_dir_host.mkdir(parents=True, exist_ok=True)
         context.log.info(f"Directory {postgres_db_dir_host.as_posix()} created.")
 
+        # Is:
+        # - "/home/michael/git/repos/OpenStudioLandscapes/.landscapes/.dagster/postgres:/var/lib/postgresql/data/pgdata"
+        #
+        # Want:
+        # - ../../../../.dagster/postgres:/var/lib/postgresql/data/pgdata
+        #
+        # Get:
+        # - ../../../../.dagster/postgres:/var/lib/postgresql/data/pgdata
+
+        # For portability, convert absolute volume paths to relative paths
+        volumes_paths_to_convert = [
+            f"{postgres_db_dir_host.as_posix()}:{env.get('PGDATA')}",
+        ]
+
+        _volume_relative = []
+
+        for v in volumes_paths_to_convert:
+
+            host, container = v.split(":", maxsplit=1)
+
+            volume_dir_host_rel_path = get_relative_path_via_common_root(
+                context=context,
+                path_src=pathlib.Path(env["DOCKER_COMPOSE"]),
+                path_dst=pathlib.Path(host),
+                path_common_root=pathlib.Path(env["DOT_LANDSCAPES"]),
+            )
+
+            _volume_relative.append(
+                f"{volume_dir_host_rel_path.as_posix()}:{container}",
+            )
+
         volumes_dict = {
             "volumes": [
-                f"{postgres_db_dir_host.as_posix()}:{env.get('PGDATA')}",
+                *_volume_relative,
             ]
         }
 
@@ -839,6 +884,51 @@ def compose_maps(
 ) -> Generator[Output[list[dict]] | AssetMaterialization, None, None]:
 
     ret = list(kwargs.values())
+
+    yield Output(ret)
+
+    yield AssetMaterialization(
+        asset_key=context.asset_key,
+        metadata={
+            "__".join(context.asset_key.path): MetadataValue.json(ret),
+        },
+    )
+
+
+@asset(
+    **ASSET_HEADER,
+    ins={
+    },
+)
+def cmd_extend(
+        context: AssetExecutionContext,
+) -> Generator[Output[list[Any]] | AssetMaterialization | Any, Any, None]:
+
+    ret = []
+
+    yield Output(ret)
+
+    yield AssetMaterialization(
+        asset_key=context.asset_key,
+        metadata={
+            "__".join(context.asset_key.path): MetadataValue.json(ret),
+        },
+    )
+
+
+@asset(
+    **ASSET_HEADER,
+    ins={
+    },
+)
+def cmd_append(
+        context: AssetExecutionContext,
+) -> Generator[Output[dict[str, list[Any]]] | AssetMaterialization | Any, Any, None]:
+
+    ret = {
+        "cmd": [],
+        "exclude_from_quote": []
+    }
 
     yield Output(ret)
 

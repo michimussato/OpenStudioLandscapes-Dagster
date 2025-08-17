@@ -94,7 +94,7 @@ FEATURE_CONFIGS = {
             )
             .expanduser()
             .as_posix(),
-        }["landscapes_root"],
+        }["default"],
     }
 }
 # @formatter:on
