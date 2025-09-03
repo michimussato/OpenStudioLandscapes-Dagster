@@ -7,16 +7,16 @@ __all__ = [
 
 import pathlib
 from pathlib import Path
-from typing import Generator, Any
+from typing import Any, Generator
 
 from dagster import (
-    multi_asset,
-    AssetOut,
-    AssetMaterialization,
     AssetExecutionContext,
-    Output,
+    AssetMaterialization,
+    AssetOut,
     MetadataValue,
+    Output,
     get_dagster_logger,
+    multi_asset,
 )
 
 LOGGER = get_dagster_logger(__name__)
@@ -59,7 +59,6 @@ FEATURE_CONFIGS = {
         "DAGSTER_HOME": "/dagster/materializations",
         "DAGSTER_HOST": "0.0.0.0",
         "DAGSTER_WORKSPACE": "/dagster/workspace.yaml",
-
         # Postgres
         # # If Dagster is used with MySQL (no Postgres)
         # # Uncomment everything below this (or create an
@@ -125,8 +124,14 @@ FEATURE_CONFIGS = {
 def constants_multi_asset(
     context: AssetExecutionContext,
 ) -> Generator[
-    Output[dict[OpenStudioLandscapesConfig, dict[str | Any, bool | str | Any]]] | AssetMaterialization | Output[Any] |
-    Output[Path] | Any, None, None]:
+    Output[dict[OpenStudioLandscapesConfig, dict[str | Any, bool | str | Any]]]
+    | AssetMaterialization
+    | Output[Any]
+    | Output[Path]
+    | Any,
+    None,
+    None,
+]:
     """ """
 
     yield Output(
@@ -151,9 +156,9 @@ def constants_multi_asset(
     yield AssetMaterialization(
         asset_key=context.asset_key_for_output("NAME"),
         metadata={
-            "__".join(
-                context.asset_key_for_output("NAME").path
-            ): MetadataValue.path(__name__),
+            "__".join(context.asset_key_for_output("NAME").path): MetadataValue.path(
+                __name__
+            ),
         },
     )
 

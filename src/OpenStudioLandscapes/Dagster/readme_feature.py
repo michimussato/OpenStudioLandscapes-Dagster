@@ -1,4 +1,5 @@
 import textwrap
+
 import snakemd
 
 
@@ -70,10 +71,10 @@ def readme_feature(doc: snakemd.Document) -> snakemd.Document:
         text=textwrap.dedent(
             """
             `OpenStudioLandscapes-Dagster` is based on the Community release.
-            Dagster is evolving at a very fast pace and it can be hard to keep up. 
-            Therefore, for now, the Dagster version used in `OpenStudioLandscapes-Dagster` 
-            is locked to [version 1.9.11](https://pypi.org/project/dagster/1.9.11/). 
-            When consulting the official [Dagster Documentation](https://docs.dagster.io), 
+            Dagster is evolving at a very fast pace and it can be hard to keep up.
+            Therefore, for now, the Dagster version used in `OpenStudioLandscapes-Dagster`
+            is locked to [version 1.9.11](https://pypi.org/project/dagster/1.9.11/).
+            When consulting the official [Dagster Documentation](https://docs.dagster.io),
             make sure you consult the matching [version](#official-documentation-version-19).
             """
         )
@@ -98,14 +99,14 @@ def readme_feature(doc: snakemd.Document) -> snakemd.Document:
     doc.add_paragraph(
         text=textwrap.dedent(
             """
-            Dagsters primary learning resource is called 
+            Dagsters primary learning resource is called
             [Dagster University](https://courses.dagster.io).
             It is a fantastic learning path and you should check it out
-            if you plan to use Dagster as you automation platform (a 
+            if you plan to use Dagster as you automation platform (a
             personal recommendation by the `OpenStudioLandscapes-Dagster`
-            maintainer). The course 
-            [Dagster Essentials](https://courses.dagster.io/courses/dagster-essentials) 
-            will give you a basic but deep enough understanding of how Dagster works. 
+            maintainer). The course
+            [Dagster Essentials](https://courses.dagster.io/courses/dagster-essentials)
+            will give you a basic but deep enough understanding of how Dagster works.
             """
         )
     )

@@ -4,7 +4,7 @@ import pathlib
 import textwrap
 import time
 import urllib.parse
-from typing import Generator, Any
+from typing import Any, Generator
 
 import yaml
 from dagster import (
@@ -16,24 +16,25 @@ from dagster import (
     Output,
     asset,
 )
-
+from OpenStudioLandscapes.engine.common_assets.compose import get_compose
+from OpenStudioLandscapes.engine.common_assets.constants import get_constants
+from OpenStudioLandscapes.engine.common_assets.docker_compose_graph import (
+    get_docker_compose_graph,
+)
+from OpenStudioLandscapes.engine.common_assets.docker_config import get_docker_config
+from OpenStudioLandscapes.engine.common_assets.docker_config_json import (
+    get_docker_config_json,
+)
+from OpenStudioLandscapes.engine.common_assets.env import get_env
+from OpenStudioLandscapes.engine.common_assets.feature_out import get_feature_out
+from OpenStudioLandscapes.engine.common_assets.group_in import get_group_in
+from OpenStudioLandscapes.engine.common_assets.group_out import get_group_out
 from OpenStudioLandscapes.engine.constants import *
 from OpenStudioLandscapes.engine.enums import *
 from OpenStudioLandscapes.engine.utils import *
 from OpenStudioLandscapes.engine.utils.docker import *
 
 from OpenStudioLandscapes.Dagster.constants import *
-
-from OpenStudioLandscapes.engine.common_assets.constants import get_constants
-from OpenStudioLandscapes.engine.common_assets.docker_config import get_docker_config
-from OpenStudioLandscapes.engine.common_assets.env import get_env
-from OpenStudioLandscapes.engine.common_assets.group_in import get_group_in
-from OpenStudioLandscapes.engine.common_assets.group_out import get_group_out
-from OpenStudioLandscapes.engine.common_assets.docker_compose_graph import get_docker_compose_graph
-from OpenStudioLandscapes.engine.common_assets.feature_out import get_feature_out
-from OpenStudioLandscapes.engine.common_assets.compose import get_compose
-from OpenStudioLandscapes.engine.common_assets.docker_config_json import get_docker_config_json
-
 
 # Todo:
 #  - [ ] Create dagster.yaml dynamically
@@ -135,7 +136,9 @@ def pip_packages(
         "docker_config_json": AssetIn(
             AssetKey([*ASSET_HEADER["key_prefix"], "docker_config_json"]),
         ),
-        "group_in": AssetIn(AssetKey([*ASSET_HEADER_BASE["key_prefix"], str(GroupIn.BASE_IN)])),
+        "group_in": AssetIn(
+            AssetKey([*ASSET_HEADER_BASE["key_prefix"], str(GroupIn.BASE_IN)])
+        ),
         "pip_packages": AssetIn(
             AssetKey([*ASSET_HEADER["key_prefix"], "pip_packages"]),
         ),
@@ -667,7 +670,8 @@ def compose_dagster(
                 "hostname": host_name,
                 "domainname": env.get("ROOT_DOMAIN"),
                 "restart": "always",
-                "image": "${DOT_OVERRIDES_REGISTRY_NAMESPACE:-docker.io/openstudiolandscapes}/%s:%s" % (build['image_name'], build['image_tags'][0]),
+                "image": "${DOT_OVERRIDES_REGISTRY_NAMESPACE:-docker.io/openstudiolandscapes}/%s:%s"
+                % (build["image_name"], build["image_tags"][0]),
                 **copy.deepcopy(network_dict),
                 "environment": {
                     "DAGSTER_HOME": env.get("DAGSTER_HOME"),
@@ -897,11 +901,10 @@ def compose_maps(
 
 @asset(
     **ASSET_HEADER,
-    ins={
-    },
+    ins={},
 )
 def cmd_extend(
-        context: AssetExecutionContext,
+    context: AssetExecutionContext,
 ) -> Generator[Output[list[Any]] | AssetMaterialization | Any, Any, None]:
 
     ret = []
@@ -918,17 +921,13 @@ def cmd_extend(
 
 @asset(
     **ASSET_HEADER,
-    ins={
-    },
+    ins={},
 )
 def cmd_append(
-        context: AssetExecutionContext,
+    context: AssetExecutionContext,
 ) -> Generator[Output[dict[str, list[Any]]] | AssetMaterialization | Any, Any, None]:
 
-    ret = {
-        "cmd": [],
-        "exclude_from_quote": []
-    }
+    ret = {"cmd": [], "exclude_from_quote": []}
 
     yield Output(ret)
 
