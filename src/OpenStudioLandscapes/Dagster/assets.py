@@ -661,7 +661,7 @@ def compose_dagster(
 
     service_name = "dagster"
     container_name = "--".join([service_name, env.get("LANDSCAPE", "default")])
-    host_name = ".".join([service_name, env["ROOT_DOMAIN"]])
+    host_name = ".".join([env["DAGSTER_HOSTNAME"] or service_name, env["ROOT_DOMAIN"]])
 
     docker_dict = {
         "services": {
