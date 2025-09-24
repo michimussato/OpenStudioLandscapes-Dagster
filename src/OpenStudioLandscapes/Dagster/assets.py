@@ -353,7 +353,7 @@ def dagster_yaml(
                         "hostname": ".".join(
                             [
                                 str(env.get("POSTGRES_SERVICE_NAME")),
-                                env["ROOT_DOMAIN"],
+                                env["OPENSTUDIOLANDSCAPES__DOMAIN_LAN"],
                             ],
                         ),
                         "db_name": str(env.get("POSTGRES_DB")),
@@ -661,14 +661,14 @@ def compose_dagster(
 
     service_name = "dagster"
     container_name = "--".join([service_name, env.get("LANDSCAPE", "default")])
-    host_name = ".".join([env["DAGSTER_HOSTNAME"] or service_name, env["ROOT_DOMAIN"]])
+    host_name = ".".join([env["HOSTNAME"] or service_name, env["OPENSTUDIOLANDSCAPES__DOMAIN_LAN"]])
 
     docker_dict = {
         "services": {
             service_name: {
                 "container_name": container_name,
                 "hostname": host_name,
-                "domainname": env.get("ROOT_DOMAIN"),
+                "domainname": env.get("OPENSTUDIOLANDSCAPES__DOMAIN_LAN"),
                 "restart": "always",
                 "image": "${DOT_OVERRIDES_REGISTRY_NAMESPACE:-docker.io/openstudiolandscapes}/%s:%s"
                 % (build["image_name"], build["image_tags"][0]),
@@ -816,14 +816,14 @@ def compose_postgres(
 
         service_name = env["POSTGRES_SERVICE_NAME"]
         container_name = "--".join([service_name, env.get("LANDSCAPE", "default")])
-        host_name = ".".join([service_name, env["ROOT_DOMAIN"]])
+        host_name = ".".join([service_name, env["OPENSTUDIOLANDSCAPES__DOMAIN_LAN"]])
 
         docker_dict = {
             "services": {
                 service_name: {
                     "container_name": container_name,
                     "hostname": host_name,
-                    "domainname": env.get("ROOT_DOMAIN"),
+                    "domainname": env.get("OPENSTUDIOLANDSCAPES__DOMAIN_LAN"),
                     "restart": "always",
                     "image": "docker.io/postgres",
                     **copy.deepcopy(network_dict),

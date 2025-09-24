@@ -45,6 +45,9 @@ ASSET_HEADER = {
 FEATURE_CONFIGS = {
     OpenStudioLandscapesConfig.DEFAULT: {
         "DOCKER_USE_CACHE": DOCKER_USE_CACHE,
+        "HOSTNAME": "dagster",
+        "TELEPORT_ENTRY_POINT_HOST": "{{HOSTNAME}}",  # Either a hardcoded str or a ref to a Variable (with double {{ }}!)
+        "TELEPORT_ENTRY_POINT_PORT": "{{DAGSTER_DEV_PORT_HOST}}",  # Either a hardcoded str or a ref to a Variable (with double {{ }}!)
         "CONFIGS_ROOT": pathlib.Path(
             "{DOT_FEATURES}",
             FEATURE,
@@ -70,9 +73,6 @@ FEATURE_CONFIGS = {
         "PGDATA": "/var/lib/postgresql/data/pgdata",
         "POSTGRES_PORT_HOST": "5432",
         "POSTGRES_PORT_CONTAINER": "5432",
-        "DAGSTER_HOSTNAME": "dagster",
-        "TELEPORT_ENTRY_POINT_HOST": "{{DAGSTER_HOSTNAME}}",  # Either a hardcoded str or a ref to a Variable (with double {{ }}!)
-        "TELEPORT_ENTRY_POINT_PORT": "{{DAGSTER_DEV_PORT_HOST}}",  # Either a hardcoded str or a ref to a Variable (with double {{ }}!)
         "POSTGRES_DATABASE_INSTALL_DESTINATION": {
             #################################################################
             # Dagster directory
