@@ -22,7 +22,7 @@ from dagster import (
 LOGGER = get_dagster_logger(__name__)
 
 from OpenStudioLandscapes.engine.constants import DOCKER_USE_CACHE_GLOBAL
-from OpenStudioLandscapes.engine.enums import OpenStudioLandscapesConfig
+from OpenStudioLandscapes.engine.enums import OpenStudioLandscapesConfig, FeatureVolumeType
 
 DOCKER_USE_CACHE = DOCKER_USE_CACHE_GLOBAL or False
 
@@ -77,9 +77,7 @@ FEATURE_CONFIGS = {
             #################################################################
             # Dagster directory
             #################################################################
-            #################################################################
-            # Inside Landscape:
-            "default": pathlib.Path(
+            FeatureVolumeType.CONTAINED: pathlib.Path(
                 "{DOT_LANDSCAPES}",
                 "{LANDSCAPE}",
                 f"{GROUP}__{'__'.join(KEY)}",
@@ -87,16 +85,15 @@ FEATURE_CONFIGS = {
             )
             .expanduser()
             .as_posix(),
-            #################################################################
-            # In Landscapes root dir:
-            "landscapes_root": pathlib.Path(
+            FeatureVolumeType.SHARED: pathlib.Path(
                 "{DOT_LANDSCAPES}",
-                ".dagster",
+                "{DOT_SHARED_VOLUMES}",
+                f"{GROUP}__{'__'.join(KEY)}",
                 "postgres",
             )
             .expanduser()
             .as_posix(),
-        }["default"],
+        }[FeatureVolumeType.CONTAINED],
     }
 }
 # @formatter:on
