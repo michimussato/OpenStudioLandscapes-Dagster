@@ -637,19 +637,6 @@
         "message-id": "C0114"
     },
     {
-        "type": "error",
-        "module": "OpenStudioLandscapes.Dagster.readme_feature",
-        "obj": "",
-        "line": 3,
-        "column": 0,
-        "endLine": 3,
-        "endColumn": 14,
-        "path": "src/OpenStudioLandscapes/Dagster/readme_feature.py",
-        "symbol": "import-error",
-        "message": "Unable to import 'snakemd'",
-        "message-id": "E0401"
-    },
-    {
         "type": "convention",
         "module": "OpenStudioLandscapes.Dagster.readme_feature",
         "obj": "readme_feature",
