@@ -338,7 +338,6 @@ def dagster_yaml(
             postgres_db:
               username: postgres
               password: mysecretpassword
-        #      hostname: openstudiolandscapes-postgres-dagster.farm.evil
               hostname: openstudiolandscapes-postgres-dagster
               db_name: postgres
               port: 5432
@@ -348,16 +347,16 @@ def dagster_yaml(
             "storage": {
                 "postgres": {
                     "postgres_db": {
-                        "username": str(env.get("POSTGRES_USER")),
-                        "password": str(env.get("POSTGRES_PASSWORD")),
+                        "username": str(env["POSTGRES_USER"]),
+                        "password": str(env["POSTGRES_PASSWORD"]),
                         "hostname": ".".join(
                             [
-                                str(env.get("POSTGRES_SERVICE_NAME")),
+                                str(env["POSTGRES_SERVICE_NAME"]),
                                 env["OPENSTUDIOLANDSCAPES__DOMAIN_LAN"],
                             ],
                         ),
-                        "db_name": str(env.get("POSTGRES_DB")),
-                        "port": int(env.get("POSTGRES_PORT_CONTAINER")),
+                        "db_name": str(env["POSTGRES_DB"]),
+                        "port": int(env["POSTGRES_PORT_CONTAINER"]),
                     }
                 }
             }
@@ -606,18 +605,18 @@ def compose_dagster(
         network_dict = {"networks": list(compose_networks.get("networks", {}).keys())}
         ports_dict = {
             "ports": [
-                f"{env.get('DAGSTER_DEV_PORT_HOST')}:{env.get('DAGSTER_DEV_PORT_CONTAINER')}",
+                f"{env['DAGSTER_DEV_PORT_HOST']}:{env['DAGSTER_DEV_PORT_CONTAINER']}",
             ]
         }
     elif "network_mode" in compose_networks:
-        network_dict = {"network_mode": compose_networks.get("network_mode")}
+        network_dict = {"network_mode": compose_networks["network_mode"]}
 
     # ./materializations
     # with ./materlializations/dagster.yaml inside
     materializations_dagster_yaml_container = pathlib.Path(
-        env.get("DAGSTER_HOME"),
+        env["DAGSTER_HOME"],
     )
-    workspace_yaml_container = pathlib.Path(env.get("DAGSTER_ROOT"), "workspace.yaml")
+    workspace_yaml_container = pathlib.Path(env["DAGSTER_ROOT"], "workspace.yaml")
 
     volumes_dict = {
         "volumes": [
@@ -670,13 +669,13 @@ def compose_dagster(
             service_name: {
                 "container_name": container_name,
                 "hostname": host_name,
-                "domainname": env.get("OPENSTUDIOLANDSCAPES__DOMAIN_LAN"),
+                "domainname": env["OPENSTUDIOLANDSCAPES__DOMAIN_LAN"],
                 "restart": "always",
                 "image": "${DOT_OVERRIDES_REGISTRY_NAMESPACE:-docker.io/openstudiolandscapes}/%s:%s"
                 % (build["image_name"], build["image_tags"][0]),
                 **copy.deepcopy(network_dict),
                 "environment": {
-                    "DAGSTER_HOME": env.get("DAGSTER_HOME"),
+                    "DAGSTER_HOME": env["DAGSTER_HOME"],
                     # Todo
                     #  - [ ] fix hard code here (from deadline-dagster .env)
                     "DAGSTER_DEPLOYMENT": "farm",
@@ -686,7 +685,7 @@ def compose_dagster(
                         "CMD",
                         "curl",
                         "-f",
-                        f"http://localhost:{env.get('DAGSTER_DEV_PORT_CONTAINER')}",
+                        f"http://localhost:{env['DAGSTER_DEV_PORT_CONTAINER']}",
                     ],
                     "interval": "10s",
                     "timeout": "2s",
@@ -696,11 +695,11 @@ def compose_dagster(
                     "dagster",
                     "dev",
                     "--workspace",
-                    env.get("DAGSTER_WORKSPACE"),
+                    env["DAGSTER_WORKSPACE"],
                     "--host",
-                    env.get("DAGSTER_HOST"),
+                    env["DAGSTER_HOST"],
                     "--port",
-                    env.get("DAGSTER_DEV_PORT_CONTAINER"),
+                    env["DAGSTER_DEV_PORT_CONTAINER"],
                 ],
                 **copy.deepcopy(depends_on_dict),
                 **copy.deepcopy(volumes_dict),
@@ -767,14 +766,14 @@ def compose_postgres(
             }
             ports_dict = {
                 # "ports": [
-                #     f"{env.get('POSTGRES_PORT_HOST')}:{env.get('POSTGRES_PORT_CONTAINER')}",
+                #     f"{env['POSTGRES_PORT_HOST']}:{env['POSTGRES_PORT_CONTAINER']}",
                 # ]
             }
         elif "network_mode" in compose_networks:
-            network_dict = {"network_mode": compose_networks.get("network_mode")}
+            network_dict = {"network_mode": compose_networks["network_mode"]}
 
         postgres_db_dir_host = pathlib.Path(
-            env.get("POSTGRES_DATABASE_INSTALL_DESTINATION")
+            env["POSTGRES_DATABASE_INSTALL_DESTINATION"]
         )
         postgres_db_dir_host.mkdir(parents=True, exist_ok=True)
         context.log.info(f"Directory {postgres_db_dir_host.as_posix()} created.")
@@ -790,7 +789,7 @@ def compose_postgres(
 
         # For portability, convert absolute volume paths to relative paths
         volumes_paths_to_convert = [
-            f"{postgres_db_dir_host.as_posix()}:{env.get('PGDATA')}",
+            f"{postgres_db_dir_host.as_posix()}:{env['PGDATA']}",
         ]
 
         _volume_relative = []
@@ -825,21 +824,21 @@ def compose_postgres(
                 service_name: {
                     "container_name": container_name,
                     "hostname": host_name,
-                    "domainname": env.get("OPENSTUDIOLANDSCAPES__DOMAIN_LAN"),
+                    "domainname": env["OPENSTUDIOLANDSCAPES__DOMAIN_LAN"],
                     "restart": "always",
                     "image": "docker.io/postgres",
                     **copy.deepcopy(network_dict),
                     "environment": {
-                        "POSTGRES_USER": env.get("POSTGRES_USER"),
-                        "POSTGRES_PASSWORD": env.get("POSTGRES_PASSWORD"),
-                        "POSTGRES_DB": env.get("POSTGRES_DB"),
-                        "PGDATA": env.get("PGDATA"),
+                        "POSTGRES_USER": env["POSTGRES_USER"],
+                        "POSTGRES_PASSWORD": env["POSTGRES_PASSWORD"],
+                        "POSTGRES_DB": env["POSTGRES_DB"],
+                        "PGDATA": env["PGDATA"],
                         # ??? "POSTGRES_PORT": env.get("PGDAPOSTGRES_PORT_CONTAINERTA"),
                     },
                     "healthcheck": {
                         "test": [
                             "CMD-SHELL",
-                            f"pg_isready --username {env.get('POSTGRES_USER')} --dbname {env.get('POSTGRES_DB')} --port {env.get('POSTGRES_PORT_CONTAINER')}",
+                            f"pg_isready --username {env['POSTGRES_USER']} --dbname {env['POSTGRES_DB']} --port {env['POSTGRES_PORT_CONTAINER']}",
                         ],
                         "interval": "10s",
                         "timeout": "8s",
@@ -847,11 +846,11 @@ def compose_postgres(
                     },
                     # "command": [
                     #     "--workspace",
-                    #     env.get("DAGSTER_WORKSPACE"),
+                    #     env["DAGSTER_WORKSPACE"],
                     #     "--host",
-                    #     env.get("DAGSTER_HOST"),
+                    #     env["DAGSTER_HOST"],
                     #     "--port",
-                    #     env.get("DAGSTER_DEV_PORT_CONTAINER"),
+                    #     env["DAGSTER_DEV_PORT_CONTAINER"],
                     # ],
                     **copy.deepcopy(volumes_dict),
                     **copy.deepcopy(ports_dict),
