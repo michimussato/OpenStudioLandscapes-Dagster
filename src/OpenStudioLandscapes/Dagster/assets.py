@@ -826,7 +826,7 @@ def compose_postgres(
                     "hostname": host_name,
                     "domainname": env["OPENSTUDIOLANDSCAPES__DOMAIN_LAN"],
                     "restart": "always",
-                    "image": "docker.io/postgres",
+                    "image": env["POSTGRES_IMAGE"],
                     **copy.deepcopy(network_dict),
                     "environment": {
                         "POSTGRES_USER": env["POSTGRES_USER"],

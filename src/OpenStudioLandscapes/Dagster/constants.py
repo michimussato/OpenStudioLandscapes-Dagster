@@ -70,6 +70,7 @@ FEATURE_CONFIGS = {
         # # Uncomment everything below this (or create an
         # # extra OpenStudioLandscapesConfig)
         "POSTGRES_SERVICE_NAME": "openstudiolandscapes-postgres-dagster",
+        "POSTGRES_IMAGE": "docker.io/postgres:17",  # Be VERY careful when changing the version
         "POSTGRES_USER": "postgres",
         "POSTGRES_PASSWORD": "mysecretpassword",
         "POSTGRES_DB": "postgres",
