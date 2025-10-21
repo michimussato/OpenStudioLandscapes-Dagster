@@ -183,6 +183,7 @@ The following variables are being declared in `OpenStudioLandscapes.Dagster.cons
 | `DAGSTER_HOST`                          | `str`  | `0.0.0.0`                                                     |
 | `DAGSTER_WORKSPACE`                     | `str`  | `/dagster/workspace.yaml`                                     |
 | `POSTGRES_SERVICE_NAME`                 | `str`  | `openstudiolandscapes-postgres-dagster`                       |
+| `POSTGRES_IMAGE`                        | `str`  | `docker.io/postgres:17`                                       |
 | `POSTGRES_USER`                         | `str`  | `postgres`                                                    |
 | `POSTGRES_PASSWORD`                     | `str`  | `mysecretpassword`                                            |
 | `POSTGRES_DB`                           | `str`  | `postgres`                                                    |
@@ -212,11 +213,11 @@ To follow up on the previous LinkedIn publications, visit:
 
 # Official Resources
 
-[![ Logo Dagster ](https://dagster-website.vercel.app/images/brand/logos/dagster-primary-horizontal.png)](https://dagster.io/platform)
+[![Logo Dagster ](https://dagster-website.vercel.app/images/brand/logos/dagster-primary-horizontal.png)](https://dagster.io/platform)
 
 Dagster is written and maintained by Dagster Labs.
 
-[![ Logo Dagster Labs ](https://docs.dagster.io/img/dagster_labs-primary-horizontal.svg)](https://dagster.io)
+[![Logo Dagster Labs ](https://docs.dagster.io/img/dagster_labs-primary-horizontal.svg)](https://dagster.io)
 
 Dagster is available in two flavors:
 

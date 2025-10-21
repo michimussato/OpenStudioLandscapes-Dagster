@@ -17,8 +17,8 @@ def readme_feature(doc: snakemd.Document) -> snakemd.Document:
     doc.add_paragraph(
         snakemd.Inline(
             text=textwrap.dedent(
-                """
-                Logo Dagster
+                """\
+                Logo Dagster\
                 """
             ),
             image={
@@ -30,8 +30,8 @@ def readme_feature(doc: snakemd.Document) -> snakemd.Document:
 
     doc.add_paragraph(
         text=textwrap.dedent(
-            """
-            Dagster is written and maintained by Dagster Labs.
+            """\
+            Dagster is written and maintained by Dagster Labs.\
             """
         )
     )
@@ -41,8 +41,8 @@ def readme_feature(doc: snakemd.Document) -> snakemd.Document:
     doc.add_paragraph(
         snakemd.Inline(
             text=textwrap.dedent(
-                """
-                Logo Dagster Labs
+                """\
+                Logo Dagster Labs\
                 """
             ),
             image={
@@ -54,8 +54,8 @@ def readme_feature(doc: snakemd.Document) -> snakemd.Document:
 
     doc.add_paragraph(
         text=textwrap.dedent(
-            """
-            Dagster is available in two flavors:
+            """\
+            Dagster is available in two flavors:\
             """
         )
     )
@@ -69,13 +69,13 @@ def readme_feature(doc: snakemd.Document) -> snakemd.Document:
 
     doc.add_paragraph(
         text=textwrap.dedent(
-            """
+            """\
             `OpenStudioLandscapes-Dagster` is based on the Community release.
             Dagster is evolving at a very fast pace and it can be hard to keep up.
             Therefore, for now, the Dagster version used in `OpenStudioLandscapes-Dagster`
             is locked to [version 1.9.11](https://pypi.org/project/dagster/1.9.11/).
             When consulting the official [Dagster Documentation](https://docs.dagster.io),
-            make sure you consult the matching [version](#official-documentation-version-19).
+            make sure you consult the matching [version](#official-documentation-version-19).\
             """
         )
     )
@@ -98,7 +98,7 @@ def readme_feature(doc: snakemd.Document) -> snakemd.Document:
 
     doc.add_paragraph(
         text=textwrap.dedent(
-            """
+            """\
             Dagsters primary learning resource is called
             [Dagster University](https://courses.dagster.io).
             It is a fantastic learning path and you should check it out
@@ -106,7 +106,7 @@ def readme_feature(doc: snakemd.Document) -> snakemd.Document:
             personal recommendation by the `OpenStudioLandscapes-Dagster`
             maintainer). The course
             [Dagster Essentials](https://courses.dagster.io/courses/dagster-essentials)
-            will give you a basic but deep enough understanding of how Dagster works.
+            will give you a basic but deep enough understanding of how Dagster works.\
             """
         )
     )
