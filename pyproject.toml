@@ -94,9 +94,13 @@ code_location_name = "OpenStudioLandscapes-Dagster"
 module_name = "OpenStudioLandscapes.Dagster.definitions"
 
 [tool.setuptools]
+include-package-data = true
 packages = [
     "OpenStudioLandscapes.Dagster",
 ]
 platforms = [
     "Linux",
 ]
+
+[tool.setuptools.package-dir]
+"" = "src"
