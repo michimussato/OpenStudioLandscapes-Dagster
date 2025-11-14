@@ -11,8 +11,6 @@ project:
     - OpenStudioLandscapes-Dagster[readme]
     nox:
     - OpenStudioLandscapes-Dagster[testing]
-    readme:
-    - OpenStudioLandscapesUtil-ReadmeGenerator @ git+https://github.com/michimussato/OpenStudioLandscapesUtil-ReadmeGenerator.git@v1.8.0-rc1
     sbom:
     - OpenStudioLandscapes-Dagster[graphviz]
   urls:
