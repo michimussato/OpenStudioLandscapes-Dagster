@@ -645,7 +645,7 @@ def compose_dagster(
                 "restart": "always",
                 # "image": "${DOT_OVERRIDES_REGISTRY_NAMESPACE:-docker.io/openstudiolandscapes}/%s:%s"
                 # % (build["image_name"], build["image_tags"][0]),
-                "image": "%s:%s" % (build["image_name"], build["image_tags"][0]),
+                "image": "%s%s:%s" % (build["image_prefixes"], build["image_name"], build["image_tags"][0]),
                 **copy.deepcopy(network_dict),
                 "environment": {
                     "DAGSTER_HOME": env["DAGSTER_HOME"],
