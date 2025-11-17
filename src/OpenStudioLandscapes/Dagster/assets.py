@@ -161,6 +161,8 @@ def build_docker_image(
     """ """
 
     docker_image: dict = group_in["docker_image"]
+    context.log.debug(f"{docker_image = }")
+    # docker_image = {'image_name': 'openstudiolandscapes_base_build_docker_image', 'image_prefixes': '', 'image_tags': ['2025-11-17-01-26-31-05a9b85aa33b47ffa7dfb21a28ca24ab'], 'image_parent': {}}
 
     docker_file = pathlib.Path(
         env["DOT_LANDSCAPES"],
