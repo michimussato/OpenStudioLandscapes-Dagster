@@ -497,9 +497,9 @@ def compose_networks(
     Output[dict[str, dict[str, dict[str, str]]]] | AssetMaterialization, None, None
 ]:
 
-    compose_network_mode = ComposeNetworkMode.DEFAULT
+    compose_network_mode = DockerComposePolicies.NETWORK_MODE.DEFAULT
 
-    if compose_network_mode == ComposeNetworkMode.DEFAULT:
+    if compose_network_mode is DockerComposePolicies.NETWORK_MODE.DEFAULT:
         docker_dict = {
             "networks": {
                 "mongodb": {
@@ -642,10 +642,15 @@ def compose_dagster(
                 "container_name": container_name,
                 "hostname": host_name,
                 "domainname": env["OPENSTUDIOLANDSCAPES__DOMAIN_LAN"],
-                "restart": "always",
+                "restart": DockerComposePolicies.RESTART_POLICY.ALWAYS.value,
                 # "image": "${DOT_OVERRIDES_REGISTRY_NAMESPACE:-docker.io/openstudiolandscapes}/%s:%s"
                 # % (build["image_name"], build["image_tags"][0]),
-                "image": "%s%s:%s" % (build["image_prefixes"], build["image_name"], build["image_tags"][0]),
+                "image": "%s%s:%s"
+                % (
+                    build["image_prefixes"],
+                    build["image_name"],
+                    build["image_tags"][0],
+                ),
                 **copy.deepcopy(network_dict),
                 "environment": {
                     "DAGSTER_HOME": env["DAGSTER_HOME"],
@@ -798,7 +803,7 @@ def compose_postgres(
                     "container_name": container_name,
                     "hostname": host_name,
                     "domainname": env["OPENSTUDIOLANDSCAPES__DOMAIN_LAN"],
-                    "restart": "always",
+                    "restart": DockerComposePolicies.RESTART_POLICY.ALWAYS.value,
                     "image": env["POSTGRES_IMAGE"],
                     **copy.deepcopy(network_dict),
                     "environment": {
