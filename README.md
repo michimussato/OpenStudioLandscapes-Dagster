@@ -172,9 +172,6 @@ The following variables are being declared in `OpenStudioLandscapes.Dagster.cons
 | Variable                                | Type   | Value                                                         |
 | :-------------------------------------- | :----- | :------------------------------------------------------------ |
 | `DOCKER_USE_CACHE`                      | `bool` | `False`                                                       |
-| `HOSTNAME`                              | `str`  | `dagster`                                                     |
-| `TELEPORT_ENTRY_POINT_HOST`             | `str`  | `{{HOSTNAME}}`                                                |
-| `TELEPORT_ENTRY_POINT_PORT`             | `str`  | `{{DAGSTER_DEV_PORT_HOST}}`                                   |
 | `CONFIGS_ROOT`                          | `str`  | `{DOT_FEATURES}/OpenStudioLandscapes-Dagster/.payload/config` |
 | `DAGSTER_DEV_PORT_HOST`                 | `str`  | `3003`                                                        |
 | `DAGSTER_DEV_PORT_CONTAINER`            | `str`  | `3006`                                                        |
