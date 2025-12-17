@@ -1,9 +1,9 @@
 import copy
-import json
+import enum
 import pathlib
 import textwrap
 import urllib.parse
-from typing import Any, Generator
+from typing import Generator, Dict, Union, List
 
 import yaml
 from dagster import (
@@ -13,90 +13,98 @@ from dagster import (
     AssetMaterialization,
     MetadataValue,
     Output,
-    asset,
+    asset, AssetsDefinition,
 )
 from OpenStudioLandscapes.engine.common_assets.compose import get_compose
-from OpenStudioLandscapes.engine.common_assets.constants import get_constants
+from OpenStudioLandscapes.engine.common_assets.compose_scope import get_compose_scope_group__cmd
 from OpenStudioLandscapes.engine.common_assets.docker_compose_graph import (
     get_docker_compose_graph,
 )
-from OpenStudioLandscapes.engine.common_assets.docker_config import get_docker_config
-from OpenStudioLandscapes.engine.common_assets.docker_config_json import (
-    get_docker_config_json,
-)
-from OpenStudioLandscapes.engine.common_assets.env import get_env
-from OpenStudioLandscapes.engine.common_assets.feature_out import get_feature_out
-from OpenStudioLandscapes.engine.common_assets.group_in import get_group_in
+from OpenStudioLandscapes.engine.common_assets.feature import get_feature__CONFIG
+from OpenStudioLandscapes.engine.common_assets.feature_out import get_feature_out_v2
+from OpenStudioLandscapes.engine.common_assets.group_in import get_feature_in_parent, get_feature_in
 from OpenStudioLandscapes.engine.common_assets.group_out import get_group_out
+from OpenStudioLandscapes.engine.config.models import DockerConfigModel, ConfigEngine
 from OpenStudioLandscapes.engine.constants import *
 from OpenStudioLandscapes.engine.enums import *
+from OpenStudioLandscapes.engine.link.models import OpenStudioLandscapesFeatureIn
 from OpenStudioLandscapes.engine.policies.retry import build_docker_image_retry_policy
 from OpenStudioLandscapes.engine.utils import *
 from OpenStudioLandscapes.engine.utils.docker.compose_dicts import *
 
+from OpenStudioLandscapes.Dagster import dist
+from OpenStudioLandscapes.Dagster.config.models import CONFIG_STR, Config
 from OpenStudioLandscapes.Dagster.constants import *
 
 # Todo:
 #  - [ ] Create dagster.yaml dynamically
 
+# https://github.com/yaml/pyyaml/issues/722#issuecomment-1969292770
+yaml.SafeDumper.add_multi_representer(
+    data_type=enum.Enum,
+    representer=yaml.representer.SafeRepresenter.represent_str,
+)
 
-constants = get_constants(
+
+compose_scope_group__cmd: AssetsDefinition = get_compose_scope_group__cmd(
+    ASSET_HEADER=ASSET_HEADER,
+)
+
+CONFIG: AssetsDefinition = get_feature__CONFIG(
+    ASSET_HEADER=ASSET_HEADER,
+    CONFIG_STR=CONFIG_STR,
+    search_model_of_type=Config,
+)
+
+
+feature_in: AssetsDefinition = get_feature_in(
+    ASSET_HEADER=ASSET_HEADER,
+    ASSET_HEADER_BASE=ASSET_HEADER_BASE,
+    ASSET_HEADER_FEATURE_IN={},
+)
+
+
+group_out: AssetsDefinition = get_group_out(
     ASSET_HEADER=ASSET_HEADER,
 )
 
 
-docker_config = get_docker_config(
+docker_compose_graph: AssetsDefinition = get_docker_compose_graph(
     ASSET_HEADER=ASSET_HEADER,
 )
 
 
-group_in = get_group_in(
-    ASSET_HEADER=ASSET_HEADER,
-    ASSET_HEADER_PARENT=ASSET_HEADER_BASE,
-    input_name=str(GroupIn.BASE_IN),
-)
-
-
-env = get_env(
+compose: AssetsDefinition = get_compose(
     ASSET_HEADER=ASSET_HEADER,
 )
 
 
-group_out = get_group_out(
+feature_out_v2: AssetsDefinition = get_feature_out_v2(
     ASSET_HEADER=ASSET_HEADER,
 )
 
 
-docker_compose_graph = get_docker_compose_graph(
+# Produces
+# - feature_in_parent
+# - CONFIG_PARENT
+# if ConfigParent is or type FeatureBaseModel
+feature_in_parent: Union[AssetsDefinition, None] = get_feature_in_parent(
     ASSET_HEADER=ASSET_HEADER,
-)
-
-
-compose = get_compose(
-    ASSET_HEADER=ASSET_HEADER,
-)
-
-
-feature_out = get_feature_out(
-    ASSET_HEADER=ASSET_HEADER,
-    feature_out_ins={
-        "env": dict,
-        "compose": dict,
-        "group_in": dict,
-    },
-)
-
-
-docker_config_json = get_docker_config_json(
-    ASSET_HEADER=ASSET_HEADER,
+    config_parent=ConfigParent,
 )
 
 
 @asset(
     **ASSET_HEADER,
+    ins={
+        "CONFIG": AssetIn(
+            AssetKey([*ASSET_HEADER["key_prefix"], "CONFIG"]),
+        ),
+    },
 )
 def pip_packages(
     context: AssetExecutionContext,
+    CONFIG: Config,  # pylint: disable=redefined-outer-name
 ) -> Generator[Output[list] | AssetMaterialization, None, None]:
     """ """
 
@@ -105,12 +113,30 @@ def pip_packages(
     _pip_packages: list = [
         "dagster==1.9.11",
         "dagster-webserver==1.9.11",
-        # "dagster-shared[dev] @ git+https://github.com/michimussato/dagster-shared.git@main",
-        # "dagster-job-processor[dev] @ git+https://github.com/michimussato/dagster-job-processor.git@main",
-        "OpenStudioLandscapes-Dagster-Showcase[dev] @ git+https://github.com/michimussato/OpenStudioLandscapes-Dagster-Showcase.git@main",
     ]
 
-    if DAGSTER_USE_POSTGRES:
+    # if CONFIG.dagster_enable_openstudiolandscapes_shared:
+    #     _pip_packages.extend(
+    #         [
+    #             "dagster-shared[dev] @ git+https://github.com/michimussato/dagster-shared.git@main",
+    #         ]
+    #     )
+
+    # if CONFIG.dagster_enable_openstudiolandscapes_job_processor:
+    #     _pip_packages.extend(
+    #         [
+    #             "dagster-job-processor[dev] @ git+https://github.com/michimussato/dagster-job-processor.git@main",
+    #         ]
+    #     )
+
+    if CONFIG.dagster_enable_openstudiolandscapes_showcase:
+        _pip_packages.extend(
+            [
+                "OpenStudioLandscapes-Dagster-Showcase[dev] @ git+https://github.com/michimussato/OpenStudioLandscapes-Dagster-Showcase.git@main",
+            ]
+        )
+
+    if CONFIG.dagster_enable_postgres:
         _pip_packages.extend(
             [
                 "dagster-postgres==0.25.11",
@@ -130,20 +156,11 @@ def pip_packages(
 @asset(
     **ASSET_HEADER,
     ins={
-        "env": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "env"]),
+        "feature_in": AssetIn(
+            AssetKey([*ASSET_HEADER["key_prefix"], "feature_in"]),
         ),
-        "docker_config_json": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "docker_config_json"]),
-        ),
-        "group_in": AssetIn(
-            AssetKey([*ASSET_HEADER_BASE["key_prefix"], str(GroupIn.BASE_IN)])
-        ),
-        # "docker_image": AssetIn(
-        #     AssetKey([*ASSET_HEADER["key_prefix"], "docker_image"])
-        # ),
-        "docker_config": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "docker_config"])
+        "CONFIG": AssetIn(
+            AssetKey([*ASSET_HEADER["key_prefix"], "CONFIG"]),
         ),
         "pip_packages": AssetIn(
             AssetKey([*ASSET_HEADER["key_prefix"], "pip_packages"]),
@@ -153,22 +170,28 @@ def pip_packages(
 )
 def build_docker_image(
     context: AssetExecutionContext,
-    env: dict,  # pylint: disable=redefined-outer-name
-    docker_config_json: pathlib.Path,  # pylint: disable=redefined-outer-name
-    group_in: dict,  # pylint: disable=redefined-outer-name
-    docker_config: DockerConfig,  # pylint: disable=redefined-outer-name
-    pip_packages: list,  # pylint: disable=redefined-outer-name
-) -> Generator[Output[dict] | AssetMaterialization, None, None]:
+    feature_in: OpenStudioLandscapesFeatureIn,  # pylint: disable=redefined-outer-name
+    CONFIG: Config,  # pylint: disable=redefined-outer-name
+    pip_packages: List,  # pylint: disable=redefined-outer-name
+) -> Generator[Output[Dict] | AssetMaterialization, None, None]:
     """ """
 
-    docker_image: dict = group_in["docker_image"]
+    env: Dict = CONFIG.env
+
+    docker_config_json: pathlib.Path = feature_in.openstudiolandscapes_base.docker_config_json
+
+    config_engine: ConfigEngine = feature_in.openstudiolandscapes_base.config_engine
+
+    docker_config: DockerConfigModel = config_engine.openstudiolandscapes__docker_config
+
+    docker_image: Dict = feature_in.openstudiolandscapes_base.docker_image_base
     context.log.debug(f"{docker_image = }")
     # docker_image = {'image_name': 'openstudiolandscapes_base_build_docker_image', 'image_prefixes': '', 'image_tags': ['2025-11-17-01-26-31-05a9b85aa33b47ffa7dfb21a28ca24ab'], 'image_parent': {}}
 
     docker_file = pathlib.Path(
         env["DOT_LANDSCAPES"],
         env.get("LANDSCAPE", "default"),
-        f"{ASSET_HEADER['group_name']}__{'__'.join(ASSET_HEADER['key_prefix'])}",
+        f"{dist.name}",
         "__".join(context.asset_key.path),
         "Dockerfiles",
         "Dockerfile",
@@ -208,10 +231,10 @@ def build_docker_image(
 
         {pip_install_str}
 
-        RUN mkdir -p {DAGSTER_ROOT}
-        RUN mkdir -p {DAGSTER_HOME}
+        RUN mkdir -p {dagster_root}
+        RUN mkdir -p {dagster_home}
 
-        WORKDIR {DAGSTER_ROOT}
+        WORKDIR {dagster_root}
 
         ENTRYPOINT []
         CMD []
@@ -228,6 +251,8 @@ def build_docker_image(
         image_name=image_name,
         # Todo: this won't work as expected if len(tags) > 1
         parent_image=f"{build_base_parent_image_prefix}{build_base_parent_image_name}:{build_base_parent_image_tags[0]}",
+        dagster_root=CONFIG.dagster_root,
+        dagster_home=CONFIG.dagster_home,
         **env,
     )
     # @formatter:on
@@ -267,29 +292,48 @@ def build_docker_image(
 @asset(
     **ASSET_HEADER,
     ins={
-        "env": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "env"]),
+        "CONFIG": AssetIn(
+            AssetKey([*ASSET_HEADER["key_prefix"], "CONFIG"]),
+        ),
+        "feature_in": AssetIn(
+            AssetKey([*ASSET_HEADER["key_prefix"], "feature_in"]),
         ),
     },
-    description="Visit https://docs.dagster.io/guides/deploy/dagster-yaml for reference. "
-    "For more info regarding Postgres backend for Dagster, visit "
-    "https://docs.dagster.io/api/python-api/libraries/dagster-postgres and "
-    "https://docs.dagster.io/guides/deploy/dagster-instance-configuration.",
-)
-def dagster_yaml(
-    context: AssetExecutionContext,
-    env: dict,  # pylint: disable=redefined-outer-name
-) -> Generator[Output[pathlib.Path] | AssetMaterialization, None, None]:
-    # @formatter:off
-
-    concurrency_dict = {}
-    storage_dict = {}
-
-    if DAGSTER_USE_POSTGRES:
-        # dagster.yaml with Postgres backend
+    description=textwrap.dedent(
         """
-        Reference
-
+        Visit https://docs.dagster.io/guides/deploy/dagster-yaml for reference.
+        "For more info regarding Postgres backend for Dagster, visit
+        "https://docs.dagster.io/api/python-api/libraries/dagster-postgres and
+        "https://docs.dagster.io/guides/deploy/dagster-instance-configuration.
+        
+        ---
+        
+        # Reference
+        
+        ## MySQL Backend
+        
+        ```yaml
+        # https://docs.dagster.io/guides/deploy/dagster-yaml
+        ## https://docs.dagster.io/guides/limiting-concurrency-in-data-pipelines
+        run_queue:
+          max_concurrent_runs: 1
+          block_op_concurrency_limited_runs:
+            enabled: true
+        concurrency:
+          default_op_concurrency_limit: 1
+        telemetry:
+          enabled: false
+        #run_monitoring:
+        #  enabled: true
+        #  free_slots_after_run_end_seconds: 300
+        auto_materialize:
+          enabled: true
+          use_sensors: true
+        ```
+        
+        ## Postgres Backend
+        
+        ```yaml
         # https://docs.dagster.io/guides/deploy/dagster-yaml
         ## https://docs.dagster.io/guides/limiting-concurrency-in-data-pipelines
         run_queue:
@@ -314,49 +358,45 @@ def dagster_yaml(
               hostname: openstudiolandscapes-postgres-dagster
               db_name: postgres
               port: 5432
+        ```
         """
+    ),
+)
+def dagster_yaml(
+    context: AssetExecutionContext,
+    CONFIG: Config,  # pylint: disable=redefined-outer-name
+    feature_in: OpenStudioLandscapesFeatureIn,  # pylint: disable=redefined-outer-name
+) -> Generator[Output[pathlib.Path] | AssetMaterialization, None, None]:
 
+    config_engine: ConfigEngine = feature_in.openstudiolandscapes_base.config_engine
+
+    env: Dict = CONFIG.env
+
+    concurrency_dict = {}
+    storage_dict = {}
+
+    if CONFIG.dagster_enable_postgres:
+        # dagster.yaml with Postgres backend
         storage_dict = {
             "storage": {
                 "postgres": {
                     "postgres_db": {
-                        "username": str(env["POSTGRES_USER"]),
-                        "password": str(env["POSTGRES_PASSWORD"]),
+                        "username": CONFIG.dagster_postgres_user,
+                        "password": CONFIG.dagster_postgres_password,
                         "hostname": ".".join(
                             [
-                                str(env["POSTGRES_SERVICE_NAME"]),
-                                env["OPENSTUDIOLANDSCAPES__DOMAIN_LAN"],
+                                CONFIG.dagster_postgres_service_name,
+                                config_engine.openstudiolandscapes__domain_lan
                             ],
                         ),
-                        "db_name": str(env["POSTGRES_DB"]),
-                        "port": int(env["POSTGRES_PORT_CONTAINER"]),
+                        "db_name": CONFIG.dagster_postgres_db,
+                        "port": CONFIG.dagster_postgres_port_container,
                     }
                 }
             }
         }
     else:
         # dagster.yaml with default MySQL backend
-        """
-        Reference
-
-        # https://docs.dagster.io/guides/deploy/dagster-yaml
-        ## https://docs.dagster.io/guides/limiting-concurrency-in-data-pipelines
-        run_queue:
-          max_concurrent_runs: 1
-          block_op_concurrency_limited_runs:
-            enabled: true
-        concurrency:
-          default_op_concurrency_limit: 1
-        telemetry:
-          enabled: false
-        #run_monitoring:
-        #  enabled: true
-        #  free_slots_after_run_end_seconds: 300
-        auto_materialize:
-          enabled: true
-          use_sensors: true
-        """
-
         concurrency_dict = {"concurrency": {"default_op_concurrency_limit": 1}}
 
     dagster_yaml_dict = {
@@ -382,7 +422,7 @@ def dagster_yaml(
     dagster_yaml_file = pathlib.Path(
         env["DOT_LANDSCAPES"],
         env.get("LANDSCAPE", "default"),
-        f"{ASSET_HEADER['group_name']}__{'__'.join(ASSET_HEADER['key_prefix'])}",
+        f"{dist.name}",
         "__".join(context.asset_key.path),
         "materializations",
         "dagster.yaml",
@@ -399,10 +439,8 @@ def dagster_yaml(
         asset_key=context.asset_key,
         metadata={
             "__".join(context.asset_key.path): MetadataValue.path(dagster_yaml_file),
-            "use_postgres": MetadataValue.bool(DAGSTER_USE_POSTGRES),
-            "dagster_yaml_dict": MetadataValue.json(dagster_yaml_dict),
-            "dagster_yaml": MetadataValue.md(f"```\n{dagster_yaml_load}\n```"),
-            "env": MetadataValue.json(env),
+            "use_postgres": MetadataValue.bool(CONFIG.dagster_enable_postgres),
+            "dagster_yaml": MetadataValue.md(f"```yaml\n{dagster_yaml_load}\n```"),
         },
     )
 
@@ -410,43 +448,50 @@ def dagster_yaml(
 @asset(
     **ASSET_HEADER,
     ins={
-        "env": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "env"]),
+        "CONFIG": AssetIn(
+            AssetKey([*ASSET_HEADER["key_prefix"], "CONFIG"]),
         ),
     },
-    description="Visit https://docs.dagster.io/guides/deploy/code-locations/workspace-yaml for reference.",
+    description=textwrap.dedent(
+        """
+        Visit https://docs.dagster.io/guides/deploy/code-locations/workspace-yaml for reference.
+        
+        ---
+        
+        # Reference
+        
+        ```yaml
+        load_from:
+        #  - python_package:
+        #      package_name: My-Skeleton-Package
+        #      location_name: "My Skeleton Package Location"
+        # Todo:
+        #  - [ ] dynamic workspace.yaml to be able to add dagster-shared dynamically (https://github.com/michimussato/dagster-shared)
+        #  - [ ] Shouldn't this be OpenStudioLandscapes.open_studio_landscapes also?
+          - python_module:
+              # https://github.com/michimussato/deadline-dagster
+              working_directory: src
+              module_name: OpenStudioLandscapes.dagster_job_processor.definitions
+              location_name: "dagster_job_processor Package Location"
+              # executable_path: ../.venv/bin/python
+        #  - python_module:
+        #      # Todo:
+        #      #  - [ ] will only work after making studio-landscapes public
+        #      # https://github.com/michimussato/deadline-dagster
+        #      working_directory: src
+        #      module_name: OpenStudioLandscapes.open_studio_landscapes.definitions
+        #      location_name: "OpenStudioLandscapes.open_studio_landscapes Package Location"
+        #      # executable_path: ../.venv/bin/python
+        ```
+        """
+    ),
 )
 def workspace_yaml(
     context: AssetExecutionContext,
-    env: dict,  # pylint: disable=redefined-outer-name
+    CONFIG: Config,  # pylint: disable=redefined-outer-name
 ) -> Generator[Output[pathlib.Path] | AssetMaterialization, None, None]:
-    # @formatter:off
 
-    """
-    Reference
-
-    load_from:
-    #  - python_package:
-    #      package_name: My-Skeleton-Package
-    #      location_name: "My Skeleton Package Location"
-    # Todo:
-    #  - [ ] dynamic workspace.yaml to be able to add dagster-shared dynamically (https://github.com/michimussato/dagster-shared)
-    #  - [ ] Shouldn't this be OpenStudioLandscapes.open_studio_landscapes also?
-      - python_module:
-          # https://github.com/michimussato/deadline-dagster
-          working_directory: src
-          module_name: OpenStudioLandscapes.dagster_job_processor.definitions
-          location_name: "dagster_job_processor Package Location"
-          # executable_path: ../.venv/bin/python
-    #  - python_module:
-    #      # Todo:
-    #      #  - [ ] will only work after making studio-landscapes public
-    #      # https://github.com/michimussato/deadline-dagster
-    #      working_directory: src
-    #      module_name: OpenStudioLandscapes.open_studio_landscapes.definitions
-    #      location_name: "OpenStudioLandscapes.open_studio_landscapes Package Location"
-    #      # executable_path: ../.venv/bin/python
-    """
+    env: Dict = CONFIG.env
 
     workspace_yaml_dict = {
         "load_from": [
@@ -465,7 +510,7 @@ def workspace_yaml(
     workspace_yaml_file = pathlib.Path(
         env["DOT_LANDSCAPES"],
         env.get("LANDSCAPE", "default"),
-        f"{ASSET_HEADER['group_name']}__{'__'.join(ASSET_HEADER['key_prefix'])}",
+        f"{dist.name}",
         "__".join(context.asset_key.path),
         "workspace.yaml",
     ).expanduser()
@@ -481,10 +526,8 @@ def workspace_yaml(
         asset_key=context.asset_key,
         metadata={
             "__".join(context.asset_key.path): MetadataValue.path(workspace_yaml_file),
-            "use_postgres": MetadataValue.bool(DAGSTER_USE_POSTGRES),
-            "workspace_yaml_dict": MetadataValue.json(workspace_yaml_dict),
-            "workspace_yaml": MetadataValue.md(f"```\n{workspace_yaml_load}\n```"),
-            "env": MetadataValue.json(env),
+            "use_postgres": MetadataValue.bool(CONFIG.dagster_enable_postgres),
+            "workspace_yaml": MetadataValue.md(f"```yaml\n{workspace_yaml_load}\n```"),
         },
     )
 
@@ -492,17 +535,19 @@ def workspace_yaml(
 @asset(
     **ASSET_HEADER,
     ins={
-        "env": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "env"]),
+        "CONFIG": AssetIn(
+            AssetKey([*ASSET_HEADER["key_prefix"], "CONFIG"]),
         ),
     },
 )
 def compose_networks(
     context: AssetExecutionContext,
-    env: dict,  # pylint: disable=redefined-outer-name
+    CONFIG: Config,  # pylint: disable=redefined-outer-name
 ) -> Generator[
-    Output[dict[str, dict[str, dict[str, str]]]] | AssetMaterialization, None, None
+    Output[Dict[str, Dict[str, Dict[str, str]]]] | AssetMaterialization, None, None
 ]:
+
+    env: Dict = CONFIG.env
 
     compose_network_mode = DockerComposePolicies.NETWORK_MODE.BRIDGE
 
@@ -521,9 +566,6 @@ def compose_networks(
         metadata={
             "__".join(context.asset_key.path): MetadataValue.json(docker_dict),
             "compose_network_mode": MetadataValue.text(compose_network_mode.value),
-            "docker_dict": MetadataValue.md(
-                f"```json\n{json.dumps(docker_dict, indent=2)}\n```"
-            ),
             "docker_yaml": MetadataValue.md(f"```shell\n{docker_yaml}\n```"),
         },
     )
@@ -532,8 +574,8 @@ def compose_networks(
 @asset(
     **ASSET_HEADER,
     ins={
-        "env": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "env"]),
+        "CONFIG": AssetIn(
+            AssetKey([*ASSET_HEADER["key_prefix"], "CONFIG"]),
         ),
         "compose_networks": AssetIn(
             AssetKey([*ASSET_HEADER["key_prefix"], "compose_networks"]),
@@ -551,13 +593,17 @@ def compose_networks(
 )
 def compose_dagster(
     context: AssetExecutionContext,
-    env: dict,  # pylint: disable=redefined-outer-name
-    compose_networks: dict,  # pylint: disable=redefined-outer-name
-    build: dict,  # pylint: disable=redefined-outer-name
+    CONFIG: Config,  # pylint: disable=redefined-outer-name
+    compose_networks: Dict,  # pylint: disable=redefined-outer-name
+    build: Dict,  # pylint: disable=redefined-outer-name
     dagster_yaml: pathlib.Path,  # pylint: disable=redefined-outer-name
     workspace_yaml: pathlib.Path,  # pylint: disable=redefined-outer-name
-) -> Generator[Output[dict] | AssetMaterialization, None, None]:
+) -> Generator[Output[Dict] | AssetMaterialization, None, None]:
     """ """
+
+    env: Dict = CONFIG.env
+
+    config_engine: ConfigEngine = CONFIG.config_engine
 
     network_dict = {}
     ports_dict = {}
@@ -567,7 +613,7 @@ def compose_dagster(
         network_dict = {"networks": list(compose_networks.get("networks", {}).keys())}
         ports_dict = {
             "ports": [
-                f"{env['DAGSTER_DEV_PORT_HOST']}:{env['DAGSTER_DEV_PORT_CONTAINER']}",
+                f"{CONFIG.dagster_dev_port_host}:{CONFIG.dagster_dev_port_container}",
             ]
         }
     elif "network_mode" in compose_networks:
@@ -576,9 +622,9 @@ def compose_dagster(
     # ./materializations
     # with ./materlializations/dagster.yaml inside
     materializations_dagster_yaml_container = pathlib.Path(
-        env["DAGSTER_HOME"],
+        CONFIG.dagster_home,
     )
-    workspace_yaml_container = pathlib.Path(env["DAGSTER_ROOT"], "workspace.yaml")
+    workspace_yaml_container = pathlib.Path(CONFIG.dagster_root, "workspace.yaml")
 
     volumes_dict = {
         "volumes": [
@@ -597,7 +643,7 @@ def compose_dagster(
 
         volume_dir_host_rel_path = get_relative_path_via_common_root(
             context=context,
-            path_src=pathlib.Path(env["DOCKER_COMPOSE"]),
+            path_src=CONFIG.docker_compose_expanded,
             path_dst=pathlib.Path(host),
             path_common_root=pathlib.Path(env["DOT_LANDSCAPES"]),
         )
@@ -612,11 +658,11 @@ def compose_dagster(
         ]
     }
 
-    if DAGSTER_USE_POSTGRES:
+    if CONFIG.dagster_enable_postgres:
 
         depends_on_dict = {
             "depends_on": [
-                env["POSTGRES_SERVICE_NAME"],
+                CONFIG.dagster_postgres_service_name,
             ],
         }
 
@@ -625,7 +671,7 @@ def compose_dagster(
         context=context,
         service_name=service_name,
         landscape_id=env.get("LANDSCAPE", "default"),
-        domain_lan=env.get("OPENSTUDIOLANDSCAPES__DOMAIN_LAN"),
+        domain_lan=config_engine.openstudiolandscapes__domain_lan,
     )
 
     docker_dict = {
@@ -633,7 +679,7 @@ def compose_dagster(
             service_name: {
                 "container_name": container_name,
                 "hostname": host_name,
-                "domainname": env["OPENSTUDIOLANDSCAPES__DOMAIN_LAN"],
+                "domainname": config_engine.openstudiolandscapes__domain_lan,
                 "restart": DockerComposePolicies.RESTART_POLICY.ALWAYS.value,
                 # "image": "${DOT_OVERRIDES_REGISTRY_NAMESPACE:-docker.io/openstudiolandscapes}/%s:%s"
                 # % (build["image_name"], build["image_tags"][0]),
@@ -645,17 +691,17 @@ def compose_dagster(
                 ),
                 **copy.deepcopy(network_dict),
                 "environment": {
-                    "DAGSTER_HOME": env["DAGSTER_HOME"],
+                    "DAGSTER_HOME": CONFIG.dagster_home.as_posix(),
                     # Todo
                     #  - [ ] fix hard code here (from deadline-dagster .env)
-                    "DAGSTER_DEPLOYMENT": "farm",
+                    # "DAGSTER_DEPLOYMENT": "farm",
                 },
                 "healthcheck": {
                     "test": [
                         "CMD",
                         "curl",
                         "-f",
-                        f"http://localhost:{env['DAGSTER_DEV_PORT_CONTAINER']}",
+                        f"http://localhost:{CONFIG.dagster_dev_port_container}",
                     ],
                     "interval": "10s",
                     "timeout": "2s",
@@ -665,11 +711,11 @@ def compose_dagster(
                     "dagster",
                     "dev",
                     "--workspace",
-                    env["DAGSTER_WORKSPACE"],
+                    workspace_yaml_container.as_posix(),
                     "--host",
-                    env["DAGSTER_HOST"],
+                    CONFIG.dagster_listen_addr,
                     "--port",
-                    env["DAGSTER_DEV_PORT_CONTAINER"],
+                    str(CONFIG.dagster_dev_port_container),
                 ],
                 **copy.deepcopy(depends_on_dict),
                 **copy.deepcopy(volumes_dict),
@@ -685,7 +731,6 @@ def compose_dagster(
     yield AssetMaterialization(
         asset_key=context.asset_key,
         metadata={
-            "__".join(context.asset_key.path): MetadataValue.json(docker_dict),
             "docker_yaml": MetadataValue.md(f"```yaml\n{docker_yaml}\n```"),
             # Todo: "cmd_docker_run": MetadataValue.path(cmd_list_to_str(cmd_docker_run)),
         },
@@ -695,8 +740,8 @@ def compose_dagster(
 @asset(
     **ASSET_HEADER,
     ins={
-        "env": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "env"]),
+        "CONFIG": AssetIn(
+            AssetKey([*ASSET_HEADER["key_prefix"], "CONFIG"]),
         ),
         "compose_networks": AssetIn(
             AssetKey([*ASSET_HEADER["key_prefix"], "compose_networks"]),
@@ -707,12 +752,16 @@ def compose_dagster(
 )
 def compose_postgres(
     context: AssetExecutionContext,
-    env: dict,  # pylint: disable=redefined-outer-name
-    compose_networks: dict,  # pylint: disable=redefined-outer-name
-) -> Generator[Output[dict] | AssetMaterialization, None, None]:
+    CONFIG: Config,  # pylint: disable=redefined-outer-name
+    compose_networks: Dict,  # pylint: disable=redefined-outer-name
+) -> Generator[Output[Dict] | AssetMaterialization, None, None]:
     """ """
 
-    if not DAGSTER_USE_POSTGRES:
+    env: dict = CONFIG.env
+
+    config_engine: ConfigEngine = CONFIG.config_engine
+
+    if not CONFIG.dagster_enable_postgres:
 
         ret = dict()
 
@@ -742,9 +791,7 @@ def compose_postgres(
         elif "network_mode" in compose_networks:
             network_dict = {"network_mode": compose_networks["network_mode"]}
 
-        postgres_db_dir_host = pathlib.Path(
-            env["POSTGRES_DATABASE_INSTALL_DESTINATION"]
-        )
+        postgres_db_dir_host: pathlib.Path = CONFIG.dagster_postgres_db_install_dir_expanded
         postgres_db_dir_host.mkdir(parents=True, exist_ok=True)
         context.log.info(f"Directory {postgres_db_dir_host.as_posix()} created.")
 
@@ -759,7 +806,7 @@ def compose_postgres(
 
         # For portability, convert absolute volume paths to relative paths
         volumes_paths_to_convert = [
-            f"{postgres_db_dir_host.as_posix()}:{env['PGDATA']}",
+            f"{postgres_db_dir_host.as_posix()}:{CONFIG.dagster_postgres_pgdata}",
         ]
 
         _volume_relative = []
@@ -770,7 +817,7 @@ def compose_postgres(
 
             volume_dir_host_rel_path = get_relative_path_via_common_root(
                 context=context,
-                path_src=pathlib.Path(env["DOCKER_COMPOSE"]),
+                path_src=CONFIG.docker_compose_expanded,
                 path_dst=pathlib.Path(host),
                 path_common_root=pathlib.Path(env["DOT_LANDSCAPES"]),
             )
@@ -785,12 +832,12 @@ def compose_postgres(
             ]
         }
 
-        service_name = env["POSTGRES_SERVICE_NAME"]
+        service_name = CONFIG.dagster_postgres_service_name
         container_name, host_name = get_docker_compose_names(
             context=context,
             service_name=service_name,
             landscape_id=env.get("LANDSCAPE", "default"),
-            domain_lan=env.get("OPENSTUDIOLANDSCAPES__DOMAIN_LAN"),
+            domain_lan=config_engine.openstudiolandscapes__domain_lan,
         )
 
         docker_dict = {
@@ -798,21 +845,21 @@ def compose_postgres(
                 service_name: {
                     "container_name": container_name,
                     "hostname": host_name,
-                    "domainname": env["OPENSTUDIOLANDSCAPES__DOMAIN_LAN"],
+                    "domainname": config_engine.openstudiolandscapes__domain_lan,
                     "restart": DockerComposePolicies.RESTART_POLICY.ALWAYS.value,
-                    "image": env["POSTGRES_IMAGE"],
+                    "image": CONFIG.dagster_postgres_image,
                     **copy.deepcopy(network_dict),
                     "environment": {
-                        "POSTGRES_USER": env["POSTGRES_USER"],
-                        "POSTGRES_PASSWORD": env["POSTGRES_PASSWORD"],
-                        "POSTGRES_DB": env["POSTGRES_DB"],
-                        "PGDATA": env["PGDATA"],
+                        "POSTGRES_USER": CONFIG.dagster_postgres_user,
+                        "POSTGRES_PASSWORD": CONFIG.dagster_postgres_password,
+                        "POSTGRES_DB": CONFIG.dagster_postgres_db,
+                        "PGDATA": CONFIG.dagster_postgres_pgdata.as_posix(),
                         # ??? "POSTGRES_PORT": env.get("PGDAPOSTGRES_PORT_CONTAINERTA"),
                     },
                     "healthcheck": {
                         "test": [
                             "CMD-SHELL",
-                            f"pg_isready --username {env['POSTGRES_USER']} --dbname {env['POSTGRES_DB']} --port {env['POSTGRES_PORT_CONTAINER']}",
+                            f"pg_isready --username {CONFIG.dagster_postgres_user} --dbname {CONFIG.dagster_postgres_db} --port {str(CONFIG.dagster_postgres_port_container)}",
                         ],
                         "interval": "10s",
                         "timeout": "8s",
@@ -839,37 +886,9 @@ def compose_postgres(
         yield AssetMaterialization(
             asset_key=context.asset_key,
             metadata={
-                "__".join(context.asset_key.path): MetadataValue.json(docker_dict),
                 "docker_yaml": MetadataValue.md(f"```yaml\n{docker_yaml}\n```"),
-                # Todo: "cmd_docker_run": MetadataValue.path(cmd_list_to_str(cmd_docker_run)),
             },
         )
-
-
-# @asset(
-#     **ASSET_HEADER,
-#     ins={
-#         "features_in": AssetIn(AssetKey([*ASSET_HEADER["key_prefix"], "group_in"])),
-#     },
-# )
-# def docker_image(
-#     context: AssetExecutionContext,
-#     features_in: dict,
-# ) -> Generator[Output[dict] | AssetMaterialization, None, None]:
-#
-#     context.log.info(features_in)
-#
-#     _docker_image: dict = features_in.pop("docker_image")
-#     context.log.info(_docker_image)
-#
-#     yield Output(_docker_image)
-#
-#     yield AssetMaterialization(
-#         asset_key=context.asset_key,
-#         metadata={
-#             "docker_image": MetadataValue.json(_docker_image),
-#         },
-#     )
 
 
 @asset(
@@ -886,49 +905,9 @@ def compose_postgres(
 def compose_maps(
     context: AssetExecutionContext,
     **kwargs,  # pylint: disable=redefined-outer-name
-) -> Generator[Output[list[dict]] | AssetMaterialization, None, None]:
+) -> Generator[Output[List[Dict]] | AssetMaterialization, None, None]:
 
     ret = list(kwargs.values())
-
-    yield Output(ret)
-
-    yield AssetMaterialization(
-        asset_key=context.asset_key,
-        metadata={
-            "__".join(context.asset_key.path): MetadataValue.json(ret),
-        },
-    )
-
-
-@asset(
-    **ASSET_HEADER,
-    ins={},
-)
-def cmd_extend(
-    context: AssetExecutionContext,
-) -> Generator[Output[list[Any]] | AssetMaterialization | Any, Any, None]:
-
-    ret = []
-
-    yield Output(ret)
-
-    yield AssetMaterialization(
-        asset_key=context.asset_key,
-        metadata={
-            "__".join(context.asset_key.path): MetadataValue.json(ret),
-        },
-    )
-
-
-@asset(
-    **ASSET_HEADER,
-    ins={},
-)
-def cmd_append(
-    context: AssetExecutionContext,
-) -> Generator[Output[dict[str, list[Any]]] | AssetMaterialization | Any, Any, None]:
-
-    ret = {"cmd": [], "exclude_from_quote": []}
 
     yield Output(ret)
 
