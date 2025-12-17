@@ -105,12 +105,12 @@ feature_in_parent: Union[AssetsDefinition, None] = get_feature_in_parent(
 def pip_packages(
     context: AssetExecutionContext,
     CONFIG: Config,  # pylint: disable=redefined-outer-name
-) -> Generator[Output[list] | AssetMaterialization, None, None]:
+) -> Generator[Output[List] | AssetMaterialization, None, None]:
     """ """
 
     # Todo
     #  Check: content seems identical to asset `pip_packages_base_image`
-    _pip_packages: list = [
+    _pip_packages: List = [
         "dagster==1.9.11",
         "dagster-webserver==1.9.11",
     ]
@@ -753,13 +753,13 @@ def compose_postgres(
 ) -> Generator[Output[Dict] | AssetMaterialization, None, None]:
     """ """
 
-    env: dict = CONFIG.env
+    env: Dict = CONFIG.env
 
     config_engine: ConfigEngine = CONFIG.config_engine
 
     if not CONFIG.dagster_enable_postgres:
 
-        ret = dict()
+        ret: Dict = {}
 
         yield Output(ret)
 
