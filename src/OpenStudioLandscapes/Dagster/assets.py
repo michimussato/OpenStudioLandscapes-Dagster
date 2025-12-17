@@ -180,7 +180,7 @@ def build_docker_image(
 
     docker_config_json: pathlib.Path = feature_in.openstudiolandscapes_base.docker_config_json
 
-    config_engine: ConfigEngine = feature_in.openstudiolandscapes_base.config_engine
+    config_engine: ConfigEngine = CONFIG.config_engine
 
     docker_config: DockerConfigModel = config_engine.openstudiolandscapes__docker_config
 
@@ -295,9 +295,6 @@ def build_docker_image(
         "CONFIG": AssetIn(
             AssetKey([*ASSET_HEADER["key_prefix"], "CONFIG"]),
         ),
-        "feature_in": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "feature_in"]),
-        ),
     },
     description=textwrap.dedent(
         """
@@ -365,10 +362,9 @@ def build_docker_image(
 def dagster_yaml(
     context: AssetExecutionContext,
     CONFIG: Config,  # pylint: disable=redefined-outer-name
-    feature_in: OpenStudioLandscapesFeatureIn,  # pylint: disable=redefined-outer-name
 ) -> Generator[Output[pathlib.Path] | AssetMaterialization, None, None]:
 
-    config_engine: ConfigEngine = feature_in.openstudiolandscapes_base.config_engine
+    config_engine: ConfigEngine = CONFIG.config_engine
 
     env: Dict = CONFIG.env
 
