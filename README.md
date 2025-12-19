@@ -5,7 +5,7 @@
 1. [Feature: OpenStudioLandscapes-Dagster](#feature-openstudiolandscapes-dagster)
    1. [Brief](#brief)
    2. [Configuration](#configuration)
-2. [Official Resources](#official-resources)
+2. [External Resources](#external-resources)
    1. [Official Documentation (Version 1.9)](#official-documentation-version-19)
    2. [Getting Started with Dagster](#getting-started-with-dagster)
    3. [Resources](#resources)
@@ -94,7 +94,7 @@ key_prefixes:
 
 ***
 
-# Official Resources
+# External Resources
 
 [![Logo Dagster ](https://dagster-website.vercel.app/images/brand/logos/dagster-primary-horizontal.png)](https://dagster.io/platform)
 
@@ -246,4 +246,4 @@ Currently, the following Python interpreters are enabled for testing:
 
 ***
 
-Last changed: **2025-12-19 16:47:49 UTC**
+Last changed: **2025-12-19 21:11:29 UTC**

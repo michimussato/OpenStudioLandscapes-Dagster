@@ -3,12 +3,15 @@ import textwrap
 import snakemd
 
 
-def readme_feature(doc: snakemd.Document) -> snakemd.Document:
+def readme_feature(
+        doc: snakemd.Document,
+        main_header: str,
+) -> snakemd.Document:
 
-    ## Some Specific information
+    # Some Specific information
 
     doc.add_heading(
-        text="Official Resources",
+        text=main_header,
         level=1,
     )
 
