@@ -5,7 +5,6 @@
 1. [Feature: OpenStudioLandscapes-Dagster](#feature-openstudiolandscapes-dagster)
    1. [Brief](#brief)
    2. [Configuration](#configuration)
-   3. [Official Resources](#official-resources)
 2. [Official Resources](#official-resources)
    1. [Official Documentation (Version 1.9)](#official-documentation-version-19)
    2. [Getting Started with Dagster](#getting-started-with-dagster)
@@ -94,8 +93,6 @@ key_prefixes:
 ```
 
 ***
-
-## Official Resources
 
 # Official Resources
 
@@ -249,4 +246,4 @@ Currently, the following Python interpreters are enabled for testing:
 
 ***
 
-Last changed: **2025-12-19 15:51:30 UTC**.
+Last changed: **2025-12-19 16:41:25 UTC**
