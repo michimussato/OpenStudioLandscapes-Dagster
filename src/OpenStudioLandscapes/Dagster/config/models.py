@@ -50,7 +50,7 @@ class Config(FeatureBaseModel):
 
     dagster_enable_openstudiolandscapes_showcase: bool = Field(
         description="Enable the OpenStudioLandscapes Dagster Showcase "
-                    "project (https://github.com/michimussato/OpenStudioLandscapes-Dagster-Showcase).",
+        "project (https://github.com/michimussato/OpenStudioLandscapes-Dagster-Showcase).",
         default=True,
     )
 
@@ -116,9 +116,7 @@ class Config(FeatureBaseModel):
     )
 
     dagster_postgres_db_install_dir: pathlib.Path = Field(
-        default=pathlib.Path(
-            "{DOT_LANDSCAPES}/{LANDSCAPE}/{FEATURE}/postgres"
-        ),
+        default=pathlib.Path("{DOT_LANDSCAPES}/{LANDSCAPE}/{FEATURE}/postgres"),
         description="Dagster host side postgres database directory.",
     )
 

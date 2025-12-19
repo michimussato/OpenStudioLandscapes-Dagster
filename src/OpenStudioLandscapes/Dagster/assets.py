@@ -3,7 +3,7 @@ import enum
 import pathlib
 import textwrap
 import urllib.parse
-from typing import Generator, Dict, Union, List
+from typing import Dict, Generator, List, Union
 
 import yaml
 from dagster import (
@@ -11,20 +11,26 @@ from dagster import (
     AssetIn,
     AssetKey,
     AssetMaterialization,
+    AssetsDefinition,
     MetadataValue,
     Output,
-    asset, AssetsDefinition,
+    asset,
 )
 from OpenStudioLandscapes.engine.common_assets.compose import get_compose
-from OpenStudioLandscapes.engine.common_assets.compose_scope import get_compose_scope_group__cmd
+from OpenStudioLandscapes.engine.common_assets.compose_scope import (
+    get_compose_scope_group__cmd,
+)
 from OpenStudioLandscapes.engine.common_assets.docker_compose_graph import (
     get_docker_compose_graph,
 )
 from OpenStudioLandscapes.engine.common_assets.feature import get_feature__CONFIG
 from OpenStudioLandscapes.engine.common_assets.feature_out import get_feature_out_v2
-from OpenStudioLandscapes.engine.common_assets.group_in import get_feature_in_parent, get_feature_in
+from OpenStudioLandscapes.engine.common_assets.group_in import (
+    get_feature_in,
+    get_feature_in_parent,
+)
 from OpenStudioLandscapes.engine.common_assets.group_out import get_group_out
-from OpenStudioLandscapes.engine.config.models import DockerConfigModel, ConfigEngine
+from OpenStudioLandscapes.engine.config.models import ConfigEngine, DockerConfigModel
 from OpenStudioLandscapes.engine.constants import *
 from OpenStudioLandscapes.engine.enums import *
 from OpenStudioLandscapes.engine.link.models import OpenStudioLandscapesFeatureIn
@@ -178,7 +184,9 @@ def build_docker_image(
 
     env: Dict = CONFIG.env
 
-    docker_config_json: pathlib.Path = feature_in.openstudiolandscapes_base.docker_config_json
+    docker_config_json: pathlib.Path = (
+        feature_in.openstudiolandscapes_base.docker_config_json
+    )
 
     config_engine: ConfigEngine = CONFIG.config_engine
 
@@ -381,7 +389,7 @@ def dagster_yaml(
                         "hostname": ".".join(
                             [
                                 CONFIG.dagster_postgres_service_name,
-                                config_engine.openstudiolandscapes__domain_lan
+                                config_engine.openstudiolandscapes__domain_lan,
                             ],
                         ),
                         "db_name": CONFIG.dagster_postgres_db,
@@ -786,7 +794,9 @@ def compose_postgres(
         elif "network_mode" in compose_networks:
             network_dict = {"network_mode": compose_networks["network_mode"]}
 
-        postgres_db_dir_host: pathlib.Path = CONFIG.dagster_postgres_db_install_dir_expanded
+        postgres_db_dir_host: pathlib.Path = (
+            CONFIG.dagster_postgres_db_install_dir_expanded
+        )
         postgres_db_dir_host.mkdir(parents=True, exist_ok=True)
         context.log.info(f"Directory {postgres_db_dir_host.as_posix()} created.")
 
