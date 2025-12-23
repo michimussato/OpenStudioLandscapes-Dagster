@@ -129,6 +129,8 @@ def readme_feature(
         ]
     )
 
+    doc.add_horizontal_rule()
+
     return doc
 
 
