@@ -8,18 +8,16 @@ from pydantic import (
 
 LOGGER = get_dagster_logger(__name__)
 
+from OpenStudioLandscapes.engine.config.str_gen import get_config_str
 from OpenStudioLandscapes.engine.config.models import FeatureBaseModel
 
 from OpenStudioLandscapes.Dagster import dist
 
 config_default = pathlib.Path(__file__).parent.joinpath("config_default.yml")
-CONFIG_STR = config_default.read_text()
 
 
 class Config(FeatureBaseModel):
     feature_name: str = dist.name
-
-    definitions: str = "OpenStudioLandscapes.Dagster.definitions"
 
     dagster_dev_port_host: PositiveInt = Field(
         default=3003,  # Must not clash with the local OpenStudioLandscapes Dagster instance (default=3000).
@@ -139,3 +137,9 @@ class Config(FeatureBaseModel):
             )
         )
         return ret
+
+
+CONFIG_STR = get_config_str(
+    Config=Config,
+)
+
