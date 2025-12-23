@@ -66,10 +66,17 @@ The following settings are available in `OpenStudioLandscapes-Dagster` and are a
 #
 # Type: typing.Dict
 # Base Class:
+#     Required: False
 #     Description:
 #         None
 #     Default value:
 #         None
+# Description:
+#     None
+# Required: False
+#     None
+# Examples:
+#     None
 
 
 # =============
@@ -78,10 +85,17 @@ The following settings are available in `OpenStudioLandscapes-Dagster` and are a
 #
 # Type: <class 'OpenStudioLandscapes.engine.config.models.ConfigEngine'>
 # Base Class:
+#     Required: False
 #     Description:
 #         None
 #     Default value:
 #         None
+# Description:
+#     None
+# Required: False
+#     None
+# Examples:
+#     None
 
 
 # =============
@@ -90,10 +104,17 @@ The following settings are available in `OpenStudioLandscapes-Dagster` and are a
 #
 # Type: <class 'OpenStudioLandscapes.engine.config.models.FeatureBaseModel'>
 # Base Class:
+#     Required: False
 #     Description:
 #         None
 #     Default value:
 #         None
+# Description:
+#     None
+# Required: False
+#     None
+# Examples:
+#     None
 
 
 # ============
@@ -102,10 +123,17 @@ The following settings are available in `OpenStudioLandscapes-Dagster` and are a
 #
 # Type: <class 'importlib.metadata.Distribution'>
 # Base Class:
+#     Required: False
 #     Description:
 #         None
 #     Default value:
 #         None
+# Description:
+#     None
+# Required: False
+#     None
+# Examples:
+#     None
 
 
 # ==========
@@ -114,10 +142,17 @@ The following settings are available in `OpenStudioLandscapes-Dagster` and are a
 #
 # Type: <class 'str'>
 # Base Class:
+#     Required: False
 #     Description:
 #         None
 #     Default value:
 #         None
+# Description:
+#     None
+# Required: False
+#     None
+# Examples:
+#     None
 
 
 # ============
@@ -126,10 +161,17 @@ The following settings are available in `OpenStudioLandscapes-Dagster` and are a
 #
 # Type: typing.List[str]
 # Base Class:
+#     Required: False
 #     Description:
 #         None
 #     Default value:
 #         None
+# Description:
+#     None
+# Required: False
+#     None
+# Examples:
+#     None
 
 
 # =======
@@ -138,10 +180,17 @@ The following settings are available in `OpenStudioLandscapes-Dagster` and are a
 #
 # Type: <class 'bool'>
 # Base Class:
+#     Required: False
 #     Description:
 #         Whether the Feature is enabled or not.
 #     Default value:
 #         True
+# Description:
+#     Whether the Feature is enabled or not.
+# Required: False
+#     Whether the Feature is enabled or not.
+# Examples:
+#     None
 
 
 # =============
@@ -150,10 +199,17 @@ The following settings are available in `OpenStudioLandscapes-Dagster` and are a
 #
 # Type: <class 'str'>
 # Base Class:
+#     Required: False
 #     Description:
 #         None
 #     Default value:
 #         default
+# Description:
+#     None
+# Required: False
+#     None
+# Examples:
+#     ['default', 'license_server', 'worker']
 
 
 # ============
@@ -162,10 +218,17 @@ The following settings are available in `OpenStudioLandscapes-Dagster` and are a
 #
 # Type: <class 'str'>
 # Base Class:
+#     Required: True
 #     Description:
 #         The name of the feature. It is derived from the `OpenStudioLandscapes.<Feature>.dist` attribute.
 #     Default value:
 #         PydanticUndefined
+# Description:
+#     None
+# Required: False
+#     None
+# Examples:
+#     None
 feature_name: OpenStudioLandscapes-Dagster
 
 
@@ -175,10 +238,17 @@ feature_name: OpenStudioLandscapes-Dagster
 #
 # Type: <class 'pathlib.Path'>
 # Base Class:
+#     Required: False
 #     Description:
 #         The path to the `docker-compose.yml` file.
 #     Default value:
 #         {DOT_LANDSCAPES}/{LANDSCAPE}/{FEATURE}/docker_compose/docker-compose.yml
+# Description:
+#     The path to the `docker-compose.yml` file.
+# Required: False
+#     The path to the `docker-compose.yml` file.
+# Examples:
+#     None
 
 
 # =====================
@@ -186,7 +256,9 @@ feature_name: OpenStudioLandscapes-Dagster
 # ---------------------
 #
 # Type: <class 'int'>
-# Sub Class Description:
+# Description:
+#     The Dagster UI container port.
+# Required: False
 #     The Dagster UI container port.
 # Examples:
 #     None
@@ -198,7 +270,9 @@ dagster_dev_port_host: 3003
 # --------------------------
 #
 # Type: <class 'int'>
-# Sub Class Description:
+# Description:
+#     The Dagster UI container port.
+# Required: False
 #     The Dagster UI container port.
 # Examples:
 #     None
@@ -210,7 +284,9 @@ dagster_dev_port_container: 3006
 # ------------
 #
 # Type: <class 'pathlib.Path'>
-# Sub Class Description:
+# Description:
+#     The container side Dagster root directory.
+# Required: False
 #     The container side Dagster root directory.
 # Examples:
 #     None
@@ -222,7 +298,9 @@ dagster_root: /dagster
 # ------------
 #
 # Type: <class 'pathlib.Path'>
-# Sub Class Description:
+# Description:
+#     The container side Dagster HOME directory.
+# Required: False
 #     The container side Dagster HOME directory.
 # Examples:
 #     None
@@ -234,7 +312,9 @@ dagster_home: /dagster/materializations
 # -------------------
 #
 # Type: <class 'str'>
-# Sub Class Description:
+# Description:
+#     The listen address.
+# Required: False
 #     The listen address.
 # Examples:
 #     None
@@ -246,7 +326,9 @@ dagster_listen_addr: 0.0.0.0
 # --------------------------------------------
 #
 # Type: <class 'bool'>
-# Sub Class Description:
+# Description:
+#     Enable the OpenStudioLandscapes Dagster Showcase project (https://github.com/michimussato/OpenStudioLandscapes-Dagster-Showcase).
+# Required: False
 #     Enable the OpenStudioLandscapes Dagster Showcase project (https://github.com/michimussato/OpenStudioLandscapes-Dagster-Showcase).
 # Examples:
 #     None
@@ -258,7 +340,9 @@ dagster_enable_openstudiolandscapes_showcase: true
 # -----------------------------
 #
 # Type: <class 'str'>
-# Sub Class Description:
+# Description:
+#     Dagster postgres Docker service name.
+# Required: False
 #     Dagster postgres Docker service name.
 # Examples:
 #     None
@@ -270,7 +354,9 @@ dagster_postgres_service_name: openstudiolandscapes-postgres-dagster
 # -----------------------
 #
 # Type: <class 'bool'>
-# Sub Class Description:
+# Description:
+#     Enable Postgres for Dagster.
+# Required: False
 #     Enable Postgres for Dagster.
 # Examples:
 #     None
@@ -282,7 +368,9 @@ dagster_enable_postgres: true
 # ----------------------
 #
 # Type: <class 'str'>
-# Sub Class Description:
+# Description:
+#     Dagster postgres Docker image.
+# Required: False
 #     Dagster postgres Docker image.
 # Examples:
 #     None
@@ -294,7 +382,9 @@ dagster_postgres_image: docker.io/postgres:17
 # ---------------------
 #
 # Type: <class 'str'>
-# Sub Class Description:
+# Description:
+#     Dagster postgres user.
+# Required: False
 #     Dagster postgres user.
 # Examples:
 #     None
@@ -306,7 +396,9 @@ dagster_postgres_user: postgres
 # -------------------------
 #
 # Type: <class 'str'>
-# Sub Class Description:
+# Description:
+#     Dagster postgres password.
+# Required: False
 #     Dagster postgres password.
 # Examples:
 #     None
@@ -318,7 +410,9 @@ dagster_postgres_password: mysecretpassword
 # -------------------
 #
 # Type: <class 'str'>
-# Sub Class Description:
+# Description:
+#     Dagster postgres database name.
+# Required: False
 #     Dagster postgres database name.
 # Examples:
 #     None
@@ -330,7 +424,9 @@ dagster_postgres_db: postgres
 # -----------------------
 #
 # Type: <class 'pathlib.Path'>
-# Sub Class Description:
+# Description:
+#     Dagster postgres PGDATA directory.
+# Required: False
 #     Dagster postgres PGDATA directory.
 # Examples:
 #     None
@@ -342,7 +438,9 @@ dagster_postgres_pgdata: /var/lib/postgresql/data/pgdata
 # --------------------------
 #
 # Type: <class 'int'>
-# Sub Class Description:
+# Description:
+#     The Dagster postgres container port.
+# Required: False
 #     The Dagster postgres container port.
 # Examples:
 #     None
@@ -354,7 +452,9 @@ dagster_postgres_port_host: 5432
 # -------------------------------
 #
 # Type: <class 'int'>
-# Sub Class Description:
+# Description:
+#     The Dagster postgres host port.
+# Required: False
 #     The Dagster postgres host port.
 # Examples:
 #     None
@@ -366,7 +466,9 @@ dagster_postgres_port_container: 5432
 # -------------------------------
 #
 # Type: <class 'pathlib.Path'>
-# Sub Class Description:
+# Description:
+#     Dagster host side postgres database directory.
+# Required: False
 #     Dagster host side postgres database directory.
 # Examples:
 #     None
@@ -530,4 +632,4 @@ Currently, the following Python interpreters are enabled for testing:
 
 ***
 
-Last changed: **2025-12-23 12:26:13 UTC**
+Last changed: **2025-12-23 12:48:33 UTC**
