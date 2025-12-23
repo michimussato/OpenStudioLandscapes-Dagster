@@ -60,35 +60,319 @@ A local config store location will be created if it doesn't exist, together with
 The following settings are available in `OpenStudioLandscapes-Dagster` and are accessible throughout the [`OpenStudioLandscapes-Dagster`](https://github.com/michimussato/OpenStudioLandscapes-Dagster/tree/main/OpenStudioLandscapes/Dagster/config/models.py) package.
 
 ```yaml
-# Base Information
-group_name: "OpenStudioLandscapes_Dagster"
-key_prefixes:
-  - "OpenStudioLandscapes_Dagster"
+# ===
+# env
+# ---
+#
+# Type: typing.Dict
+# Base Class:
+#     Description:
+#         None
+#     Default value:
+#         None
 
-#compose_scope: "default"
 
-#enabled: true
+# =============
+# config_engine
+# -------------
+#
+# Type: <class 'OpenStudioLandscapes.engine.config.models.ConfigEngine'>
+# Base Class:
+#     Description:
+#         None
+#     Default value:
+#         None
 
-#dagster_dev_port_host: 3003
-#dagster_dev_port_container: 3006
 
-#dagster_root: "/dagster"
-#dagster_home: "/dagster/materializations"
-#dagster_listen_addr: "0.0.0.0"
-#dagster_workspace: "/dagster/workspace.yaml"
+# =============
+# config_parent
+# -------------
+#
+# Type: <class 'OpenStudioLandscapes.engine.config.models.FeatureBaseModel'>
+# Base Class:
+#     Description:
+#         None
+#     Default value:
+#         None
 
-#dagster_enable_openstudiolandscapes_showcase: true
 
-#dagster_enable_postgres: true
-#dagster_postgres_service_name: "openstudiolandscapes-postgres-dagster"
-#dagster_postgres_image: "docker.io/postgres:17"
-#dagster_postgres_user: "postgres"
-#dagster_postgres_password: "mysecretpassword"
-#dagster_postgres_db: "postgres"
-#dagster_postgres_pgdata: "/var/lib/postgresql/data/pgdata"
-#dagster_postgres_port_host: 5432
-#dagster_postgres_port_container: 5432
-#dagster_postgres_db_install_dir: "{DOT_LANDSCAPES}/{LANDSCAPE}/{FEATURE}/postgres"
+# ============
+# distribution
+# ------------
+#
+# Type: <class 'importlib.metadata.Distribution'>
+# Base Class:
+#     Description:
+#         None
+#     Default value:
+#         None
+
+
+# ==========
+# group_name
+# ----------
+#
+# Type: <class 'str'>
+# Base Class:
+#     Description:
+#         None
+#     Default value:
+#         None
+
+
+# ============
+# key_prefixes
+# ------------
+#
+# Type: typing.List[str]
+# Base Class:
+#     Description:
+#         None
+#     Default value:
+#         None
+
+
+# =======
+# enabled
+# -------
+#
+# Type: <class 'bool'>
+# Base Class:
+#     Description:
+#         Whether the Feature is enabled or not.
+#     Default value:
+#         True
+
+
+# =============
+# compose_scope
+# -------------
+#
+# Type: <class 'str'>
+# Base Class:
+#     Description:
+#         None
+#     Default value:
+#         default
+
+
+# ============
+# feature_name
+# ------------
+#
+# Type: <class 'str'>
+# Base Class:
+#     Description:
+#         The name of the feature. It is derived from the `OpenStudioLandscapes.<Feature>.dist` attribute.
+#     Default value:
+#         PydanticUndefined
+feature_name: OpenStudioLandscapes-Dagster
+
+
+# ==============
+# docker_compose
+# --------------
+#
+# Type: <class 'pathlib.Path'>
+# Base Class:
+#     Description:
+#         The path to the `docker-compose.yml` file.
+#     Default value:
+#         {DOT_LANDSCAPES}/{LANDSCAPE}/{FEATURE}/docker_compose/docker-compose.yml
+
+
+# =====================
+# dagster_dev_port_host
+# ---------------------
+#
+# Type: <class 'int'>
+# Sub Class Description:
+#     The Dagster UI container port.
+# Examples:
+#     None
+dagster_dev_port_host: 3003
+
+
+# ==========================
+# dagster_dev_port_container
+# --------------------------
+#
+# Type: <class 'int'>
+# Sub Class Description:
+#     The Dagster UI container port.
+# Examples:
+#     None
+dagster_dev_port_container: 3006
+
+
+# ============
+# dagster_root
+# ------------
+#
+# Type: <class 'pathlib.Path'>
+# Sub Class Description:
+#     The container side Dagster root directory.
+# Examples:
+#     None
+dagster_root: /dagster
+
+
+# ============
+# dagster_home
+# ------------
+#
+# Type: <class 'pathlib.Path'>
+# Sub Class Description:
+#     The container side Dagster HOME directory.
+# Examples:
+#     None
+dagster_home: /dagster/materializations
+
+
+# ===================
+# dagster_listen_addr
+# -------------------
+#
+# Type: <class 'str'>
+# Sub Class Description:
+#     The listen address.
+# Examples:
+#     None
+dagster_listen_addr: 0.0.0.0
+
+
+# ============================================
+# dagster_enable_openstudiolandscapes_showcase
+# --------------------------------------------
+#
+# Type: <class 'bool'>
+# Sub Class Description:
+#     Enable the OpenStudioLandscapes Dagster Showcase project (https://github.com/michimussato/OpenStudioLandscapes-Dagster-Showcase).
+# Examples:
+#     None
+dagster_enable_openstudiolandscapes_showcase: true
+
+
+# =============================
+# dagster_postgres_service_name
+# -----------------------------
+#
+# Type: <class 'str'>
+# Sub Class Description:
+#     Dagster postgres Docker service name.
+# Examples:
+#     None
+dagster_postgres_service_name: openstudiolandscapes-postgres-dagster
+
+
+# =======================
+# dagster_enable_postgres
+# -----------------------
+#
+# Type: <class 'bool'>
+# Sub Class Description:
+#     Enable Postgres for Dagster.
+# Examples:
+#     None
+dagster_enable_postgres: true
+
+
+# ======================
+# dagster_postgres_image
+# ----------------------
+#
+# Type: <class 'str'>
+# Sub Class Description:
+#     Dagster postgres Docker image.
+# Examples:
+#     None
+dagster_postgres_image: docker.io/postgres:17
+
+
+# =====================
+# dagster_postgres_user
+# ---------------------
+#
+# Type: <class 'str'>
+# Sub Class Description:
+#     Dagster postgres user.
+# Examples:
+#     None
+dagster_postgres_user: postgres
+
+
+# =========================
+# dagster_postgres_password
+# -------------------------
+#
+# Type: <class 'str'>
+# Sub Class Description:
+#     Dagster postgres password.
+# Examples:
+#     None
+dagster_postgres_password: mysecretpassword
+
+
+# ===================
+# dagster_postgres_db
+# -------------------
+#
+# Type: <class 'str'>
+# Sub Class Description:
+#     Dagster postgres database name.
+# Examples:
+#     None
+dagster_postgres_db: postgres
+
+
+# =======================
+# dagster_postgres_pgdata
+# -----------------------
+#
+# Type: <class 'pathlib.Path'>
+# Sub Class Description:
+#     Dagster postgres PGDATA directory.
+# Examples:
+#     None
+dagster_postgres_pgdata: /var/lib/postgresql/data/pgdata
+
+
+# ==========================
+# dagster_postgres_port_host
+# --------------------------
+#
+# Type: <class 'int'>
+# Sub Class Description:
+#     The Dagster postgres container port.
+# Examples:
+#     None
+dagster_postgres_port_host: 5432
+
+
+# ===============================
+# dagster_postgres_port_container
+# -------------------------------
+#
+# Type: <class 'int'>
+# Sub Class Description:
+#     The Dagster postgres host port.
+# Examples:
+#     None
+dagster_postgres_port_container: 5432
+
+
+# ===============================
+# dagster_postgres_db_install_dir
+# -------------------------------
+#
+# Type: <class 'pathlib.Path'>
+# Sub Class Description:
+#     Dagster host side postgres database directory.
+# Examples:
+#     None
+dagster_postgres_db_install_dir: '{DOT_LANDSCAPES}/{LANDSCAPE}/{FEATURE}/postgres'
+
+
 
 ```
 
@@ -246,4 +530,4 @@ Currently, the following Python interpreters are enabled for testing:
 
 ***
 
-Last changed: **2025-12-19 21:11:29 UTC**
+Last changed: **2025-12-23 12:26:13 UTC**
