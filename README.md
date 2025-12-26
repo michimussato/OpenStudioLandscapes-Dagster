@@ -82,7 +82,7 @@ The following settings are available in `OpenStudioLandscapes-Dagster` and are b
 
 
 <details>
-<summary(click to expand)</summary>
+<summary><code>config.yml</code> (click to expand)</summary>
 
 
 ```yaml
@@ -574,4 +574,4 @@ To follow up on the previous LinkedIn publications, visit:
 
 ***
 
-Last changed: **2025-12-26 10:53:05 UTC**
+Last changed: **2025-12-26 10:56:46 UTC**
