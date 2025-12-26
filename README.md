@@ -4,19 +4,13 @@
 
 1. [Feature: OpenStudioLandscapes-Dagster](#feature-openstudiolandscapes-dagster)
    1. [Brief](#brief)
-   2. [Configuration](#configuration)
+   2. [Install](#install)
+   3. [Configure](#configure)
 2. [External Resources](#external-resources)
    1. [Official Documentation (Version 1.9)](#official-documentation-version-19)
    2. [Getting Started with Dagster](#getting-started-with-dagster)
    3. [Resources](#resources)
 3. [Community](#community)
-4. [Technical Reference](#technical-reference)
-   1. [Requirements](#requirements)
-   2. [Install](#install)
-      1. [This Feature](#this-feature)
-   3. [Testing](#testing)
-      1. [pre-commit](#pre-commit)
-      2. [nox](#nox)
 
 ***
 
@@ -35,7 +29,31 @@ This is an extension to the OpenStudioLandscapes ecosystem. The full documentati
 > You feel like writing your own Feature? Go and check out the 
 > [OpenStudioLandscapes-Template](https://github.com/michimussato/OpenStudioLandscapes-Template).
 
-## Configuration
+## Install
+
+Clone this repository into `OpenStudioLandscapes/.features` (assuming the current working directory to be the Git repository root `./OpenStudioLandscapes`):
+
+```shell
+git -C ./.features clone https://github.com/michimussato/OpenStudioLandscapes-Dagster.git
+# Check out a specific branch with:
+# List branches: git -C ./.features/OpenStudioLandscapes-Dagster branch -a
+# Checkout branch: git -C ./.features/OpenStudioLandscapes-Dagster checkout <branch>
+```
+
+Install into OpenStudioLandscapes `venv` (`./OpenStudioLandscapes/.venv`):
+
+```shell
+source .venv/bin/activate
+# python -m pip install --upgrade pip setuptools
+# the following removes the `openstudiolandscapes` executable for now (will be fixed soon)
+pip install -e "./.features/OpenStudioLandscapes-Dagster"
+# so, re-install `OpenStudioLandscapes` engine:
+pip install -e "."
+```
+
+For more info on `pip` see [VCS Support of `pip`](https://pip.pypa.io/en/stable/topics/vcs-support/).
+
+## Configure
 
 OpenStudioLandscapes will search for a local config store. The default location is `~/.config/OpenStudioLandscapes/config-store/` but you can specify a different location if you need to.
 
@@ -58,6 +76,11 @@ A local config store location will be created if it doesn't exist, together with
 > ```
 
 The following settings are available in `OpenStudioLandscapes-Dagster` and are based on [`OpenStudioLandscapes-Dagster/tree/main/OpenStudioLandscapes/Dagster/config/models.py`](https://github.com/michimussato/OpenStudioLandscapes-Dagster/tree/main/OpenStudioLandscapes/Dagster/config/models.py).
+
+
+<details>
+<summary>Default Configuration (click to expand)</summary>
+
 
 ```yaml
 # ===
@@ -488,6 +511,10 @@ dagster_postgres_port_container: 5432
 dagster_postgres_db_install_dir: '{DOT_LANDSCAPES}/{LANDSCAPE}/{FEATURE}/postgres'
 ```
 
+
+</details>
+
+
 ***
 
 # External Resources
@@ -544,98 +571,4 @@ To follow up on the previous LinkedIn publications, visit:
 
 ***
 
-# Technical Reference
-
-## Requirements
-
-- `python-3.11`
-- `OpenStudioLandscapes`
-
-## Install
-
-### This Feature
-
-Clone this repository into `OpenStudioLandscapes/.features` (assuming the current working directory to be the Git repository root `./OpenStudioLandscapes`):
-
-```shell
-git -C ./.features clone https://github.com/michimussato/OpenStudioLandscapes-Dagster.git
-# Check out a specific branch by:
-# git -C ./.features/OpenStudioLandscapes-Dagster branch -a
-# git -C ./.features/OpenStudioLandscapes-Dagster checkout <branch>
-```
-
-Install into OpenStudioLandscapes `venv` (`./OpenStudioLandscapes/.venv`):
-
-```shell
-source .venv/bin/activate
-# python -m pip install --upgrade pip setuptools
-# the following removes the `openstudiolandscapes` executable for now (will be fixed soon)
-pip install -e "./.features/OpenStudioLandscapes-Dagster"
-# so, re-install `OpenStudioLandscapes` engine:
-pip install -e "."
-```
-
-For more info see [VCS Support of pip](https://pip.pypa.io/en/stable/topics/vcs-support/).
-
-## Testing
-
-### pre-commit
-
-- https://pre-commit.com
-- https://pre-commit.com/hooks.html
-
-```shell
-pre-commit install
-```
-
-### nox
-
-#### Generate Report
-
-```shell
-nox --no-error-on-missing-interpreters --report .nox/nox-report.json
-```
-
-#### Re-Generate this README
-
-```shell
-nox -v --add-timestamp --session readme
-```
-
-#### pylint
-
-```shell
-nox -v --add-timestamp --session lint
-```
-
-##### pylint: disable=redefined-outer-name
-
-- [`W0621`](https://pylint.pycqa.org/en/latest/user_guide/messages/warning/redefined-outer-name.html): Due to Dagsters way of piping arguments into assets.
-
-#### SBOM
-
-Acronym for Software Bill of Materials
-
-```shell
-nox -v --add-timestamp --session sbom
-```
-
-We create the following SBOMs:
-
-- [`cyclonedx-bom`](https://pypi.org/project/cyclonedx-bom/)
-- [`pipdeptree`](https://pypi.org/project/pipdeptree/) (Dot)
-- [`pipdeptree`](https://pypi.org/project/pipdeptree/) (Mermaid)
-
-SBOMs for the different Python interpreters defined in [`.noxfile.VERSIONS`](https://github.com/michimussato/OpenStudioLandscapes-Dagster/tree/main/noxfile.py) will be created in the [`.sbom`](https://github.com/michimussato/OpenStudioLandscapes-Dagster/tree/main/.sbom) directory of this repository.
-
-- `cyclone-dx`
-- `pipdeptree` (Dot)
-- `pipdeptree` (Mermaid)
-
-Currently, the following Python interpreters are enabled for testing:
-
-- `python3.11`
-
-***
-
-Last changed: **2025-12-25 22:46:47 UTC**
+Last changed: **2025-12-26 10:47:38 UTC**
