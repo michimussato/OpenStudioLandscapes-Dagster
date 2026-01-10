@@ -49,26 +49,6 @@ class Config(FeatureBaseModel):
         default="0.0.0.0",
     )
 
-    dagster_enable_openstudiolandscapes_showcase: bool = Field(
-        description="Enable the OpenStudioLandscapes Dagster Showcase "
-        "project (https://github.com/michimussato/OpenStudioLandscapes-Dagster-Showcase).",
-        default=True,
-    )
-
-    # Todo
-    # dagster_enable_openstudiolandscapes_shared: bool = Field(
-    #     description="Enable the OpenStudioLandscapes Dagster shared assets. "
-    #                 "(https://github.com/michimussato/dagster-shared).",
-    #     default="0.0.0.0",
-    # )
-
-    # Todo
-    # dagster_enable_openstudiolandscapes_job_processor: bool = Field(
-    #     description="Enable the OpenStudioLandscapes Dagster job processor. "
-    #                 "(https://github.com/michimussato/dagster-job-processor).",
-    #     default="0.0.0.0",
-    # )
-
     dagster_postgres_service_name: str = Field(
         description="Dagster postgres Docker service name.",
         default="openstudiolandscapes-postgres-dagster",
@@ -119,6 +99,22 @@ class Config(FeatureBaseModel):
     dagster_postgres_db_install_dir: pathlib.Path = Field(
         default=pathlib.Path("{DOT_LANDSCAPES}/{LANDSCAPE}/{FEATURE}/postgres"),
         description="Dagster host side postgres database directory.",
+    )
+
+    pip_packages: List = Field(
+        default=[
+            "dagster==1.9.11",
+            "dagster-webserver==1.9.11",
+            # Needed if dagster_enable_postgres is True
+            "dagster-postgres==0.25.11",
+            # OpenStudioLandscapes-Dagster Showcase package:
+            "OpenStudioLandscapes-Dagster-Showcase[dev] @ git+https://github.com/michimussato/OpenStudioLandscapes-Dagster-Showcase.git@main",
+            # dagster-shared:
+            # "dagster-shared[dev] @ git+https://github.com/michimussato/dagster-shared.git@main",
+            # dagster-job-processor:
+            # "dagster-job-processor[dev] @ git+https://github.com/michimussato/dagster-job-processor.git@main",
+        ],
+        frozen=True,
     )
 
     # EXPANDABLE PATHS

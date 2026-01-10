@@ -103,73 +103,11 @@ feature_in_parent: Union[AssetsDefinition, None] = get_feature_in_parent(
 @asset(
     **ASSET_HEADER,
     ins={
-        "CONFIG": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "CONFIG"]),
-        ),
-    },
-)
-def pip_packages(
-    context: AssetExecutionContext,
-    CONFIG: Config,  # pylint: disable=redefined-outer-name
-) -> Generator[Output[List] | AssetMaterialization, None, None]:
-    """ """
-
-    # Todo
-    #  Check: content seems identical to asset `pip_packages_base_image`
-    _pip_packages: List = [
-        "dagster==1.9.11",
-        "dagster-webserver==1.9.11",
-    ]
-
-    # if CONFIG.dagster_enable_openstudiolandscapes_shared:
-    #     _pip_packages.extend(
-    #         [
-    #             "dagster-shared[dev] @ git+https://github.com/michimussato/dagster-shared.git@main",
-    #         ]
-    #     )
-
-    # if CONFIG.dagster_enable_openstudiolandscapes_job_processor:
-    #     _pip_packages.extend(
-    #         [
-    #             "dagster-job-processor[dev] @ git+https://github.com/michimussato/dagster-job-processor.git@main",
-    #         ]
-    #     )
-
-    if CONFIG.dagster_enable_openstudiolandscapes_showcase:
-        _pip_packages.extend(
-            [
-                "OpenStudioLandscapes-Dagster-Showcase[dev] @ git+https://github.com/michimussato/OpenStudioLandscapes-Dagster-Showcase.git@main",
-            ]
-        )
-
-    if CONFIG.dagster_enable_postgres:
-        _pip_packages.extend(
-            [
-                "dagster-postgres==0.25.11",
-            ]
-        )
-
-    yield Output(_pip_packages)
-
-    yield AssetMaterialization(
-        asset_key=context.asset_key,
-        metadata={
-            "__".join(context.asset_key.path): MetadataValue.json(_pip_packages),
-        },
-    )
-
-
-@asset(
-    **ASSET_HEADER,
-    ins={
         "feature_in": AssetIn(
             AssetKey([*ASSET_HEADER["key_prefix"], "feature_in"]),
         ),
         "CONFIG": AssetIn(
             AssetKey([*ASSET_HEADER["key_prefix"], "CONFIG"]),
-        ),
-        "pip_packages": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "pip_packages"]),
         ),
     },
     retry_policy=build_docker_image_retry_policy,
@@ -178,7 +116,6 @@ def build_docker_image(
     context: AssetExecutionContext,
     feature_in: OpenStudioLandscapesFeatureIn,  # pylint: disable=redefined-outer-name
     CONFIG: Config,  # pylint: disable=redefined-outer-name
-    pip_packages: List,  # pylint: disable=redefined-outer-name
 ) -> Generator[Output[Dict] | AssetMaterialization, None, None]:
     """ """
 
@@ -226,7 +163,7 @@ def build_docker_image(
     #################################################
 
     pip_install_str: str = get_pip_install_str(
-        pip_install_packages=pip_packages,
+        pip_install_packages=CONFIG.pip_packages,
     )
 
     # @formatter:off
