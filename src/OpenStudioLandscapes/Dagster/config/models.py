@@ -101,6 +101,13 @@ class Config(FeatureBaseModel):
         description="Dagster host side postgres database directory.",
     )
 
+    apt_packages: List = Field(
+        default=[
+            "sqlite3",
+        ],
+        frozen=True,
+    )
+
     pip_packages: List = Field(
         default=[
             "dagster==1.9.11",

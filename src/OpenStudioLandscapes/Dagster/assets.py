@@ -162,6 +162,10 @@ def build_docker_image(
 
     #################################################
 
+    apt_install_str: str = get_apt_install_str(
+        apt_install_packages=CONFIG.apt_packages,
+    )
+
     pip_install_str: str = get_pip_install_str(
         pip_install_packages=CONFIG.pip_packages,
     )
@@ -174,6 +178,8 @@ def build_docker_image(
         FROM {parent_image} AS {image_name}
         LABEL authors="{AUTHOR}"
 
+        {apt_install_str}
+
         {pip_install_str}
 
         RUN mkdir -p {dagster_root}
@@ -185,6 +191,7 @@ def build_docker_image(
         CMD []
         """
     ).format(
+        apt_install_str=apt_install_str,
         pip_install_str=pip_install_str.format(
             **env,
         ),
