@@ -71,7 +71,7 @@ A local config store location will be created if it doesn't exist, together with
 > [!TIP]
 > 
 > To specify a config store location different than
-> the default, you can do so be setting the environment variable
+> the default, you can do so by setting the environment variable
 > `OPENSTUDIOLANDSCAPES__CONFIGSTORE_ROOT`:
 > 
 > ```shell
@@ -362,20 +362,6 @@ dagster_home: /dagster/materializations
 dagster_listen_addr: 0.0.0.0
 
 
-# ============================================
-# dagster_enable_openstudiolandscapes_showcase
-# --------------------------------------------
-#
-# Type: <class 'bool'>
-# Description:
-#     Enable the OpenStudioLandscapes Dagster Showcase project (https://github.com/michimussato/OpenStudioLandscapes-Dagster-Showcase).
-# Required:
-#     False
-# Examples:
-#     None
-dagster_enable_openstudiolandscapes_showcase: true
-
-
 # =============================
 # dagster_postgres_service_name
 # -----------------------------
@@ -514,6 +500,39 @@ dagster_postgres_port_container: 5432
 # Examples:
 #     None
 dagster_postgres_db_install_dir: '{DOT_LANDSCAPES}/{LANDSCAPE}/{FEATURE}/postgres'
+
+
+# ============
+# apt_packages
+# ------------
+#
+# Type: typing.List
+# Description:
+#     None
+# Required:
+#     False
+# Examples:
+#     None
+apt_packages:
+- sqlite3
+
+
+# ============
+# pip_packages
+# ------------
+#
+# Type: typing.List
+# Description:
+#     None
+# Required:
+#     False
+# Examples:
+#     None
+pip_packages:
+- dagster==1.9.11
+- dagster-webserver==1.9.11
+- dagster-postgres==0.25.11
+- OpenStudioLandscapes-Dagster-Showcase[dev] @ git+https://github.com/michimussato/OpenStudioLandscapes-Dagster-Showcase.git@main
 ```
 
 
@@ -585,4 +604,4 @@ To follow up on the previous LinkedIn publications, visit:
 
 ***
 
-Last changed: **2025-12-31 12:40:01 UTC**
+Last changed: **2026-01-22 09:29:10 UTC**

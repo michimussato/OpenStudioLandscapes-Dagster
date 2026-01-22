@@ -16,7 +16,9 @@ from dagster import (
     Output,
     asset,
 )
+from OpenStudioLandscapes.engine.common_assets.cmd import get_feature__cmd
 from OpenStudioLandscapes.engine.common_assets.compose import get_compose
+
 # from OpenStudioLandscapes.engine.common_assets.compose_scope import (
 #     get_compose_scope_group__cmd,
 # )
@@ -24,7 +26,6 @@ from OpenStudioLandscapes.engine.common_assets.docker_compose_graph import (
     get_docker_compose_graph,
 )
 from OpenStudioLandscapes.engine.common_assets.feature import get_feature__CONFIG
-from OpenStudioLandscapes.engine.common_assets.cmd import get_feature__cmd
 from OpenStudioLandscapes.engine.common_assets.feature_out import get_feature_out_v2
 from OpenStudioLandscapes.engine.common_assets.group_in import (
     get_feature_in,
@@ -172,8 +173,7 @@ def build_docker_image(
     )
 
     # @formatter:off
-    docker_file_str = textwrap.dedent(
-        """\
+    docker_file_str = textwrap.dedent("""\
         # {auto_generated}
         # {dagster_url}
         FROM {parent_image} AS {image_name}
@@ -190,8 +190,7 @@ def build_docker_image(
 
         ENTRYPOINT []
         CMD []
-        """
-    ).format(
+        """).format(
         apt_install_str=apt_install_str,
         pip_install_str=pip_install_str.format(
             **env,
@@ -248,8 +247,7 @@ def build_docker_image(
             AssetKey([*ASSET_HEADER["key_prefix"], "CONFIG"]),
         ),
     },
-    description=textwrap.dedent(
-        """
+    description=textwrap.dedent("""
         Visit https://docs.dagster.io/guides/deploy/dagster-yaml for reference.
         "For more info regarding Postgres backend for Dagster, visit
         "https://docs.dagster.io/api/python-api/libraries/dagster-postgres and
@@ -308,8 +306,7 @@ def build_docker_image(
               db_name: postgres
               port: 5432
         ```
-        """
-    ),
+        """),
 )
 def dagster_yaml(
     context: AssetExecutionContext,
@@ -400,8 +397,7 @@ def dagster_yaml(
             AssetKey([*ASSET_HEADER["key_prefix"], "CONFIG"]),
         ),
     },
-    description=textwrap.dedent(
-        """
+    description=textwrap.dedent("""
         Visit https://docs.dagster.io/guides/deploy/code-locations/workspace-yaml for reference.
         
         ---
@@ -431,8 +427,7 @@ def dagster_yaml(
         #      location_name: "OpenStudioLandscapes.open_studio_landscapes Package Location"
         #      # executable_path: ../.venv/bin/python
         ```
-        """
-    ),
+        """),
 )
 def workspace_yaml(
     context: AssetExecutionContext,
