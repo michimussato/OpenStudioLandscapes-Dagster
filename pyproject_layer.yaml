@@ -2,17 +2,19 @@ project:
   description: Dagster Feature for OpenStudioLandscapes
   name: OpenStudioLandscapes-Dagster
   optional-dependencies:
+    optional-base:
+    - OpenStudioLandscapes @ git+https://github.com/michimussato/OpenStudioLandscapes.git
     dev:
-    - OpenStudioLandscapes-Dagster[testing]
     - OpenStudioLandscapes-Dagster[lint]
-    - OpenStudioLandscapes-Dagster[nox]
     - OpenStudioLandscapes-Dagster[sbom]
-    - OpenStudioLandscapes-Dagster[coverage]
     - OpenStudioLandscapes-Dagster[readme]
-    nox:
-    - OpenStudioLandscapes-Dagster[testing]
+    lint:
+    - OpenStudioLandscapes-Dagster[optional-base]
+    readme:
+    - OpenStudioLandscapes-Dagster[optional-base]
     sbom:
     - OpenStudioLandscapes-Dagster[graphviz]
+    - OpenStudioLandscapes-Dagster[optional-base]
   urls:
     Homepage: https://github.com/michimussato/OpenStudioLandscapes-Dagster
 tool:
