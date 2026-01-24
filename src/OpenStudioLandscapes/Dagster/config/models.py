@@ -1,5 +1,5 @@
 import pathlib
-from typing import List
+from typing import List, Dict
 
 from dagster import get_dagster_logger
 from pydantic import (
@@ -115,9 +115,27 @@ class Config(FeatureBaseModel):
             # Needed if dagster_enable_postgres is True
             "dagster-postgres==0.25.11",
             # OpenStudioLandscapes-Dagster Showcase package:
-            "OpenStudioLandscapes-Dagster-Showcase @ git+https://github.com/michimussato/OpenStudioLandscapes-Dagster-Showcase.git@main",
+            # "OpenStudioLandscapes-Dagster-Showcase @ git+https://github.com/michimussato/OpenStudioLandscapes-Dagster-Showcase.git@main",
         ],
         frozen=True,
+    )
+
+    dagster_code_locations: Dict[str, List[Dict]] = Field(
+        default={
+            "load_from": [
+                {
+                    "python_module": {
+                        "location_name": "OpenStudioLandscapes-Dagster-Showcase Package Code Location",
+                        "module_name": "OpenStudioLandscapes.Dagster.Showcase.definitions",
+                        "working_directory": "src",
+                        "pip_path": "OpenStudioLandscapes-Dagster-Showcase @ git+https://github.com/michimussato/OpenStudioLandscapes-Dagster-Showcase.git@main",
+                        "volume_mounts": [],
+                        "environment": {},
+                    }
+                }
+            ],
+        },
+        description="The Dagster code locations. If nothing is specified, the default value should be `load_from: []`.",
     )
 
     # EXPANDABLE PATHS

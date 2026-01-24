@@ -169,7 +169,10 @@ def build_docker_image(
     )
 
     pip_install_str: str = get_pip_install_str(
-        pip_install_packages=CONFIG.pip_packages,
+        pip_install_packages=[
+            *CONFIG.pip_packages,
+            *[python_module.get("python_module", {"pip_path": ""})["pip_path"] for python_module in CONFIG.dagster_code_locations.get("load_from", [])],
+        ],
     )
 
     # @formatter:off
@@ -436,17 +439,26 @@ def workspace_yaml(
 
     env: Dict = CONFIG.env
 
-    workspace_yaml_dict = {
-        "load_from": [
-            {
-                "python_module": {
-                    "working_directory": "src",
-                    "module_name": "OpenStudioLandscapes.Dagster.Showcase.definitions",
-                    "location_name": "OpenStudioLandscapes-Dagster-Showcase Package Code Location",
-                },
-            }
-        ],
-    }
+    """
+    # Reference workspace.yaml:
+    load_from:
+    - python_module:
+        location_name: OpenStudioLandscapes-Dagster-Showcase Package Code Location
+        module_name: OpenStudioLandscapes.Dagster.Showcase.definitions
+        working_directory: src
+    - python_module:
+        location_name: OpenStudioLandscapes-Dagster-JobProcessor Package Code Location
+        module_name: OpenStudioLandscapes.Dagster.JobProcessor.dagster_job_processor.definitions
+        working_directory: src
+    """
+
+    workspace_yaml_dict = copy.deepcopy(CONFIG.dagster_code_locations)
+
+    for code_location in workspace_yaml_dict["load_from"]:
+
+        pip_path = code_location["python_module"].pop("pip_path")
+        volume_mounts = code_location["python_module"].pop("volume_mounts")
+        volume_mounts = code_location["python_module"].pop("environment")
 
     workspace_yaml_load = yaml.dump(workspace_yaml_dict)
 
@@ -595,9 +607,18 @@ def compose_dagster(
             f"{volume_dir_host_rel_path.as_posix()}:{container}",
         )
 
+    volume_mounts = []
+    env_ = {}
+
+    for python_module in CONFIG.dagster_code_locations.get("load_from", []):
+        # for volume in volume_mount["python_module"]["volume_mounts"]:
+        volume_mounts.extend(python_module["python_module"].get("volume_mounts", []))
+        env_.update(python_module["python_module"].get("environment", {}))
+
     volumes_dict = {
         "volumes": [
             *_volume_relative,
+            *list(set(volume_mounts)),
         ]
     }
 
@@ -638,6 +659,7 @@ def compose_dagster(
                     # Todo
                     #  - [ ] fix hard code here (from deadline-dagster .env)
                     # "DAGSTER_DEPLOYMENT": "farm",
+                    **env_,
                 },
                 "healthcheck": {
                     "test": [
