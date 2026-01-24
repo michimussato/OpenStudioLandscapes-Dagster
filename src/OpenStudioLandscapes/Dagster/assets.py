@@ -173,6 +173,7 @@ def build_docker_image(
             *CONFIG.pip_packages,
             *[python_module.get("python_module", {"pip_path": ""})["pip_path"] for python_module in CONFIG.dagster_code_locations.get("load_from", [])],
         ],
+        bust_cache=True,
     )
 
     # @formatter:off
