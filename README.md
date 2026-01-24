@@ -517,7 +517,28 @@ pip_packages:
 - dagster==1.9.11
 - dagster-webserver==1.9.11
 - dagster-postgres==0.25.11
-- OpenStudioLandscapes-Dagster-Showcase[dev] @ git+https://github.com/michimussato/OpenStudioLandscapes-Dagster-Showcase.git@main
+
+
+# ======================
+# dagster_code_locations
+# ----------------------
+#
+# Type: typing.Dict[str, typing.List[typing.Dict]]
+# Description:
+#     The Dagster code locations. If nothing is specified, the default value should be `load_from: []`.
+# Required:
+#     False
+# Examples:
+#     None
+dagster_code_locations:
+  load_from:
+  - python_module:
+      environment: {}
+      location_name: OpenStudioLandscapes-Dagster-Showcase Package Code Location
+      module_name: OpenStudioLandscapes.Dagster.Showcase.definitions
+      pip_path: OpenStudioLandscapes-Dagster-Showcase @ git+https://github.com/michimussato/OpenStudioLandscapes-Dagster-Showcase.git@main
+      volume_mounts: []
+      working_directory: src
 ```
 
 
@@ -589,4 +610,4 @@ To follow up on the previous LinkedIn publications, visit:
 
 ***
 
-Last changed: **2026-01-23 10:42:59 UTC**
+Last changed: **2026-01-24 16:41:39 UTC**
