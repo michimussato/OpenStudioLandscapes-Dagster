@@ -115,11 +115,7 @@ class Config(FeatureBaseModel):
             # Needed if dagster_enable_postgres is True
             "dagster-postgres==0.25.11",
             # OpenStudioLandscapes-Dagster Showcase package:
-            "OpenStudioLandscapes-Dagster-Showcase[dev] @ git+https://github.com/michimussato/OpenStudioLandscapes-Dagster-Showcase.git@main",
-            # dagster-shared:
-            # "dagster-shared[dev] @ git+https://github.com/michimussato/dagster-shared.git@main",
-            # dagster-job-processor:
-            # "dagster-job-processor[dev] @ git+https://github.com/michimussato/dagster-job-processor.git@main",
+            "OpenStudioLandscapes-Dagster-Showcase @ git+https://github.com/michimussato/OpenStudioLandscapes-Dagster-Showcase.git@main",
         ],
         frozen=True,
     )

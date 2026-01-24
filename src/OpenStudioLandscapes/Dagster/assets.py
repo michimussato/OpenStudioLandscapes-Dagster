@@ -441,8 +441,8 @@ def workspace_yaml(
             {
                 "python_module": {
                     "working_directory": "src",
-                    "module_name": "openstudiolandscapes_dagster_showcase.definitions",
-                    "location_name": "openstudiolandscapes_dagster_showcase Package Code Location",
+                    "module_name": "OpenStudioLandscapes.Dagster.Showcase.definitions",
+                    "location_name": "OpenStudioLandscapes-Dagster-Showcase Package Code Location",
                 },
             }
         ],
