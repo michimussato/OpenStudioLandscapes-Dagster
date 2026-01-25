@@ -458,8 +458,8 @@ def workspace_yaml(
     for code_location in workspace_yaml_dict["load_from"]:
 
         pip_path = code_location["python_module"].pop("pip_path")
-        volume_mounts = code_location["python_module"].pop("volume_mounts")
-        volume_mounts = code_location["python_module"].pop("environment")
+        # volume_mounts = code_location["python_module"].pop("volume_mounts")
+        # volume_mounts = code_location["python_module"].pop("environment")
 
     workspace_yaml_load = yaml.dump(workspace_yaml_dict)
 
@@ -608,19 +608,21 @@ def compose_dagster(
             f"{volume_dir_host_rel_path.as_posix()}:{container}",
         )
 
-    volume_mounts = []
-    env_ = {}
-
-    for python_module in CONFIG.dagster_code_locations.get("load_from", []):
-        # for volume in volume_mount["python_module"]["volume_mounts"]:
-        volume_mounts.extend(python_module["python_module"].get("volume_mounts", []))
-        env_.update(python_module["python_module"].get("environment", {}))
+    # volume_mounts = []
+    # env_ = {}
+    #
+    # for python_module in CONFIG.dagster_code_locations.get("load_from", []):
+    #     # for volume in volume_mount["python_module"]["volume_mounts"]:
+    #     volume_mounts.extend(python_module["python_module"].get("volume_mounts", []))
+    #     env_.update(python_module["python_module"].get("environment", {}))
 
     volumes_dict = {
-        "volumes": [
-            *_volume_relative,
-            *list(set(volume_mounts)),
-        ]
+        "volumes": list(
+            {
+                *_volume_relative,
+                *config_engine.global_bind_volumes,
+            }
+        )
     }
 
     if CONFIG.dagster_enable_postgres:
@@ -657,10 +659,7 @@ def compose_dagster(
                 **copy.deepcopy(network_dict),
                 "environment": {
                     "DAGSTER_HOME": CONFIG.dagster_home.as_posix(),
-                    # Todo
-                    #  - [ ] fix hard code here (from deadline-dagster .env)
-                    # "DAGSTER_DEPLOYMENT": "farm",
-                    **env_,
+                    **config_engine.global_environment_variables,
                 },
                 "healthcheck": {
                     "test": [
@@ -795,9 +794,12 @@ def compose_postgres(
             )
 
         volumes_dict = {
-            "volumes": [
-                *_volume_relative,
-            ]
+            "volumes": list(
+                {
+                    *_volume_relative,
+                     *config_engine.global_bind_volumes,
+                }
+            )
         }
 
         service_name = CONFIG.dagster_postgres_service_name
@@ -823,6 +825,7 @@ def compose_postgres(
                         "POSTGRES_DB": CONFIG.dagster_postgres_db,
                         "PGDATA": CONFIG.dagster_postgres_pgdata.as_posix(),
                         # ??? "POSTGRES_PORT": env.get("PGDAPOSTGRES_PORT_CONTAINERTA"),
+                        **config_engine.global_environment_variables,
                     },
                     "healthcheck": {
                         "test": [
