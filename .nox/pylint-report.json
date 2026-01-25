@@ -806,19 +806,6 @@
         "message-id": "C0116"
     },
     {
-        "type": "error",
-        "module": "OpenStudioLandscapes.Dagster.config.models",
-        "obj": "Config.dagster_postgres_db_install_dir_expanded",
-        "line": 150,
-        "column": 12,
-        "endLine": 150,
-        "endColumn": 59,
-        "path": "src/OpenStudioLandscapes/Dagster/config/models.py",
-        "symbol": "no-member",
-        "message": "Instance of 'FieldInfo' has no 'expanduser' member",
-        "message-id": "E1101"
-    },
-    {
         "type": "convention",
         "module": "OpenStudioLandscapes.Dagster.doc.readme",
         "obj": "",
