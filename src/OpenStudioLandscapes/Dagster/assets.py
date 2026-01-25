@@ -171,7 +171,10 @@ def build_docker_image(
     pip_install_str: str = get_pip_install_str(
         pip_install_packages=[
             *CONFIG.pip_packages,
-            *[python_module.get("python_module", {"pip_path": ""})["pip_path"] for python_module in CONFIG.dagster_code_locations.get("load_from", [])],
+            *[
+                python_module.get("python_module", {"pip_path": ""})["pip_path"]
+                for python_module in CONFIG.dagster_code_locations.get("load_from", [])
+            ],
         ],
         bust_cache=True,
     )
@@ -797,7 +800,7 @@ def compose_postgres(
             "volumes": list(
                 {
                     *_volume_relative,
-                     *config_engine.global_bind_volumes,
+                    *config_engine.global_bind_volumes,
                 }
             )
         }

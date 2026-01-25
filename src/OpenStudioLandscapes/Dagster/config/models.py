@@ -1,5 +1,5 @@
 import pathlib
-from typing import List, Dict
+from typing import Dict, List
 
 from dagster import get_dagster_logger
 from pydantic import (
