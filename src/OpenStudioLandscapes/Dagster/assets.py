@@ -462,7 +462,7 @@ def workspace_yaml(
 
         pip_path = code_location["python_module"].pop("pip_path")
         # volume_mounts = code_location["python_module"].pop("volume_mounts")
-        # volume_mounts = code_location["python_module"].pop("environment")
+        # environment = code_location["python_module"].pop("environment")
 
     workspace_yaml_load = yaml.dump(workspace_yaml_dict)
 
@@ -624,6 +624,7 @@ def compose_dagster(
             {
                 *_volume_relative,
                 *config_engine.global_bind_volumes,
+                *CONFIG.local_bind_volumes,
             }
         )
     }
@@ -663,6 +664,7 @@ def compose_dagster(
                 "environment": {
                     "DAGSTER_HOME": CONFIG.dagster_home.as_posix(),
                     **config_engine.global_environment_variables,
+                    **CONFIG.local_environment_variables,
                 },
                 "healthcheck": {
                     "test": [
@@ -801,6 +803,7 @@ def compose_postgres(
                 {
                     *_volume_relative,
                     *config_engine.global_bind_volumes,
+                    *CONFIG.local_bind_volumes,
                 }
             )
         }
@@ -829,6 +832,7 @@ def compose_postgres(
                         "PGDATA": CONFIG.dagster_postgres_pgdata.as_posix(),
                         # ??? "POSTGRES_PORT": env.get("PGDAPOSTGRES_PORT_CONTAINERTA"),
                         **config_engine.global_environment_variables,
+                        **CONFIG.local_environment_variables,
                     },
                     "healthcheck": {
                         "test": [
