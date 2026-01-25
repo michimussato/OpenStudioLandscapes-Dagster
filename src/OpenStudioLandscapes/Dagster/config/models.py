@@ -147,7 +147,7 @@ class Config(FeatureBaseModel):
 
         LOGGER.debug(f"Expanding {self.dagster_postgres_db_install_dir}...")
         ret = pathlib.Path(
-            self.dagster_postgres_db_install_dir.expanduser()
+            self.dagster_postgres_db_install_dir.expanduser()  # pylint: disable=E1101
             .as_posix()
             .format(
                 **{
