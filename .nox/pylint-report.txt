@@ -55,17 +55,16 @@ src/OpenStudioLandscapes/Dagster/__init__.py:6:5: W0511: TODO: Import directly (
 src/OpenStudioLandscapes/Dagster/__init__.py:1:0: C0114: Missing module docstring (missing-module-docstring)
 src/OpenStudioLandscapes/Dagster/__init__.py:1:0: C0103: Module name "Dagster" doesn't conform to snake_case naming style (invalid-name)
 ************* Module OpenStudioLandscapes.Dagster.config.models
-src/OpenStudioLandscapes/Dagster/config/models.py:26:0: C0301: Line too long (108/100) (line-too-long)
-src/OpenStudioLandscapes/Dagster/config/models.py:118:0: C0301: Line too long (139/100) (line-too-long)
-src/OpenStudioLandscapes/Dagster/config/models.py:128:0: C0301: Line too long (103/100) (line-too-long)
-src/OpenStudioLandscapes/Dagster/config/models.py:131:0: C0301: Line too long (161/100) (line-too-long)
-src/OpenStudioLandscapes/Dagster/config/models.py:138:0: C0301: Line too long (120/100) (line-too-long)
+src/OpenStudioLandscapes/Dagster/config/models.py:25:0: C0301: Line too long (108/100) (line-too-long)
+src/OpenStudioLandscapes/Dagster/config/models.py:117:0: C0301: Line too long (139/100) (line-too-long)
+src/OpenStudioLandscapes/Dagster/config/models.py:127:0: C0301: Line too long (103/100) (line-too-long)
+src/OpenStudioLandscapes/Dagster/config/models.py:130:0: C0301: Line too long (161/100) (line-too-long)
+src/OpenStudioLandscapes/Dagster/config/models.py:137:0: C0301: Line too long (120/100) (line-too-long)
 src/OpenStudioLandscapes/Dagster/config/models.py:1:0: C0114: Missing module docstring (missing-module-docstring)
 src/OpenStudioLandscapes/Dagster/config/models.py:12:0: C0413: Import "from OpenStudioLandscapes.engine.config.models import FeatureBaseModel" should be placed at the top of the module (wrong-import-position)
-src/OpenStudioLandscapes/Dagster/config/models.py:13:0: C0413: Import "from OpenStudioLandscapes.engine.config.str_gen import get_config_str" should be placed at the top of the module (wrong-import-position)
-src/OpenStudioLandscapes/Dagster/config/models.py:15:0: C0413: Import "from OpenStudioLandscapes.Dagster import constants, dist" should be placed at the top of the module (wrong-import-position)
-src/OpenStudioLandscapes/Dagster/config/models.py:18:0: C0115: Missing class docstring (missing-class-docstring)
-src/OpenStudioLandscapes/Dagster/config/models.py:143:4: C0116: Missing function or method docstring (missing-function-docstring)
+src/OpenStudioLandscapes/Dagster/config/models.py:14:0: C0413: Import "from OpenStudioLandscapes.Dagster import constants, dist" should be placed at the top of the module (wrong-import-position)
+src/OpenStudioLandscapes/Dagster/config/models.py:17:0: C0115: Missing class docstring (missing-class-docstring)
+src/OpenStudioLandscapes/Dagster/config/models.py:142:4: C0116: Missing function or method docstring (missing-function-docstring)
 ************* Module OpenStudioLandscapes.Dagster.doc.readme
 src/OpenStudioLandscapes/Dagster/doc/readme.py:26:0: C0301: Line too long (114/100) (line-too-long)
 src/OpenStudioLandscapes/Dagster/doc/readme.py:77:0: C0301: Line too long (111/100) (line-too-long)
@@ -75,5 +74,5 @@ src/OpenStudioLandscapes/Dagster/doc/readme.py:21:8: C2801: Unnecessarily calls 
 src/OpenStudioLandscapes/Dagster/doc/readme.py:39:8: C2801: Unnecessarily calls dunder method __str__. Use str built-in function. (unnecessary-dunder-call)
 
 ------------------------------------------------------------------
-Your code has been rated at 7.08/10 (previous run: 7.35/10, -0.26)
+Your code has been rated at 7.11/10 (previous run: 7.39/10, -0.28)
 
