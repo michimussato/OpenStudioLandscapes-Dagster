@@ -84,7 +84,7 @@ The following settings are available in `OpenStudioLandscapes-Dagster` and are b
 #     Description:
 #         None
 #     Default value:
-#         None
+#         PydanticUndefined
 # Description:
 #     None
 # Required:
@@ -138,26 +138,6 @@ The following settings are available in `OpenStudioLandscapes-Dagster` and are b
 # -------------
 #
 # Type: <class 'OpenStudioLandscapes.engine.config.models.ConfigEngine'>
-# Base Class Info:
-#     Required:
-#         False
-#     Description:
-#         None
-#     Default value:
-#         None
-# Description:
-#     None
-# Required:
-#     False
-# Examples:
-#     None
-
-
-# =============
-# config_parent
-# -------------
-#
-# Type: <class 'OpenStudioLandscapes.engine.config.models.FeatureBaseModel'>
 # Base Class Info:
 #     Required:
 #         False
@@ -648,4 +628,4 @@ To follow up on the previous LinkedIn publications, visit:
 
 ***
 
-Last changed: **2026-01-26 18:53:44 UTC**
+Last changed: **2026-01-27 20:32:23 UTC**
