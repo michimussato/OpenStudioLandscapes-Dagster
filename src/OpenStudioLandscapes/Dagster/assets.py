@@ -662,6 +662,7 @@ def compose_dagster(
                 ),
                 **copy.deepcopy(network_dict),
                 "environment": {
+                    "TZ": CONFIG.tz,
                     "DAGSTER_HOME": CONFIG.dagster_home.as_posix(),
                     **config_engine.global_environment_variables,
                     **CONFIG.local_environment_variables,
@@ -826,6 +827,7 @@ def compose_postgres(
                     "image": CONFIG.dagster_postgres_image,
                     **copy.deepcopy(network_dict),
                     "environment": {
+                        "TZ": CONFIG.tz,
                         "POSTGRES_USER": CONFIG.dagster_postgres_user,
                         "POSTGRES_PASSWORD": CONFIG.dagster_postgres_password,
                         "POSTGRES_DB": CONFIG.dagster_postgres_db,
