@@ -19,9 +19,6 @@ from dagster import (
 from OpenStudioLandscapes.engine.common_assets.cmd import get_feature__cmd
 from OpenStudioLandscapes.engine.common_assets.compose import get_compose
 
-# from OpenStudioLandscapes.engine.common_assets.compose_scope import (
-#     get_compose_scope_group__cmd,
-# )
 from OpenStudioLandscapes.engine.common_assets.docker_compose_graph import (
     get_docker_compose_graph,
 )
@@ -112,20 +109,15 @@ feature_in_parent: Union[AssetsDefinition, None] = get_feature_in_parent(
             AssetKey([*ASSET_HEADER["key_prefix"], "CONFIG"]),
         ),
     },
-    retry_policy=build_docker_image_retry_policy,
 )
-def build_docker_image(
+def write_dockerfile(
     context: AssetExecutionContext,
     feature_in: OpenStudioLandscapesFeatureIn,  # pylint: disable=redefined-outer-name
     CONFIG: Config,  # pylint: disable=redefined-outer-name
-) -> Generator[Output[Dict] | AssetMaterialization, None, None]:
+) -> Generator[Output[pathlib.Path] | AssetMaterialization, None, None]:
     """ """
 
     env: Dict = CONFIG.env
-
-    docker_config_json: pathlib.Path = (
-        feature_in.openstudiolandscapes_base.docker_config_json
-    )
 
     config_engine: ConfigEngine = CONFIG.config_engine
 
@@ -222,6 +214,67 @@ def build_docker_image(
     with open(docker_file, "r") as fr:
         docker_file_content = fr.read()
 
+    yield Output(docker_file)
+
+    yield AssetMaterialization(
+        asset_key=context.asset_key,
+        metadata={
+            "__".join(context.asset_key.path): MetadataValue.path(docker_file),
+            docker_file.name: MetadataValue.md(f"```shell\n{docker_file_content}\n```"),
+        },
+    )
+
+
+@asset(
+    **ASSET_HEADER,
+    ins={
+        "feature_in": AssetIn(
+            AssetKey([*ASSET_HEADER["key_prefix"], "feature_in"]),
+        ),
+        "CONFIG": AssetIn(
+            AssetKey([*ASSET_HEADER["key_prefix"], "CONFIG"]),
+        ),
+        "write_dockerfile": AssetIn(
+            AssetKey([*ASSET_HEADER["key_prefix"], "write_dockerfile"])
+        ),
+    },
+    retry_policy=build_docker_image_retry_policy,
+)
+def build_docker_image(
+    context: AssetExecutionContext,
+    feature_in: OpenStudioLandscapesFeatureIn,  # pylint: disable=redefined-outer-name
+    CONFIG: Config,  # pylint: disable=redefined-outer-name
+    write_dockerfile: pathlib.Path,  # pylint: disable=redefined-outer-name
+) -> Generator[Output[Dict] | AssetMaterialization, None, None]:
+    """ """
+
+    env: Dict = CONFIG.env
+
+    docker_config_json: pathlib.Path = (
+        feature_in.openstudiolandscapes_base.docker_config_json
+    )
+
+    config_engine: ConfigEngine = CONFIG.config_engine
+
+    docker_config: DockerConfigModel = config_engine.openstudiolandscapes__docker_config
+
+    docker_image: Dict = feature_in.openstudiolandscapes_base.docker_image_base
+    context.log.debug(f"{docker_image = }")
+
+    (
+        image_name,
+        image_prefixes,
+        tags,
+        build_base_parent_image_prefix,
+        build_base_parent_image_name,
+        build_base_parent_image_tags,
+    ) = get_image_metadata(
+        context=context,
+        docker_image=docker_image,
+        docker_config=docker_config,
+        env=env,
+    )
+
     #################################################
 
     image_data, logs = create_image(
@@ -232,7 +285,7 @@ def build_docker_image(
         docker_image=docker_image,
         docker_config=docker_config,
         docker_config_json=docker_config_json,
-        docker_file=docker_file,
+        docker_file=write_dockerfile,
     )
 
     yield Output(image_data)
@@ -241,7 +294,16 @@ def build_docker_image(
         asset_key=context.asset_key,
         metadata={
             "__".join(context.asset_key.path): MetadataValue.json(image_data),
-            "docker_file": MetadataValue.md(f"```yaml\n{docker_file_content}\n```"),
+            "env": MetadataValue.json(env),
+            "docker_image": MetadataValue.path(
+                f"{image_data['image_prefixes']}{image_data['image_name']}:{image_data['image_tags'][0]}"
+            ),
+            "docker_cmd": MetadataValue.path(
+                get_docker_run_cmd(
+                    context=context,
+                    image_data=image_data,
+                )
+            ),
             "logs": MetadataValue.json(logs),
         },
     )
