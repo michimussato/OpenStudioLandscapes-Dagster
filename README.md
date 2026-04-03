@@ -566,9 +566,10 @@ pip_packages:
 dagster_code_locations:
   load_from:
   - python_module:
-      location_name: OpenStudioLandscapes-Dagster-Showcase Package Code Location
-      module_name: OpenStudioLandscapes.Dagster.Showcase.definitions
-      pip_path: OpenStudioLandscapes-Dagster-Showcase @ git+https://github.com/michimussato/OpenStudioLandscapes-Dagster-Showcase.git@main
+      location_name: OpenStudioLandscapes-DagsterCodeLocation-Showcase Package Code
+        Location
+      module_name: OpenStudioLandscapes.DagsterCodeLocation.Showcase.definitions
+      pip_path: OpenStudioLandscapes-DagsterCodeLocation-Showcase @ git+https://github.com/michimussato/OpenStudioLandscapes-DagsterCodeLocation-Showcase.git@main
       working_directory: src
 ```
 
@@ -641,4 +642,4 @@ To follow up on the previous LinkedIn publications, visit:
 
 ***
 
-Last changed: **2026-03-27 00:07:24 UTC**
+Last changed: **2026-04-03 02:44:27 UTC**

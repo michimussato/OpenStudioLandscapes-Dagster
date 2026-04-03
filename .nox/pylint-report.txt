@@ -50,7 +50,7 @@ src/OpenStudioLandscapes/Dagster/assets.py:785:0: R0914: Too many local variable
 src/OpenStudioLandscapes/Dagster/assets.py:946:0: C0116: Missing function or method docstring (missing-function-docstring)
 src/OpenStudioLandscapes/Dagster/assets.py:32:0: W0614: Unused import(s) LOGGER, DOCKER_PROGRESS, GROUP_BASE_ENV, KEY_BASE_ENV, ASSET_HEADER_BASE_ENV, GROUP_BASE, KEY_BASE, GROUP_VFX_PLATFORM, KEY_VFX_PLATFORM, ASSET_HEADER_VFX_PLATFORM, GROUP_LANDSCAPE_MAP, KEY_LANDSCAPE_MAP, ASSET_HEADER_LANDSCAPE_MAP, GROUP_DISTRIBUTABLE, KEY_DISTRIBUTABLE, ASSET_HEADER_DISTRIBUTABLE, get_dagster_logger, DAGSTER_DEFAULT_OUTPUT and FeatureBaseModel from wildcard import of OpenStudioLandscapes.engine.constants (unused-wildcard-import)
 src/OpenStudioLandscapes/Dagster/assets.py:33:0: W0614: Unused import(s) GroupIn, OpenStudioLandscapesConfig, FeatureVolumeType, ComposeCmdExclusion, DockerComposeNetworkMode, DockerComposeRestartPolicy and DockerComposeDependsOnPolicy from wildcard import of OpenStudioLandscapes.engine.enums (unused-wildcard-import)
-src/OpenStudioLandscapes/Dagster/assets.py:36:0: W0614: Unused import(s) datetime, json, os, shlex, time, git, requests, discovery, cmd_list_to_str, get_copy_str, get_wget_str, get_git_root, get_configs_root, get_data_root, get_bin_root, get_image_name, parse_docker_image_path, get_compose_scope, get_feature_config, expand_dict_vars, metadatavalues_from_dict, get_bool_env, get_str_env, get_all_compose_scopes, get_dynamic_ins, get_networks_dict, download_file, Any, MutableMapping, Tuple, OpExecutionContext, ComposeScopeException, OpenStudioLandscapesException, queue, shutil, subprocess, threading, OpenStudioLandscapesDockerException, docker_build_cmd, docker_push_cmd, OutputReader, execute_in_threads, docker_process_cmds and docker_do from wildcard import of OpenStudioLandscapes.engine.utils (unused-wildcard-import)
+src/OpenStudioLandscapes/Dagster/assets.py:36:0: W0614: Unused import(s) datetime, json, os, shlex, time, git, requests, discovery, cmd_list_to_str, get_copy_str, get_wget_str, get_git_root, get_configs_root, get_data_root, get_bin_root, get_image_name, parse_docker_image_path, get_compose_scope, get_feature_config, expand_dict_vars, metadatavalues_from_dict, get_bool_env, get_str_env, get_all_compose_scopes, get_dynamic_ins, get_networks_dict, download_file, Any, MutableMapping, Tuple, OpExecutionContext, ComposeScopeException, OpenStudioLandscapesException, shutil, OpenStudioLandscapesDockerException, docker_build_cmd, docker_push_cmd, docker_do and submit_cmds from wildcard import of OpenStudioLandscapes.engine.utils (unused-wildcard-import)
 src/OpenStudioLandscapes/Dagster/assets.py:37:0: W0614: Unused import(s) DockerComposeServiceDefinition, DockerComposeNetworkDefinition, Optional, Required and TypedDict from wildcard import of OpenStudioLandscapes.engine.utils.docker.compose_dicts (unused-wildcard-import)
 src/OpenStudioLandscapes/Dagster/assets.py:41:0: W0614: Unused import(s) GROUP and KEY from wildcard import of OpenStudioLandscapes.Dagster.constants (unused-wildcard-import)
 ************* Module OpenStudioLandscapes.Dagster.definitions
@@ -65,9 +65,10 @@ src/OpenStudioLandscapes/Dagster/__init__.py:1:0: C0114: Missing module docstrin
 src/OpenStudioLandscapes/Dagster/__init__.py:1:0: C0103: Module name "Dagster" doesn't conform to snake_case naming style (invalid-name)
 ************* Module OpenStudioLandscapes.Dagster.config.models
 src/OpenStudioLandscapes/Dagster/config/models.py:25:0: C0301: Line too long (108/100) (line-too-long)
-src/OpenStudioLandscapes/Dagster/config/models.py:117:0: C0301: Line too long (139/100) (line-too-long)
-src/OpenStudioLandscapes/Dagster/config/models.py:127:0: C0301: Line too long (103/100) (line-too-long)
-src/OpenStudioLandscapes/Dagster/config/models.py:130:0: C0301: Line too long (161/100) (line-too-long)
+src/OpenStudioLandscapes/Dagster/config/models.py:117:0: C0301: Line too long (163/100) (line-too-long)
+src/OpenStudioLandscapes/Dagster/config/models.py:127:0: C0301: Line too long (115/100) (line-too-long)
+src/OpenStudioLandscapes/Dagster/config/models.py:128:0: C0301: Line too long (103/100) (line-too-long)
+src/OpenStudioLandscapes/Dagster/config/models.py:130:0: C0301: Line too long (185/100) (line-too-long)
 src/OpenStudioLandscapes/Dagster/config/models.py:137:0: C0301: Line too long (120/100) (line-too-long)
 src/OpenStudioLandscapes/Dagster/config/models.py:1:0: C0114: Missing module docstring (missing-module-docstring)
 src/OpenStudioLandscapes/Dagster/config/models.py:12:0: C0413: Import "from OpenStudioLandscapes.engine.config.models import FeatureBaseModel" should be placed at the top of the module (wrong-import-position)
@@ -83,5 +84,5 @@ src/OpenStudioLandscapes/Dagster/doc/readme.py:21:8: C2801: Unnecessarily calls 
 src/OpenStudioLandscapes/Dagster/doc/readme.py:39:8: C2801: Unnecessarily calls dunder method __str__. Use str built-in function. (unnecessary-dunder-call)
 
 ------------------------------------------------------------------
-Your code has been rated at 6.85/10 (previous run: 7.24/10, -0.40)
+Your code has been rated at 6.80/10 (previous run: 7.24/10, -0.44)
 
