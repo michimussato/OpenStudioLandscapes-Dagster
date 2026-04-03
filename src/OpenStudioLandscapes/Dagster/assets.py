@@ -508,12 +508,12 @@ def workspace_yaml(
     # Reference workspace.yaml:
     load_from:
     - python_module:
-        location_name: OpenStudioLandscapes-Dagster-Showcase Package Code Location
-        module_name: OpenStudioLandscapes.Dagster.Showcase.definitions
+        location_name: OpenStudioLandscapes-DagsterCodeLocation-Showcase Package Code Location
+        module_name: OpenStudioLandscapes.DagsterCodeLocation.Showcase.definitions
         working_directory: src
     - python_module:
-        location_name: OpenStudioLandscapes-Dagster-JobProcessor Package Code Location
-        module_name: OpenStudioLandscapes.Dagster.JobProcessor.dagster_job_processor.definitions
+        location_name: OpenStudioLandscapes-DagsterCodeLocation-JobProcessor Package Code Location
+        module_name: OpenStudioLandscapes.DagsterCodeLocation.JobProcessor.dagster_job_processor.definitions
         working_directory: src
     """
 
