@@ -114,7 +114,7 @@ class Config(FeatureBaseModel):
             # Needed if dagster_enable_postgres is True
             "dagster-postgres==0.25.11",
             # OpenStudioLandscapes-Dagster Showcase package:
-            # "OpenStudioLandscapes-Dagster-Showcase @ git+https://github.com/michimussato/OpenStudioLandscapes-Dagster-Showcase.git@main",
+            # "OpenStudioLandscapes-DagsterCodeLocation-Showcase @ git+https://github.com/michimussato/OpenStudioLandscapes-DagsterCodeLocation-Showcase.git@main",
         ],
         frozen=True,
     )
@@ -124,10 +124,10 @@ class Config(FeatureBaseModel):
             "load_from": [
                 {
                     "python_module": {
-                        "location_name": "OpenStudioLandscapes-Dagster-Showcase Package Code Location",
-                        "module_name": "OpenStudioLandscapes.Dagster.Showcase.definitions",
+                        "location_name": "OpenStudioLandscapes-DagsterCodeLocation-Showcase Package Code Location",
+                        "module_name": "OpenStudioLandscapes.DagsterCodeLocation.Showcase.definitions",
                         "working_directory": "src",
-                        "pip_path": "OpenStudioLandscapes-Dagster-Showcase @ git+https://github.com/michimussato/OpenStudioLandscapes-Dagster-Showcase.git@main",
+                        "pip_path": "OpenStudioLandscapes-DagsterCodeLocation-Showcase @ git+https://github.com/michimussato/OpenStudioLandscapes-DagsterCodeLocation-Showcase.git@main",
                         # "volume_mounts": [],
                         # "environment": {},
                     }
