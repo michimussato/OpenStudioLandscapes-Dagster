@@ -2,6 +2,7 @@
 src/OpenStudioLandscapes/Dagster/assets.py:127:0: C0301: Line too long (197/100) (line-too-long)
 src/OpenStudioLandscapes/Dagster/assets.py:203:0: C0301: Line too long (121/100) (line-too-long)
 src/OpenStudioLandscapes/Dagster/assets.py:298:0: C0301: Line too long (105/100) (line-too-long)
+src/OpenStudioLandscapes/Dagster/assets.py:516:0: C0301: Line too long (108/100) (line-too-long)
 src/OpenStudioLandscapes/Dagster/assets.py:651:0: C0301: Line too long (104/100) (line-too-long)
 src/OpenStudioLandscapes/Dagster/assets.py:716:0: C0301: Line too long (102/100) (line-too-long)
 src/OpenStudioLandscapes/Dagster/assets.py:833:0: C0301: Line too long (120/100) (line-too-long)
@@ -58,6 +59,9 @@ src/OpenStudioLandscapes/Dagster/definitions.py:1:0: C0114: Missing module docst
 ************* Module OpenStudioLandscapes.Dagster.constants
 src/OpenStudioLandscapes/Dagster/constants.py:7:1: W0511: Todo (fixme)
 src/OpenStudioLandscapes/Dagster/constants.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+************* Module OpenStudioLandscapes.Dagster._definitions_with_upstream_specs
+src/OpenStudioLandscapes/Dagster/_definitions_with_upstream_specs.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+src/OpenStudioLandscapes/Dagster/_definitions_with_upstream_specs.py:2:0: E0611: No name 'group_out_base_spec' in module 'OpenStudioLandscapes.engine.base.assets' (no-name-in-module)
 ************* Module OpenStudioLandscapes.Dagster.__init__
 src/OpenStudioLandscapes/Dagster/__init__.py:6:5: W0511: TODO: Import directly (no need for conditional) when `python_requires = >= 3.8` (fixme)
 ************* Module OpenStudioLandscapes.Dagster
@@ -84,5 +88,5 @@ src/OpenStudioLandscapes/Dagster/doc/readme.py:21:8: C2801: Unnecessarily calls 
 src/OpenStudioLandscapes/Dagster/doc/readme.py:39:8: C2801: Unnecessarily calls dunder method __str__. Use str built-in function. (unnecessary-dunder-call)
 
 ------------------------------------------------------------------
-Your code has been rated at 6.80/10 (previous run: 7.24/10, -0.44)
+Your code has been rated at 6.60/10 (previous run: 6.98/10, -0.38)
 
