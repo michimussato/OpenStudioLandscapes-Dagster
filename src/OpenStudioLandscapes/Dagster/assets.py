@@ -5,6 +5,7 @@ import textwrap
 import urllib.parse
 from typing import Dict, Generator, List, Union
 
+import ruamel.yaml
 import yaml
 from dagster import (
     AssetExecutionContext,
@@ -525,8 +526,6 @@ def workspace_yaml(
         # volume_mounts = code_location["python_module"].pop("volume_mounts")
         # environment = code_location["python_module"].pop("environment")
 
-    workspace_yaml_load = yaml.dump(workspace_yaml_dict)
-
     workspace_yaml_file = pathlib.Path(
         env["DOT_LANDSCAPES"],
         env.get("LANDSCAPE", "default"),
@@ -537,8 +536,14 @@ def workspace_yaml(
 
     workspace_yaml_file.parent.mkdir(parents=True, exist_ok=True)
 
+    yaml_ = ruamel.yaml.YAML(typ="rt")
+    yaml_.indent(
+        mapping=2,
+        sequence=2,
+        offset=0,
+    )
     with open(workspace_yaml_file, "w") as fw:
-        fw.write(workspace_yaml_load)
+        yaml_.dump(workspace_yaml_dict, fw)
 
     yield Output(workspace_yaml_file)
 
@@ -547,7 +552,7 @@ def workspace_yaml(
         metadata={
             "__".join(context.asset_key.path): MetadataValue.path(workspace_yaml_file),
             "use_postgres": MetadataValue.bool(CONFIG.dagster_enable_postgres),
-            "workspace_yaml": MetadataValue.md(f"```yaml\n{workspace_yaml_load}\n```"),
+            "workspace_yaml": MetadataValue.md(f"```yaml\n{workspace_yaml_file.read_text(encoding='utf-8')}\n```"),
         },
     )
 
