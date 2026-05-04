@@ -552,7 +552,9 @@ def workspace_yaml(
         metadata={
             "__".join(context.asset_key.path): MetadataValue.path(workspace_yaml_file),
             "use_postgres": MetadataValue.bool(CONFIG.dagster_enable_postgres),
-            "workspace_yaml": MetadataValue.md(f"```yaml\n{workspace_yaml_file.read_text(encoding='utf-8')}\n```"),
+            "workspace_yaml": MetadataValue.md(
+                f"```yaml\n{workspace_yaml_file.read_text(encoding='utf-8')}\n```"
+            ),
         },
     )
 
