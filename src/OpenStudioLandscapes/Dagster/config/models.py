@@ -7,7 +7,7 @@ from pydantic import (
     PositiveInt,
 )
 
-from OpenStudioLandscapes.Dagster import constants, dist, LOGGER
+from OpenStudioLandscapes.Dagster import LOGGER, constants, dist
 
 
 class Config(FeatureBaseModel):

@@ -66,20 +66,20 @@ src/OpenStudioLandscapes/Dagster/__init__.py:6:5: W0511: TODO: Import directly (
 ************* Module OpenStudioLandscapes.Dagster
 src/OpenStudioLandscapes/Dagster/__init__.py:1:0: C0114: Missing module docstring (missing-module-docstring)
 src/OpenStudioLandscapes/Dagster/__init__.py:1:0: C0103: Module name "Dagster" doesn't conform to snake_case naming style (invalid-name)
+src/OpenStudioLandscapes/Dagster/__init__.py:25:4: E0401: Unable to import 'OpenStudioLandscapes.engine.logging.loggers' (import-error)
+src/OpenStudioLandscapes/Dagster/__init__.py:25:4: E0611: No name 'logging' in module 'OpenStudioLandscapes.engine' (no-name-in-module)
 ************* Module OpenStudioLandscapes.Dagster.config.models
-src/OpenStudioLandscapes/Dagster/config/models.py:22:0: C0301: Line too long (108/100) (line-too-long)
-src/OpenStudioLandscapes/Dagster/config/models.py:114:0: C0301: Line too long (163/100) (line-too-long)
-src/OpenStudioLandscapes/Dagster/config/models.py:124:0: C0301: Line too long (115/100) (line-too-long)
-src/OpenStudioLandscapes/Dagster/config/models.py:125:0: C0301: Line too long (103/100) (line-too-long)
-src/OpenStudioLandscapes/Dagster/config/models.py:127:0: C0301: Line too long (185/100) (line-too-long)
-src/OpenStudioLandscapes/Dagster/config/models.py:134:0: C0301: Line too long (120/100) (line-too-long)
+src/OpenStudioLandscapes/Dagster/config/models.py:21:0: C0301: Line too long (108/100) (line-too-long)
+src/OpenStudioLandscapes/Dagster/config/models.py:113:0: C0301: Line too long (163/100) (line-too-long)
+src/OpenStudioLandscapes/Dagster/config/models.py:123:0: C0301: Line too long (115/100) (line-too-long)
+src/OpenStudioLandscapes/Dagster/config/models.py:124:0: C0301: Line too long (103/100) (line-too-long)
+src/OpenStudioLandscapes/Dagster/config/models.py:126:0: C0301: Line too long (185/100) (line-too-long)
+src/OpenStudioLandscapes/Dagster/config/models.py:133:0: C0301: Line too long (120/100) (line-too-long)
 src/OpenStudioLandscapes/Dagster/config/models.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-src/OpenStudioLandscapes/Dagster/config/models.py:5:0: E0401: Unable to import 'OpenStudioLandscapes.engine.logging.loggers' (import-error)
-src/OpenStudioLandscapes/Dagster/config/models.py:5:0: E0611: No name 'logging' in module 'OpenStudioLandscapes.engine' (no-name-in-module)
-src/OpenStudioLandscapes/Dagster/config/models.py:14:0: C0115: Missing class docstring (missing-class-docstring)
-src/OpenStudioLandscapes/Dagster/config/models.py:139:4: C0116: Missing function or method docstring (missing-function-docstring)
-src/OpenStudioLandscapes/Dagster/config/models.py:6:0: C0411: third party import "pydantic.Field" should be placed before first party imports "OpenStudioLandscapes.engine.config.models.FeatureBaseModel", "OpenStudioLandscapes.engine.logging.loggers.FEATURE_LOGGER"  (wrong-import-order)
-src/OpenStudioLandscapes/Dagster/config/models.py:11:0: C0412: Imports from package OpenStudioLandscapes are not grouped (ungrouped-imports)
+src/OpenStudioLandscapes/Dagster/config/models.py:13:0: C0115: Missing class docstring (missing-class-docstring)
+src/OpenStudioLandscapes/Dagster/config/models.py:138:4: C0116: Missing function or method docstring (missing-function-docstring)
+src/OpenStudioLandscapes/Dagster/config/models.py:5:0: C0411: third party import "pydantic.Field" should be placed before first party import "OpenStudioLandscapes.engine.config.models.FeatureBaseModel"  (wrong-import-order)
+src/OpenStudioLandscapes/Dagster/config/models.py:10:0: C0412: Imports from package OpenStudioLandscapes are not grouped (ungrouped-imports)
 ************* Module OpenStudioLandscapes.Dagster.doc.readme
 src/OpenStudioLandscapes/Dagster/doc/readme.py:26:0: C0301: Line too long (114/100) (line-too-long)
 src/OpenStudioLandscapes/Dagster/doc/readme.py:77:0: C0301: Line too long (111/100) (line-too-long)
@@ -89,5 +89,5 @@ src/OpenStudioLandscapes/Dagster/doc/readme.py:21:8: C2801: Unnecessarily calls 
 src/OpenStudioLandscapes/Dagster/doc/readme.py:39:8: C2801: Unnecessarily calls dunder method __str__. Use str built-in function. (unnecessary-dunder-call)
 
 ------------------------------------------------------------------
-Your code has been rated at 6.45/10 (previous run: 6.71/10, -0.25)
+Your code has been rated at 6.47/10 (previous run: 6.73/10, -0.26)
 
