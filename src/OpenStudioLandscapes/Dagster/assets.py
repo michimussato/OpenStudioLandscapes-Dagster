@@ -17,18 +17,9 @@ from dagster import (
     Output,
     asset,
 )
-from OpenStudioLandscapes.engine.common_assets.cmd import get_feature__cmd
-from OpenStudioLandscapes.engine.common_assets.compose import get_compose
-from OpenStudioLandscapes.engine.common_assets.docker_compose_graph import (
-    get_docker_compose_graph,
-)
-from OpenStudioLandscapes.engine.common_assets.feature import get_feature__CONFIG
-from OpenStudioLandscapes.engine.common_assets.feature_out import get_feature_out_v2
-from OpenStudioLandscapes.engine.common_assets.group_in import (
-    get_feature_in,
-    get_feature_in_parent,
-)
-from OpenStudioLandscapes.engine.common_assets.group_out import get_group_out
+
+from OpenStudioLandscapes.engine.common_assets import *
+
 from OpenStudioLandscapes.engine.config.models import ConfigEngine, DockerConfigModel
 from OpenStudioLandscapes.engine.constants import *
 from OpenStudioLandscapes.engine.enums import *
@@ -37,9 +28,7 @@ from OpenStudioLandscapes.engine.policies.retry import build_docker_image_retry_
 from OpenStudioLandscapes.engine.utils import *
 from OpenStudioLandscapes.engine.utils.docker.compose_dicts import *
 
-from OpenStudioLandscapes.Dagster import dist
-from OpenStudioLandscapes.Dagster.config.models import CONFIG_STR, Config
-from OpenStudioLandscapes.Dagster.constants import *
+from OpenStudioLandscapes.Dagster import *
 
 # Todo:
 #  - [ ] Create dagster.yaml dynamically
@@ -51,41 +40,41 @@ yaml.SafeDumper.add_multi_representer(
 )
 
 
-cmd: AssetsDefinition = get_feature__cmd(
-    ASSET_HEADER=ASSET_HEADER,
+cmd: AssetsDefinition = cmd.get_feature__cmd(
+    ASSET_HEADER=constants.ASSET_HEADER,
 )
 
-CONFIG: AssetsDefinition = get_feature__CONFIG(
-    ASSET_HEADER=ASSET_HEADER,
-    CONFIG_STR=CONFIG_STR,
-    search_model_of_type=Config,
+CONFIG: AssetsDefinition = feature.get_feature__CONFIG(
+    ASSET_HEADER=constants.ASSET_HEADER,
+    CONFIG_STR=config.models.CONFIG_STR,
+    search_model_of_type=config.models.Config,
 )
 
 
-feature_in: AssetsDefinition = get_feature_in(
-    ASSET_HEADER=ASSET_HEADER,
+feature_in: AssetsDefinition = group_in.get_feature_in(
+    ASSET_HEADER=constants.ASSET_HEADER,
     ASSET_HEADER_BASE=ASSET_HEADER_BASE,
     ASSET_HEADER_FEATURE_IN={},
 )
 
 
-group_out: AssetsDefinition = get_group_out(
-    ASSET_HEADER=ASSET_HEADER,
+group_out: AssetsDefinition = group_out.get_group_out(
+    ASSET_HEADER=constants.ASSET_HEADER,
 )
 
 
-docker_compose_graph: AssetsDefinition = get_docker_compose_graph(
-    ASSET_HEADER=ASSET_HEADER,
+docker_compose_graph: AssetsDefinition = docker_compose_graph.get_docker_compose_graph(
+    ASSET_HEADER=constants.ASSET_HEADER,
 )
 
 
-compose: AssetsDefinition = get_compose(
-    ASSET_HEADER=ASSET_HEADER,
+compose: AssetsDefinition = compose.get_compose(
+    ASSET_HEADER=constants.ASSET_HEADER,
 )
 
 
-feature_out_v2: AssetsDefinition = get_feature_out_v2(
-    ASSET_HEADER=ASSET_HEADER,
+feature_out_v2: AssetsDefinition = feature_out.get_feature_out_v2(
+    ASSET_HEADER=constants.ASSET_HEADER,
 )
 
 
@@ -93,27 +82,27 @@ feature_out_v2: AssetsDefinition = get_feature_out_v2(
 # - feature_in_parent
 # - CONFIG_PARENT
 # if ConfigParent is or type FeatureBaseModel
-feature_in_parent: Union[AssetsDefinition, None] = get_feature_in_parent(
-    ASSET_HEADER=ASSET_HEADER,
+feature_in_parent: Union[AssetsDefinition, None] = group_in.get_feature_in_parent(
+    ASSET_HEADER=constants.ASSET_HEADER,
     config_parent=ConfigParent,
 )
 
 
 @asset(
-    **ASSET_HEADER,
+    **constants.ASSET_HEADER,
     ins={
         "feature_in": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "feature_in"]),
+            AssetKey([*constants.ASSET_HEADER["key_prefix"], "feature_in"]),
         ),
         "CONFIG": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "CONFIG"]),
+            AssetKey([*constants.ASSET_HEADER["key_prefix"], "CONFIG"]),
         ),
     },
 )
 def write_dockerfile(
     context: AssetExecutionContext,
     feature_in: OpenStudioLandscapesFeatureIn,  # pylint: disable=redefined-outer-name
-    CONFIG: Config,  # pylint: disable=redefined-outer-name
+    CONFIG: config.models.Config,  # pylint: disable=redefined-outer-name
 ) -> Generator[Output[pathlib.Path] | AssetMaterialization, None, None]:
     """ """
 
@@ -226,16 +215,16 @@ def write_dockerfile(
 
 
 @asset(
-    **ASSET_HEADER,
+    **constants.ASSET_HEADER,
     ins={
         "feature_in": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "feature_in"]),
+            AssetKey([*constants.ASSET_HEADER["key_prefix"], "feature_in"]),
         ),
         "CONFIG": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "CONFIG"]),
+            AssetKey([*constants.ASSET_HEADER["key_prefix"], "CONFIG"]),
         ),
         "write_dockerfile": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "write_dockerfile"])
+            AssetKey([*constants.ASSET_HEADER["key_prefix"], "write_dockerfile"])
         ),
     },
     retry_policy=build_docker_image_retry_policy,
@@ -243,7 +232,7 @@ def write_dockerfile(
 def build_docker_image(
     context: AssetExecutionContext,
     feature_in: OpenStudioLandscapesFeatureIn,  # pylint: disable=redefined-outer-name
-    CONFIG: Config,  # pylint: disable=redefined-outer-name
+    CONFIG: config.models.Config,  # pylint: disable=redefined-outer-name
     write_dockerfile: pathlib.Path,  # pylint: disable=redefined-outer-name
 ) -> Generator[Output[Dict] | AssetMaterialization, None, None]:
     """ """
@@ -310,10 +299,10 @@ def build_docker_image(
 
 
 @asset(
-    **ASSET_HEADER,
+    **constants.ASSET_HEADER,
     ins={
         "CONFIG": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "CONFIG"]),
+            AssetKey([*constants.ASSET_HEADER["key_prefix"], "CONFIG"]),
         ),
     },
     description=textwrap.dedent("""
@@ -379,7 +368,7 @@ def build_docker_image(
 )
 def dagster_yaml(
     context: AssetExecutionContext,
-    CONFIG: Config,  # pylint: disable=redefined-outer-name
+    CONFIG: config.models.Config,  # pylint: disable=redefined-outer-name
 ) -> Generator[Output[pathlib.Path] | AssetMaterialization, None, None]:
 
     config_engine: ConfigEngine = CONFIG.config_engine
@@ -460,10 +449,10 @@ def dagster_yaml(
 
 
 @asset(
-    **ASSET_HEADER,
+    **constants.ASSET_HEADER,
     ins={
         "CONFIG": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "CONFIG"]),
+            AssetKey([*constants.ASSET_HEADER["key_prefix"], "CONFIG"]),
         ),
     },
     description=textwrap.dedent("""
@@ -500,7 +489,7 @@ def dagster_yaml(
 )
 def workspace_yaml(
     context: AssetExecutionContext,
-    CONFIG: Config,  # pylint: disable=redefined-outer-name
+    CONFIG: config.models.Config,  # pylint: disable=redefined-outer-name
 ) -> Generator[Output[pathlib.Path] | AssetMaterialization, None, None]:
 
     env: Dict = CONFIG.env
@@ -560,16 +549,16 @@ def workspace_yaml(
 
 
 @asset(
-    **ASSET_HEADER,
+    **constants.ASSET_HEADER,
     ins={
         "CONFIG": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "CONFIG"]),
+            AssetKey([*constants.ASSET_HEADER["key_prefix"], "CONFIG"]),
         ),
     },
 )
 def compose_networks(
     context: AssetExecutionContext,
-    CONFIG: Config,  # pylint: disable=redefined-outer-name
+    CONFIG: config.models.Config,  # pylint: disable=redefined-outer-name
 ) -> Generator[
     Output[Dict[str, Dict[str, Dict[str, str]]]] | AssetMaterialization, None, None
 ]:
@@ -599,28 +588,28 @@ def compose_networks(
 
 
 @asset(
-    **ASSET_HEADER,
+    **constants.ASSET_HEADER,
     ins={
         "CONFIG": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "CONFIG"]),
+            AssetKey([*constants.ASSET_HEADER["key_prefix"], "CONFIG"]),
         ),
         "compose_networks": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "compose_networks"]),
+            AssetKey([*constants.ASSET_HEADER["key_prefix"], "compose_networks"]),
         ),
         "build": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "build_docker_image"]),
+            AssetKey([*constants.ASSET_HEADER["key_prefix"], "build_docker_image"]),
         ),
         "dagster_yaml": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "dagster_yaml"]),
+            AssetKey([*constants.ASSET_HEADER["key_prefix"], "dagster_yaml"]),
         ),
         "workspace_yaml": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "workspace_yaml"]),
+            AssetKey([*constants.ASSET_HEADER["key_prefix"], "workspace_yaml"]),
         ),
     },
 )
 def compose_dagster(
     context: AssetExecutionContext,
-    CONFIG: Config,  # pylint: disable=redefined-outer-name
+    CONFIG: config.models.Config,  # pylint: disable=redefined-outer-name
     compose_networks: Dict,  # pylint: disable=redefined-outer-name
     build: Dict,  # pylint: disable=redefined-outer-name
     dagster_yaml: pathlib.Path,  # pylint: disable=redefined-outer-name
@@ -777,13 +766,13 @@ def compose_dagster(
 
 
 @asset(
-    **ASSET_HEADER,
+    **constants.ASSET_HEADER,
     ins={
         "CONFIG": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "CONFIG"]),
+            AssetKey([*constants.ASSET_HEADER["key_prefix"], "CONFIG"]),
         ),
         "compose_networks": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "compose_networks"]),
+            AssetKey([*constants.ASSET_HEADER["key_prefix"], "compose_networks"]),
         ),
     },
     description="See https://docs.dagster.io/guides/deploy/deployment-options/docker and "
@@ -791,7 +780,7 @@ def compose_dagster(
 )
 def compose_postgres(
     context: AssetExecutionContext,
-    CONFIG: Config,  # pylint: disable=redefined-outer-name
+    CONFIG: config.models.Config,  # pylint: disable=redefined-outer-name
     compose_networks: Dict,  # pylint: disable=redefined-outer-name
 ) -> Generator[Output[Dict] | AssetMaterialization, None, None]:
     """ """
@@ -940,13 +929,13 @@ def compose_postgres(
 
 
 @asset(
-    **ASSET_HEADER,
+    **constants.ASSET_HEADER,
     ins={
         "compose_dagster": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "compose_dagster"]),
+            AssetKey([*constants.ASSET_HEADER["key_prefix"], "compose_dagster"]),
         ),
         "compose_postgres": AssetIn(
-            AssetKey([*ASSET_HEADER["key_prefix"], "compose_postgres"]),
+            AssetKey([*constants.ASSET_HEADER["key_prefix"], "compose_postgres"]),
         ),
     },
 )

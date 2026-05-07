@@ -4,6 +4,9 @@ from dagster import (
 )
 
 import OpenStudioLandscapes.Dagster.assets
+from OpenStudioLandscapes.Dagster import *
+
+LOGGER.info(f"Loading {dist.name} assets...")
 
 assets_base = load_assets_from_modules(
     modules=[OpenStudioLandscapes.Dagster.assets],
