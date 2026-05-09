@@ -416,32 +416,6 @@
         "message-id": "W1203"
     },
     {
-        "type": "warning",
-        "module": "OpenStudioLandscapes.Dagster.constants",
-        "obj": "",
-        "line": 7,
-        "column": 1,
-        "endLine": null,
-        "endColumn": null,
-        "path": "src/OpenStudioLandscapes/Dagster/constants.py",
-        "symbol": "fixme",
-        "message": "Todo",
-        "message-id": "W0511"
-    },
-    {
-        "type": "convention",
-        "module": "OpenStudioLandscapes.Dagster.constants",
-        "obj": "",
-        "line": 1,
-        "column": 0,
-        "endLine": null,
-        "endColumn": null,
-        "path": "src/OpenStudioLandscapes/Dagster/constants.py",
-        "symbol": "missing-module-docstring",
-        "message": "Missing module docstring",
-        "message-id": "C0114"
-    },
-    {
         "type": "convention",
         "module": "OpenStudioLandscapes.Dagster._definitions_with_upstream_specs",
         "obj": "",
@@ -491,6 +465,19 @@
         "path": "src/OpenStudioLandscapes/Dagster/__init__.py",
         "symbol": "invalid-name",
         "message": "Module name \"Dagster\" doesn't conform to snake_case naming style",
+        "message-id": "C0103"
+    },
+    {
+        "type": "convention",
+        "module": "OpenStudioLandscapes.Dagster",
+        "obj": "",
+        "line": 39,
+        "column": 4,
+        "endLine": 39,
+        "endColumn": 8,
+        "path": "src/OpenStudioLandscapes/Dagster/__init__.py",
+        "symbol": "invalid-name",
+        "message": "Constant name \"fill\" doesn't conform to UPPER_CASE naming style",
         "message-id": "C0103"
     },
     {
