@@ -84,175 +84,172 @@ The following settings are available in `OpenStudioLandscapes-Dagster` and are b
 
 
 ```yaml
-properties:
-  apt_packages:
-    default:
-    - sqlite3
-    items: {}
-    title: Apt Packages
-    type: array
-  compose_scope:
-    default: default
-    examples:
-    - default
-    - license_server
-    - worker
-    title: Compose Scope
-    type: string
-  dagster_code_locations:
-    additionalProperties:
-      items:
-        additionalProperties: true
-        type: object
-      type: array
-    default:
-      load_from:
-      - python_module:
-          location_name: OpenStudioLandscapes-DagsterCodeLocation-Showcase Package
-            Code Location
-          module_name: OpenStudioLandscapes.DagsterCodeLocation.Showcase.definitions
-          pip_path: OpenStudioLandscapes-DagsterCodeLocation-Showcase @ git+https://github.com/michimussato/OpenStudioLandscapes-DagsterCodeLocation-Showcase.git@main
-          working_directory: src
-    description: 'The Dagster code locations. If nothing is specified, the default
-      value should be `load_from: []`.'
-    title: Dagster Code Locations
-    type: object
-  dagster_dev_port_container:
-    default: 3006
-    description: The Dagster UI container port.
-    exclusiveMinimum: 0
-    title: Dagster Dev Port Container
-    type: integer
-  dagster_dev_port_host:
-    default: 3003
-    description: The Dagster UI container port.
-    exclusiveMinimum: 0
-    title: Dagster Dev Port Host
-    type: integer
-  dagster_enable_postgres:
-    default: true
-    description: Enable Postgres for Dagster.
-    title: Dagster Enable Postgres
-    type: boolean
-  dagster_home:
-    default: /dagster/materializations
-    description: The container side Dagster HOME directory.
-    format: path
-    title: Dagster Home
-    type: string
-  dagster_listen_addr:
-    default: 0.0.0.0
-    description: The listen address.
-    title: Dagster Listen Addr
-    type: string
-  dagster_postgres_db:
-    default: postgres
-    description: Dagster postgres database name.
-    title: Dagster Postgres Db
-    type: string
-  dagster_postgres_db_install_dir:
-    default: '{DOT_LANDSCAPES}/{LANDSCAPE}/{FEATURE}/postgres'
-    description: Dagster host side postgres database directory.
-    format: path
-    title: Dagster Postgres Db Install Dir
-    type: string
-  dagster_postgres_image:
-    default: docker.io/postgres:17
-    description: Dagster postgres Docker image.
-    title: Dagster Postgres Image
-    type: string
-  dagster_postgres_password:
-    default: mysecretpassword
-    description: Dagster postgres password.
-    title: Dagster Postgres Password
-    type: string
-  dagster_postgres_pgdata:
-    default: /var/lib/postgresql/data/pgdata
-    description: Dagster postgres PGDATA directory.
-    format: path
-    title: Dagster Postgres Pgdata
-    type: string
-  dagster_postgres_port_container:
-    default: 5432
-    description: The Dagster postgres host port.
-    exclusiveMinimum: 0
-    title: Dagster Postgres Port Container
-    type: integer
-  dagster_postgres_port_host:
-    default: 5432
-    description: The Dagster postgres container port.
-    exclusiveMinimum: 0
-    title: Dagster Postgres Port Host
-    type: integer
-  dagster_postgres_service_name:
-    default: openstudiolandscapes-postgres-dagster
-    description: Dagster postgres Docker service name.
-    title: Dagster Postgres Service Name
-    type: string
-  dagster_postgres_user:
-    default: postgres
-    description: Dagster postgres user.
-    title: Dagster Postgres User
-    type: string
-  dagster_root:
-    default: /dagster
-    description: The container side Dagster root directory.
-    format: path
-    title: Dagster Root
-    type: string
-  docker_compose:
-    default: '{DOT_LANDSCAPES}/{LANDSCAPE}/{FEATURE}/docker_compose/docker-compose.yml'
-    description: The path to the `docker-compose.yml` file.
-    format: path
-    title: Docker Compose
-    type: string
-  enabled:
-    default: true
-    description: Whether the Feature is enabled or not.
-    title: Enabled
-    type: boolean
-  env:
-    additionalProperties: true
-    title: Env
-    type: object
-  feature_name:
-    default: OpenStudioLandscapes-Dagster
-    title: Feature Name
-    type: string
-  group_name:
-    default: OpenStudioLandscapes_Dagster
-    title: Group Name
-    type: string
-  key_prefixes:
-    default:
-    - OpenStudioLandscapes_Dagster
+apt_packages:
+  default:
+  - sqlite3
+  items: {}
+  title: Apt Packages
+  type: array
+compose_scope:
+  default: default
+  examples:
+  - default
+  - license_server
+  - worker
+  title: Compose Scope
+  type: string
+dagster_code_locations:
+  additionalProperties:
     items:
-      type: string
-    title: Key Prefixes
+      additionalProperties: true
+      type: object
     type: array
-  local_bind_volumes:
-    description: Here you can define Feature specific, arbitrary, absolute bind volume
-      mappings.
-    items:
-      type: string
-    title: Local Bind Volumes
-    type: array
-  local_environment_variables:
-    additionalProperties:
-      type: string
-    description: Here you can define Feature specific, arbitrary environment variables.
-    title: Local Environment Variables
-    type: object
-  pip_packages:
-    default:
-    - dagster==1.9.11
-    - dagster-webserver==1.9.11
-    - dagster-postgres==0.25.11
-    items: {}
-    title: Pip Packages
-    type: array
-title: Config
-type: object
+  default:
+    load_from:
+    - python_module:
+        location_name: OpenStudioLandscapes-DagsterCodeLocation-Showcase Package Code
+          Location
+        module_name: OpenStudioLandscapes.DagsterCodeLocation.Showcase.definitions
+        pip_path: OpenStudioLandscapes-DagsterCodeLocation-Showcase @ git+https://github.com/michimussato/OpenStudioLandscapes-DagsterCodeLocation-Showcase.git@main
+        working_directory: src
+  description: 'The Dagster code locations. If nothing is specified, the default value
+    should be `load_from: []`.'
+  title: Dagster Code Locations
+  type: object
+dagster_dev_port_container:
+  default: 3006
+  description: The Dagster UI container port.
+  exclusiveMinimum: 0
+  title: Dagster Dev Port Container
+  type: integer
+dagster_dev_port_host:
+  default: 3003
+  description: The Dagster UI container port.
+  exclusiveMinimum: 0
+  title: Dagster Dev Port Host
+  type: integer
+dagster_enable_postgres:
+  default: true
+  description: Enable Postgres for Dagster.
+  title: Dagster Enable Postgres
+  type: boolean
+dagster_home:
+  default: /dagster/materializations
+  description: The container side Dagster HOME directory.
+  format: path
+  title: Dagster Home
+  type: string
+dagster_listen_addr:
+  default: 0.0.0.0
+  description: The listen address.
+  title: Dagster Listen Addr
+  type: string
+dagster_postgres_db:
+  default: postgres
+  description: Dagster postgres database name.
+  title: Dagster Postgres Db
+  type: string
+dagster_postgres_db_install_dir:
+  default: '{DOT_LANDSCAPES}/{LANDSCAPE}/{FEATURE}/postgres'
+  description: Dagster host side postgres database directory.
+  format: path
+  title: Dagster Postgres Db Install Dir
+  type: string
+dagster_postgres_image:
+  default: docker.io/postgres:17
+  description: Dagster postgres Docker image.
+  title: Dagster Postgres Image
+  type: string
+dagster_postgres_password:
+  default: mysecretpassword
+  description: Dagster postgres password.
+  title: Dagster Postgres Password
+  type: string
+dagster_postgres_pgdata:
+  default: /var/lib/postgresql/data/pgdata
+  description: Dagster postgres PGDATA directory.
+  format: path
+  title: Dagster Postgres Pgdata
+  type: string
+dagster_postgres_port_container:
+  default: 5432
+  description: The Dagster postgres host port.
+  exclusiveMinimum: 0
+  title: Dagster Postgres Port Container
+  type: integer
+dagster_postgres_port_host:
+  default: 5432
+  description: The Dagster postgres container port.
+  exclusiveMinimum: 0
+  title: Dagster Postgres Port Host
+  type: integer
+dagster_postgres_service_name:
+  default: openstudiolandscapes-postgres-dagster
+  description: Dagster postgres Docker service name.
+  title: Dagster Postgres Service Name
+  type: string
+dagster_postgres_user:
+  default: postgres
+  description: Dagster postgres user.
+  title: Dagster Postgres User
+  type: string
+dagster_root:
+  default: /dagster
+  description: The container side Dagster root directory.
+  format: path
+  title: Dagster Root
+  type: string
+docker_compose:
+  default: '{DOT_LANDSCAPES}/{LANDSCAPE}/{FEATURE}/docker_compose/docker-compose.yml'
+  description: The path to the `docker-compose.yml` file.
+  format: path
+  title: Docker Compose
+  type: string
+enabled:
+  default: true
+  description: Whether the Feature is enabled or not.
+  title: Enabled
+  type: boolean
+env:
+  additionalProperties: true
+  title: Env
+  type: object
+feature_name:
+  default: OpenStudioLandscapes-Dagster
+  title: Feature Name
+  type: string
+group_name:
+  default: OpenStudioLandscapes_Dagster
+  title: Group Name
+  type: string
+key_prefixes:
+  default:
+  - OpenStudioLandscapes_Dagster
+  items:
+    type: string
+  title: Key Prefixes
+  type: array
+local_bind_volumes:
+  description: Here you can define Feature specific, arbitrary, absolute bind volume
+    mappings.
+  items:
+    type: string
+  title: Local Bind Volumes
+  type: array
+local_environment_variables:
+  additionalProperties:
+    type: string
+  description: Here you can define Feature specific, arbitrary environment variables.
+  title: Local Environment Variables
+  type: object
+pip_packages:
+  default:
+  - dagster==1.9.11
+  - dagster-webserver==1.9.11
+  - dagster-postgres==0.25.11
+  items: {}
+  title: Pip Packages
+  type: array
 
 ```
 
@@ -337,4 +334,4 @@ To follow up on the previous LinkedIn publications, visit:
 
 ***
 
-Last changed: **2026-05-09 11:21:26 UTC**
+Last changed: **2026-05-12 09:52:33 UTC**
