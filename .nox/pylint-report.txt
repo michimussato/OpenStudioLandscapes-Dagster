@@ -63,5 +63,5 @@ src/OpenStudioLandscapes/Dagster/doc/readme.py:21:8: C2801: Unnecessarily calls 
 src/OpenStudioLandscapes/Dagster/doc/readme.py:39:8: C2801: Unnecessarily calls dunder method __str__. Use str built-in function. (unnecessary-dunder-call)
 
 ------------------------------------------------------------------
-Your code has been rated at 7.78/10 (previous run: 8.00/10, -0.22)
+Your code has been rated at 7.78/10 (previous run: 7.87/10, -0.10)
 
