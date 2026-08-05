@@ -28,6 +28,7 @@ from OpenStudioLandscapes.engine.common_assets import (
     group_out,
 )
 from OpenStudioLandscapes.engine.config.models import ConfigEngine, DockerConfigModel
+from OpenStudioLandscapes.engine.base.configurable_resources.docker_registry_resource import DockerRegistryConfigurableResource
 from OpenStudioLandscapes.engine.constants import (
     ASSET_HEADER_BASE,
     ConfigParent,
@@ -127,6 +128,7 @@ feature_in_parent: Union[AssetsDefinition, None] = group_in.get_feature_in_paren
 )
 def write_dockerfile(
     context: AssetExecutionContext,
+    config_DockerRegistryConfigurableResource: DockerRegistryConfigurableResource,
     feature_in: OpenStudioLandscapesFeatureIn,  # pylint: disable=redefined-outer-name
     CONFIG: config.models.Config,  # pylint: disable=redefined-outer-name
 ) -> Generator[Output[pathlib.Path] | AssetMaterialization, None, None]:
@@ -166,6 +168,7 @@ def write_dockerfile(
         context=context,
         docker_image=docker_image,
         docker_config=docker_config,
+        config_DockerRegistryConfigurableResource=config_DockerRegistryConfigurableResource,
         env=env,
     )
 
@@ -257,6 +260,7 @@ def write_dockerfile(
 )
 def build_docker_image(
     context: AssetExecutionContext,
+    config_DockerRegistryConfigurableResource: DockerRegistryConfigurableResource,
     feature_in: OpenStudioLandscapesFeatureIn,  # pylint: disable=redefined-outer-name
     CONFIG: config.models.Config,  # pylint: disable=redefined-outer-name
     write_dockerfile: pathlib.Path,  # pylint: disable=redefined-outer-name
@@ -287,6 +291,7 @@ def build_docker_image(
         context=context,
         docker_image=docker_image,
         docker_config=docker_config,
+        config_DockerRegistryConfigurableResource=config_DockerRegistryConfigurableResource,
         env=env,
     )
 
@@ -299,6 +304,7 @@ def build_docker_image(
         tags=tags,
         docker_image=docker_image,
         docker_config=docker_config,
+        config_DockerRegistryConfigurableResource=config_DockerRegistryConfigurableResource,
         docker_config_json=docker_config_json,
         docker_file=write_dockerfile,
     )
