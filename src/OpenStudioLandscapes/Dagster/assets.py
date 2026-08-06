@@ -27,7 +27,7 @@ from OpenStudioLandscapes.engine.common_assets import (
     group_in,
     group_out,
 )
-from OpenStudioLandscapes.engine.config.models import ConfigEngine
+from OpenStudioLandscapes.engine.env.configurable_resources.config_engine import ConfigEngineConfigurableResource
 from OpenStudioLandscapes.engine.base.configurable_resources.docker_registry_resource import DockerRegistryConfigurableResource
 from OpenStudioLandscapes.engine.base.configurable_resources.docker_resource import DockerConfigurableResource
 from OpenStudioLandscapes.engine.constants import (
@@ -138,10 +138,6 @@ def write_dockerfile(
 
     env: Dict = CONFIG.env
 
-    config_engine: ConfigEngine = CONFIG.config_engine
-
-    docker_config: DockerConfigurableResource = config_DockerConfigurableResource
-
     docker_image: Dict = feature_in.openstudiolandscapes_base.docker_image_base
     context.log.debug(f"{docker_image = }")
     # docker_image = {'image_name': 'openstudiolandscapes_base_build_docker_image', 'image_prefixes': '', 'image_tags': ['2025-11-17-01-26-31-05a9b85aa33b47ffa7dfb21a28ca24ab'], 'image_parent': {}}
@@ -169,7 +165,7 @@ def write_dockerfile(
     ) = get_image_metadata(
         context=context,
         docker_image=docker_image,
-        docker_config=docker_config,
+        docker_config=config_DockerConfigurableResource,
         config_DockerRegistryConfigurableResource=config_DockerRegistryConfigurableResource,
         env=env,
     )
@@ -276,10 +272,6 @@ def build_docker_image(
         feature_in.openstudiolandscapes_base.docker_config_json
     )
 
-    config_engine: ConfigEngine = CONFIG.config_engine
-
-    docker_config: DockerConfigurableResource = config_DockerConfigurableResource
-
     docker_image: Dict = feature_in.openstudiolandscapes_base.docker_image_base
     context.log.debug(f"{docker_image = }")
 
@@ -293,7 +285,7 @@ def build_docker_image(
     ) = get_image_metadata(
         context=context,
         docker_image=docker_image,
-        docker_config=docker_config,
+        docker_config=config_DockerConfigurableResource,
         config_DockerRegistryConfigurableResource=config_DockerRegistryConfigurableResource,
         env=env,
     )
@@ -306,7 +298,7 @@ def build_docker_image(
         image_prefixes=image_prefixes,
         tags=tags,
         docker_image=docker_image,
-        docker_config=docker_config,
+        docker_config=config_DockerConfigurableResource,
         config_DockerRegistryConfigurableResource=config_DockerRegistryConfigurableResource,
         docker_config_json=docker_config_json,
         docker_file=write_dockerfile,
@@ -403,10 +395,9 @@ def build_docker_image(
 )
 def dagster_yaml(
     context: AssetExecutionContext,
+    config_ConfigEngineConfigurableResource: ConfigEngineConfigurableResource,
     CONFIG: config.models.Config,  # pylint: disable=redefined-outer-name
 ) -> Generator[Output[pathlib.Path] | AssetMaterialization, None, None]:
-
-    config_engine: ConfigEngine = CONFIG.config_engine
 
     env: Dict = CONFIG.env
 
@@ -424,7 +415,7 @@ def dagster_yaml(
                         "hostname": ".".join(
                             [
                                 CONFIG.dagster_postgres_service_name,
-                                config_engine.openstudiolandscapes__domain_lan,
+                                config_ConfigEngineConfigurableResource.openstudiolandscapes__domain_lan,
                             ],
                         ),
                         "db_name": CONFIG.dagster_postgres_db,
@@ -644,6 +635,7 @@ def compose_networks(
 )
 def compose_dagster(
     context: AssetExecutionContext,
+    config_ConfigEngineConfigurableResource: ConfigEngineConfigurableResource,
     CONFIG: config.models.Config,  # pylint: disable=redefined-outer-name
     compose_networks: Dict,  # pylint: disable=redefined-outer-name
     build: Dict,  # pylint: disable=redefined-outer-name
@@ -653,8 +645,6 @@ def compose_dagster(
     """ """
 
     env: Dict = CONFIG.env
-
-    config_engine: ConfigEngine = CONFIG.config_engine
 
     network_dict = {}
     ports_dict = {}
@@ -715,7 +705,7 @@ def compose_dagster(
         "volumes": list(
             {
                 *_volume_relative,
-                *config_engine.global_bind_volumes,
+                *config_ConfigEngineConfigurableResource.global_bind_volumes,
                 *CONFIG.local_bind_volumes,
             }
         )
@@ -734,7 +724,7 @@ def compose_dagster(
         context=context,
         service_name=service_name,
         landscape_id=env.get("LANDSCAPE", "default"),
-        domain_lan=config_engine.openstudiolandscapes__domain_lan,
+        domain_lan=config_ConfigEngineConfigurableResource.openstudiolandscapes__domain_lan,
     )
 
     docker_dict = {
@@ -742,7 +732,7 @@ def compose_dagster(
             service_name: {
                 "container_name": container_name,
                 "hostname": host_name,
-                "domainname": config_engine.openstudiolandscapes__domain_lan,
+                "domainname": config_ConfigEngineConfigurableResource.openstudiolandscapes__domain_lan,
                 "restart": DockerComposePolicies.RESTART_POLICY.ALWAYS.value,
                 # "image": "${DOT_OVERRIDES_REGISTRY_NAMESPACE:-docker.io/openstudiolandscapes}/%s:%s"
                 # % (build["image_name"], build["image_tags"][0]),
@@ -754,9 +744,9 @@ def compose_dagster(
                 ),
                 **copy.deepcopy(network_dict),
                 "environment": {
-                    "TZ": config_engine.tz,
+                    "TZ": config_ConfigEngineConfigurableResource.tz,
                     "DAGSTER_HOME": CONFIG.dagster_home.as_posix(),
-                    **config_engine.global_environment_variables,
+                    **config_ConfigEngineConfigurableResource.global_environment_variables,
                     **CONFIG.local_environment_variables,
                 },
                 "healthcheck": {
@@ -815,14 +805,13 @@ def compose_dagster(
 )
 def compose_postgres(
     context: AssetExecutionContext,
+    config_ConfigEngineConfigurableResource: ConfigEngineConfigurableResource,
     CONFIG: config.models.Config,  # pylint: disable=redefined-outer-name
     compose_networks: Dict,  # pylint: disable=redefined-outer-name
 ) -> Generator[Output[Dict] | AssetMaterialization, None, None]:
     """ """
 
     env: Dict = CONFIG.env
-
-    config_engine: ConfigEngine = CONFIG.config_engine
 
     if not CONFIG.dagster_enable_postgres:
 
@@ -895,7 +884,7 @@ def compose_postgres(
             "volumes": list(
                 {
                     *_volume_relative,
-                    *config_engine.global_bind_volumes,
+                    *config_ConfigEngineConfigurableResource.global_bind_volumes,
                     *CONFIG.local_bind_volumes,
                 }
             )
@@ -906,7 +895,7 @@ def compose_postgres(
             context=context,
             service_name=service_name,
             landscape_id=env.get("LANDSCAPE", "default"),
-            domain_lan=config_engine.openstudiolandscapes__domain_lan,
+            domain_lan=config_ConfigEngineConfigurableResource.openstudiolandscapes__domain_lan,
         )
 
         docker_dict = {
@@ -914,18 +903,18 @@ def compose_postgres(
                 service_name: {
                     "container_name": container_name,
                     "hostname": host_name,
-                    "domainname": config_engine.openstudiolandscapes__domain_lan,
+                    "domainname": config_ConfigEngineConfigurableResource.openstudiolandscapes__domain_lan,
                     "restart": DockerComposePolicies.RESTART_POLICY.ALWAYS.value,
                     "image": CONFIG.dagster_postgres_image,
                     **copy.deepcopy(network_dict),
                     "environment": {
-                        "TZ": config_engine.tz,
+                        "TZ": config_ConfigEngineConfigurableResource.tz,
                         "POSTGRES_USER": CONFIG.dagster_postgres_user,
                         "POSTGRES_PASSWORD": CONFIG.dagster_postgres_password,
                         "POSTGRES_DB": CONFIG.dagster_postgres_db,
                         "PGDATA": CONFIG.dagster_postgres_pgdata.as_posix(),
                         # ??? "POSTGRES_PORT": env.get("PGDAPOSTGRES_PORT_CONTAINERTA"),
-                        **config_engine.global_environment_variables,
+                        **config_ConfigEngineConfigurableResource.global_environment_variables,
                         **CONFIG.local_environment_variables,
                     },
                     "healthcheck": {
