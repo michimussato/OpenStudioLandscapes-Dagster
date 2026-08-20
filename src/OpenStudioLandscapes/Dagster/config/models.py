@@ -7,7 +7,7 @@ from pydantic import (
     PositiveInt,
 )
 
-from OpenStudioLandscapes.Dagster import (
+from OpenStudioLandscapes.Dagster.constants import (
     ASSET_HEADER,
     LOGGER,
     dist,
