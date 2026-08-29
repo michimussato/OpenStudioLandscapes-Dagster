@@ -4,7 +4,7 @@ from dagster import (
 )
 
 import OpenStudioLandscapes.Dagster.assets
-from OpenStudioLandscapes.Dagster import (
+from OpenStudioLandscapes.Dagster.constants import (
     LOGGER,
     dist,
 )
