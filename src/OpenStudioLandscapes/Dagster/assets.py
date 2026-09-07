@@ -50,11 +50,11 @@ from OpenStudioLandscapes.engine.utils.docker.compose_dicts import (
     get_network_dicts,
 )
 
+from OpenStudioLandscapes.Dagster.config import models
 from OpenStudioLandscapes.Dagster.constants import (
     ASSET_HEADER,
     dist,
 )
-from OpenStudioLandscapes.Dagster.config import models
 
 # Todo:
 #  - [ ] Create dagster.yaml dynamically

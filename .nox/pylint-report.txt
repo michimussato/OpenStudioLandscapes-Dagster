@@ -32,14 +32,14 @@ src/OpenStudioLandscapes/Dagster/assets.py:968:0: C0116: Missing function or met
 ************* Module OpenStudioLandscapes.Dagster.definitions
 src/OpenStudioLandscapes/Dagster/definitions.py:1:0: C0114: Missing module docstring (missing-module-docstring)
 src/OpenStudioLandscapes/Dagster/definitions.py:12:0: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+************* Module OpenStudioLandscapes.Dagster.constants
+src/OpenStudioLandscapes/Dagster/constants.py:14:5: W0511: TODO: Import directly (no need for conditional) when `python_requires = >= 3.8` (fixme)
+src/OpenStudioLandscapes/Dagster/constants.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+src/OpenStudioLandscapes/Dagster/constants.py:38:4: C0103: Constant name "fill" doesn't conform to UPPER_CASE naming style (invalid-name)
 ************* Module OpenStudioLandscapes.Dagster._definitions_with_upstream_specs
 src/OpenStudioLandscapes/Dagster/_definitions_with_upstream_specs.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-************* Module OpenStudioLandscapes.Dagster.__init__
-src/OpenStudioLandscapes/Dagster/__init__.py:15:5: W0511: TODO: Import directly (no need for conditional) when `python_requires = >= 3.8` (fixme)
 ************* Module OpenStudioLandscapes.Dagster
-src/OpenStudioLandscapes/Dagster/__init__.py:1:0: C0114: Missing module docstring (missing-module-docstring)
 src/OpenStudioLandscapes/Dagster/__init__.py:1:0: C0103: Module name "Dagster" doesn't conform to snake_case naming style (invalid-name)
-src/OpenStudioLandscapes/Dagster/__init__.py:39:4: C0103: Constant name "fill" doesn't conform to UPPER_CASE naming style (invalid-name)
 ************* Module OpenStudioLandscapes.Dagster.config.models
 src/OpenStudioLandscapes/Dagster/config/models.py:25:0: C0301: Line too long (108/100) (line-too-long)
 src/OpenStudioLandscapes/Dagster/config/models.py:117:0: C0301: Line too long (163/100) (line-too-long)
@@ -63,5 +63,5 @@ src/OpenStudioLandscapes/Dagster/doc/readme.py:21:8: C2801: Unnecessarily calls 
 src/OpenStudioLandscapes/Dagster/doc/readme.py:39:8: C2801: Unnecessarily calls dunder method __str__. Use str built-in function. (unnecessary-dunder-call)
 
 ------------------------------------------------------------------
-Your code has been rated at 7.78/10 (previous run: 7.99/10, -0.21)
+Your code has been rated at 7.79/10 (previous run: 7.90/10, -0.11)
 
