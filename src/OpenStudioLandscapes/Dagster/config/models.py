@@ -115,6 +115,12 @@ class Config(FeatureBaseModel):
             "dagster-postgres==0.25.11",
             # OpenStudioLandscapes-Dagster Showcase package:
             # "OpenStudioLandscapes-DagsterCodeLocation-Showcase @ git+https://github.com/michimussato/OpenStudioLandscapes-DagsterCodeLocation-Showcase.git@main",
+            # Todo:
+            #  - [ ] dagster 1.9.11 seems to have problems with
+            #        newer versions of psycopg (v3)
+            #        We lock to the following versions:
+            "SQLAlchemy==2.0.49",
+            "psycopg2-binary==2.9.11",
         ],
         frozen=True,
     )
